@@ -93,6 +93,16 @@ class ProductPayablesDetail extends Component
         $this->showingModal = false;
     }
 
+    public function updated($name, $value)
+    {
+        if ($name == 'payable.margin') {
+            if ($value >= 0) {
+                $percentage = $this->payable->cost * ($value / 100);
+                $this->payable->total = number_format($this->payable->cost + $percentage, 2);
+            }
+        }
+    }
+
     public function save()
     {
         $this->validate();
