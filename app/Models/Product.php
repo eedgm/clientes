@@ -11,7 +11,7 @@ class Product extends Model
     use HasFactory;
     use Searchable;
 
-    protected $fillable = ['name', 'url', 'description', 'client_id'];
+    protected $fillable = ['name', 'url', 'description', 'client_id', 'RUC', 'DV', 'direction'];
 
     protected $searchableFields = ['*'];
 

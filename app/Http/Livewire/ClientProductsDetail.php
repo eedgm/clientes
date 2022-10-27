@@ -27,6 +27,9 @@ class ClientProductsDetail extends Component
         'product.name' => ['required', 'max:255', 'string'],
         'product.url' => ['nullable', 'url'],
         'product.description' => ['nullable', 'max:255', 'string'],
+        'product.direction' => ['nullable', 'max:255', 'string'],
+        'product.RUC' => ['nullable', 'max:255', 'string'],
+        'product.DV' => ['nullable', 'max:255', 'string'],
     ];
 
     public function mount(Client $client)

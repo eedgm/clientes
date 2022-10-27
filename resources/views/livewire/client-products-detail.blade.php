@@ -8,7 +8,7 @@
         @endcan @can('delete-any', App\Models\Product::class)
         <button
             class="button button-danger"
-             {{ empty($selected) ? 'disabled' : '' }} 
+                {{ empty($selected) ? 'disabled' : '' }}
             onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
             wire:click="destroySelected"
         >
@@ -45,6 +45,36 @@
                     </x-inputs.group>
 
                     <x-inputs.group class="w-full">
+                        <x-inputs.text
+                            name="product.RUC"
+                            label="RUC"
+                            maxlength="255"
+                            placeholder="RUC"
+                            wire:model="product.RUC"
+                        ></x-inputs.text>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full">
+                        <x-inputs.text
+                            name="DV"
+                            label="DV"
+                            maxlength="255"
+                            placeholder="DV"
+                            wire:model="product.DV"
+                        ></x-inputs.text>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full">
+                        <x-inputs.textarea
+                            name="direction"
+                            label="Direction"
+                            maxlength="255"
+                            wire:model="product.direction"
+                            ></x-inputs.textarea
+                        >
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full">
                         <x-inputs.textarea
                             name="product.description"
                             label="Description"
@@ -57,20 +87,20 @@
 
             @if($editing) @can('view-any', App\Models\Ticket::class)
             <x-partials.card class="mt-5 shadow-none bg-gray-50">
-                <h4 class="text-sm text-gray-600 font-bold mb-3">Tickets</h4>
+                <h4 class="mb-3 text-sm font-bold text-gray-600">Tickets</h4>
 
                 <livewire:product-tickets-detail :product="$product" />
             </x-partials.card>
             @endcan @can('view-any', App\Models\Payable::class)
             <x-partials.card class="mt-5 shadow-none bg-gray-50">
-                <h4 class="text-sm text-gray-600 font-bold mb-3">Payables</h4>
+                <h4 class="mb-3 text-sm font-bold text-gray-600">Payables</h4>
 
                 <livewire:product-payables-detail :product="$product" />
             </x-partials.card>
             @endcan @endif
         </div>
 
-        <div class="px-6 py-4 bg-gray-50 flex justify-between">
+        <div class="flex justify-between px-6 py-4 bg-gray-50">
             <button
                 type="button"
                 class="button"
@@ -91,11 +121,11 @@
         </div>
     </x-modal>
 
-    <div class="block w-full overflow-auto scrolling-touch mt-4">
+    <div class="block w-full mt-4 overflow-auto scrolling-touch">
         <table class="w-full max-w-full mb-4 bg-transparent">
             <thead class="text-gray-700">
                 <tr>
-                    <th class="px-4 py-3 text-left w-1">
+                    <th class="w-1 px-4 py-3 text-left">
                         <input
                             type="checkbox"
                             wire:model="allSelected"
@@ -157,7 +187,7 @@
             <tfoot>
                 <tr>
                     <td colspan="4">
-                        <div class="mt-10 px-4">{{ $products->render() }}</div>
+                        <div class="px-4 mt-10">{{ $products->render() }}</div>
                     </td>
                 </tr>
             </tfoot>

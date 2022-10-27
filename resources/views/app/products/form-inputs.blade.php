@@ -23,6 +23,38 @@
     </x-inputs.group>
 
     <x-inputs.group class="w-full">
+        <x-inputs.text
+            name="RUC"
+            label="RUC"
+            :value="old('RUC', ($editing ? $product->RUC : ''))"
+            maxlength="255"
+            placeholder="RUC"
+            required
+        ></x-inputs.text>
+    </x-inputs.group>
+
+    <x-inputs.group class="w-full">
+        <x-inputs.text
+            name="DV"
+            label="DV"
+            :value="old('DV', ($editing ? $product->DV : ''))"
+            maxlength="255"
+            placeholder="DV"
+            required
+        ></x-inputs.text>
+    </x-inputs.group>
+
+    <x-inputs.group class="w-full">
+        <x-inputs.textarea
+            name="direction"
+            label="Direction"
+            maxlength="255"
+            >{{ old('direction', ($editing ? $product->direction : ''))
+            }}</x-inputs.textarea
+        >
+    </x-inputs.group>
+
+    <x-inputs.group class="w-full">
         <x-inputs.textarea
             name="description"
             label="Description"
