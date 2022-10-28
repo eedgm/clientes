@@ -47,6 +47,8 @@ Route::middleware(['auth:sanctum', 'verified'])
 Route::prefix('/')
     ->middleware(['auth:sanctum', 'verified'])
     ->group(function () {
+        Route::get('/client/receipt/pdf/{receipt}', [ReceiptController::class, 'createPDF'])->name('client.receipt');
+
         Route::resource('roles', RoleController::class);
         Route::resource('permissions', PermissionController::class);
 

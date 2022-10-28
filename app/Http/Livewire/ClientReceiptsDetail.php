@@ -66,9 +66,9 @@ class ClientReceiptsDetail extends Component
         $this->receipt = $receipt;
 
         $this->receiptRealDate = $this->receipt->real_date->format('Y-m-d');
-        $this->receiptDateCharged = $this->receipt->date_charged->format(
+        $this->receiptDateCharged = $this->receipt->date_charged ? $this->receipt->date_charged->format(
             'Y-m-d'
-        );
+        ) : '';
 
         $this->dispatchBrowserEvent('refresh');
 

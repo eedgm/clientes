@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\Ticket;
+use App\Models\Payable;
 use App\Models\Receipt;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Http\Requests\ReceiptStoreRequest;
 use App\Http\Requests\ReceiptUpdateRequest;
@@ -116,5 +119,34 @@ class ReceiptController extends Controller
         return redirect()
             ->route('receipts.index')
             ->withSuccess(__('crud.common.removed'));
+    }
+
+    public function createPDF(Receipt $receipt)
+    {
+        $result = [];
+        $payables = Payable::where('receipt_id', $receipt->id)->get();
+        $tickets = Ticket::where('receipt_id', $receipt->id)->get();
+
+        $total = 0;
+
+        foreach ($payables as $payable) {
+            $result['payables'][$payable->id]['product'] = $payable->product->name;
+            $result['payables'][$payable->id]['date'] = $payable->date->format('Y-m-d');
+            $result['payables'][$payable->id]['description'] = $payable->name;
+            $result['payables'][$payable->id]['cost'] = $payable->total;
+            $total += $payable->total;
+        }
+
+        foreach ($tickets as $ticket) {
+            $result['tickets'][$ticket->id]['product'] = $ticket->product->name;
+            $result['tickets'][$ticket->id]['date'] = $ticket->finished_ticket->format('Y-m-d');
+            $result['tickets'][$ticket->id]['description'] = $ticket->description;
+            $result['tickets'][$ticket->id]['cost'] = $ticket->total;
+            $total += $ticket->total;
+        }
+
+        $pdf = Pdf::loadView('app.receipts.invoice', ['results' => $result, 'receipt' => $receipt, 'total' => $total]);
+        $name = 'estado-de-cuenta-'.$receipt->client->name.'-'.$receipt->number;
+        return $pdf->download($name.'.pdf');
     }
 }

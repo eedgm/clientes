@@ -9,6 +9,11 @@
             Users
         </x-sidebar-link>
     @endcan
+    @can('view-any', App\Models\Receipt::class)
+        <x-sidebar-link href="{{ route('receipts.index') }}" :active="request()->routeIs('receipts.index')" icon="{{ 'bx-receipt' }}">
+            Receipts
+        </x-sidebar-link>
+    @endcan
     @can('view-any', App\Models\Supplier::class)
         <x-sidebar-link href="{{ route('suppliers.index') }}" :active="request()->routeIs('suppliers.index')" icon="{{ 'bx-network-chart' }}">
             Suppliers

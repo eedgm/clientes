@@ -19,9 +19,10 @@ class DashboardPieChart extends Component
     public $colors = [
         'Created' => '#008000',
         'In Progress' => '#FF0000',
-        'entertainment' => '#90cdf4',
-        'travel' => '#66DA26',
-        'other' => '#cbd5e0',
+        'Completed' => '#90cdf4',
+        'Waiting for client' => '#66DA26',
+        'Late' => '#cbd5e0',
+        'In Progress' => '#FF00FF',
     ];
 
     public function mount() {
