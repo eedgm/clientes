@@ -122,22 +122,26 @@
 					</tr>
 				</thead>
 				<tbody>
-                    @foreach ($results['payables'] as $result)
-                        <tr>
-                            <td><span>{{ $result['product'] }}</span></td>
-                            <td><span>{{ $result['date'] }}</span></td>
-                            <td><span>{{ $result['description'] }}</span></td>
-                            <td><span>{{ $result['cost'] }}</span></td>
-                        </tr>
-                    @endforeach
-					@foreach ($results['tickets'] as $result)
-                        <tr>
-                            <td><span>{{ $result['product'] }}</span></td>
-                            <td><span>{{ $result['date'] }}</span></td>
-                            <td><span>{{ $result['description'] }}</span></td>
-                            <td><span>$ {{ $result['cost'] }}</span></td>
-                        </tr>
-                    @endforeach
+                    @if (isset($results['payables']))
+                        @foreach ($results['payables'] as $result)
+                            <tr>
+                                <td><span>{{ $result['product'] }}</span></td>
+                                <td><span>{{ $result['date'] }}</span></td>
+                                <td><span>{{ $result['description'] }}</span></td>
+                                <td><span>{{ $result['cost'] }}</span></td>
+                            </tr>
+                        @endforeach
+                    @endif
+                    @if (isset($results['tickets']))
+                        @foreach ($results['tickets'] as $result)
+                            <tr>
+                                <td><span>{{ $result['product'] }}</span></td>
+                                <td><span>{{ $result['date'] }}</span></td>
+                                <td><span>{{ $result['description'] }}</span></td>
+                                <td><span>$ {{ $result['cost'] }}</span></td>
+                            </tr>
+                        @endforeach
+                    @endif
 				</tbody>
 			</table>
             <table class="balance">
