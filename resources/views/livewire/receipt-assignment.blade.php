@@ -180,7 +180,9 @@
     </x-modal>
 
     <div class="text-right">
-        <a class="px-5 py-2 text-white bg-blue-600 hover:shadow rounded-3xl" href="{{ route('client.receipt', $receipt_id) }}">Exportar a Pdf</a>
+        @if (isset($results['payables']) || isset($results['tickets']))
+            <a class="px-5 py-2 text-white bg-blue-600 hover:shadow rounded-3xl" href="{{ route('client.receipt', $receipt_id) }}">Exportar a Pdf</a>
+        @endif
     </div>
 
     <table class="w-full max-w-full mb-4 bg-transparent">
@@ -202,7 +204,7 @@
         </thead>
         <tbody class="text-gray-600">
 
-            <tr class="hover:bg-gray-100">
+            @if (isset($results['payables']))
                 @foreach ($results['payables'] as $result)
                     <tr class="hover:bg-gray-100">
                         <td class="px-4 py-3 text-left">{{ $result['product'] }}</td>
@@ -211,6 +213,8 @@
                         <td class="px-4 py-3 text-right">{{ $result['cost'] }}</td>
                     </tr>
                 @endforeach
+            @endif
+            @if (isset($results['tickets']))
                 @foreach ($results['tickets'] as $result)
                     <tr class="hover:bg-gray-100">
                         <td class="px-4 py-3 text-left">{{ $result['product'] }}</td>
@@ -219,7 +223,7 @@
                         <td class="px-4 py-3 text-right">{{ $result['cost'] }}</td>
                     </tr>
                 @endforeach
-            </tr>
+            @endif
         </tbody>
     </table>
 
