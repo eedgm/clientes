@@ -128,7 +128,7 @@
                                 <td><span>{{ $result['product'] }}</span></td>
                                 <td><span>{{ $result['date'] }}</span></td>
                                 <td><span>{{ $result['description'] }}</span></td>
-                                <td><span>{{ $result['cost'] }}</span></td>
+                                <td><span data-prefix>$ </span><span>{{ $result['cost'] }}</span></td>
                             </tr>
                         @endforeach
                     @endif
@@ -138,7 +138,7 @@
                                 <td><span>{{ $result['product'] }}</span></td>
                                 <td><span>{{ $result['date'] }}</span></td>
                                 <td><span>{{ $result['description'] }}</span></td>
-                                <td><span>$ {{ $result['cost'] }}</span></td>
+                                <td><span data-prefix>$ </span><span>{{ $result['cost'] }}</span></td>
                             </tr>
                         @endforeach
                     @endif
@@ -146,7 +146,7 @@
 			</table>
             <table class="balance">
 				<tr>
-					<th><span contenteditable>Total</span></th>
+					<th><span>Total</span></th>
 					<td><span data-prefix>$ </span><span>{{ number_format($total, 2) }}</span></td>
 				</tr>
 			</table>
