@@ -145,8 +145,9 @@ class ReceiptController extends Controller
             $total += $ticket->total;
         }
 
-        $pdf = Pdf::loadView('app.receipts.invoice', ['results' => $result, 'receipt' => $receipt, 'total' => $total]);
         $name = 'estado-de-cuenta-'.$receipt->client->name.'-'.$receipt->number;
+
+        $pdf = Pdf::loadView('app.receipts.invoice', ['results' => $result, 'receipt' => $receipt, 'total' => $total, 'name' => $name]);
         return $pdf->download($name.'.pdf');
     }
 }

@@ -29,7 +29,6 @@
                             name="ticket.description"
                             label="Description"
                             wire:model="ticket.description"
-                            maxlength="255"
                         ></x-inputs.textarea>
                     </x-inputs.group>
 
@@ -177,12 +176,6 @@
                         @lang('crud.product_tickets.inputs.finished_ticket')
                     </th>
                     <th class="px-4 py-3 text-left">
-                        @lang('crud.product_tickets.inputs.comments')
-                    </th>
-                    <th class="px-4 py-3 text-left">
-                        @lang('crud.product_tickets.inputs.receipt_id')
-                    </th>
-                    <th class="px-4 py-3 text-left">
                         @lang('crud.product_tickets.inputs.person_id')
                     </th>
                     <th></th>
@@ -215,12 +208,6 @@
                     </td>
                     <td class="px-4 py-3 text-left">
                         {{ $ticket->finished_ticket ?? '-' }}
-                    </td>
-                    <td class="px-4 py-3 text-left">
-                        {{ $ticket->comments ?? '-' }}
-                    </td>
-                    <td class="px-4 py-3 text-left">
-                        {{ optional($ticket->receipt)->description ?? '-' }}
                     </td>
                     <td class="px-4 py-3 text-left">
                         {{ optional($ticket->person)->description ?? '-' }}

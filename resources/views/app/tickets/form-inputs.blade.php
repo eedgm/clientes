@@ -5,7 +5,6 @@
         <x-inputs.textarea
             name="description"
             label="Description"
-            maxlength="255"
             required
             >{{ old('description', ($editing ? $ticket->description : ''))
             }}</x-inputs.textarea
