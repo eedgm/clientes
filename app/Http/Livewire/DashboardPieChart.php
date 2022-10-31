@@ -69,6 +69,7 @@ class DashboardPieChart extends Component
         }
 
         $tickets = Ticket::join('status', 'tickets.statu_id', '=', 'status.id')
+            ->where('receipt_id', null)
             ->select('status.id', 'status.name', Ticket::raw('count(statu_id) as total'))->groupBy('statu_id')->get();
 
         $ticketsPieChartModel = $tickets->reduce(function ($ticketsPieChartModel, $data, $key) {
@@ -82,6 +83,7 @@ class DashboardPieChart extends Component
             );
 
         $tasks = Task::join('status', 'tasks.statu_id', '=', 'status.id')
+            ->where('receipt_id', null)
             ->select('status.id', 'status.name', Task::raw('count(statu_id) as total'))->groupBy('statu_id')->get();
 
         $tasksPieChartModel = $tasks->reduce(function ($tasksPieChartModel, $data, $key) {
