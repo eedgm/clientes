@@ -32,6 +32,12 @@
                     <thead class="text-gray-700">
                         <tr>
                             <th class="px-4 py-3 text-left">
+                                @lang('crud.clients.name')
+                            </th>
+                            <th class="px-4 py-3 text-left">
+                                @lang('crud.products.name')
+                            </th>
+                            <th class="px-4 py-3 text-left">
                                 @lang('crud.product_tickets.inputs.description')
                             </th>
                             <th class="px-4 py-3 text-left">
@@ -54,6 +60,12 @@
                     <tbody class="text-gray-600">
                             @foreach ($tickets_show as $ticket)
                             <tr class="hover:bg-gray-100">
+                                <td class="px-4 py-3 text-left">
+                                    {{ $ticket->product->client->name ?? '-' }}
+                                </td>
+                                <td class="px-4 py-3 text-left">
+                                    {{ $ticket->product->name ?? '-' }}
+                                </td>
                                 <td class="px-4 py-3 text-left">
                                     {{ $ticket->description ?? '-' }}
                                 </td>

@@ -65,7 +65,7 @@ class DashboardPieChart extends Component
     {
         $this->tickets_show = Ticket::where('statu_id', 1)->get();
         if ($this->model == 'tickets') {
-            $this->tickets_show = Ticket::where('statu_id', $this->status)->get();
+            $this->tickets_show = Ticket::where('statu_id', $this->status)->where('receipt_id', null)->get();
         }
 
         $tickets = Ticket::join('status', 'tickets.statu_id', '=', 'status.id')
