@@ -200,6 +200,7 @@
                 <th class="px-4 py-3 text-right">
                     Costo
                 </th>
+                <th></th>
             </tr>
         </thead>
         <tbody class="text-gray-600">
@@ -210,7 +211,14 @@
                         <td class="px-4 py-3 text-left">{{ $result['product'] }}</td>
                         <td class="px-4 py-3 text-left">{{ $result['date'] }}</td>
                         <td class="px-4 py-3 text-left">{{ $result['description'] }}</td>
-                        <td class="px-4 py-3 text-right">{{ $result['cost'] }}</td>
+                        <td class="px-4 py-3 text-right">$ {{ $result['cost'] }}</td>
+                        <td class="px-4 py-3 text-right">
+                            <i
+                                class="cursor-pointer bx bx-x hover:text-blue-600"
+                                wire:click="removePayable({{ $result['id'] }})"
+                                >
+                            </i>
+                        </td>
                     </tr>
                 @endforeach
             @endif
@@ -220,7 +228,14 @@
                         <td class="px-4 py-3 text-left">{{ $result['product'] }}</td>
                         <td class="px-4 py-3 text-left">{{ $result['date'] }}</td>
                         <td class="px-4 py-3 text-left">{{ $result['description'] }}</td>
-                        <td class="px-4 py-3 text-right">{{ $result['cost'] }}</td>
+                        <td class="px-4 py-3 text-right">$ {{ $result['cost'] }}</td>
+                        <td class="px-4 py-3 text-right">
+                            <i
+                                class="cursor-pointer bx bx-x hover:text-blue-600"
+                                wire:click="removeTicket({{ $result['id'] }})"
+                                >
+                            </i>
+                        </td>
                     </tr>
                 @endforeach
             @endif

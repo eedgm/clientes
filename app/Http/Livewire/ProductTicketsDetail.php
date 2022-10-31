@@ -119,9 +119,9 @@ class ProductTicketsDetail extends Component
             $this->authorize('update', $this->ticket);
         }
 
-        $this->ticket->finished_ticket = \Carbon\Carbon::parse(
+        $this->ticket->finished_ticket = $this->ticket->finished_ticket ? \Carbon\Carbon::parse(
             $this->ticketFinishedTicket
-        );
+        ) : null;
 
         $this->ticket->save();
 

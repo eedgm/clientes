@@ -94,6 +94,7 @@ class ReceiptAssignment extends Component
         $total = 0;
 
         foreach ($payables as $payable) {
+            $result['payables'][$payable->id]['id'] = $payable->id;
             $result['payables'][$payable->id]['product'] = $payable->product->name;
             $result['payables'][$payable->id]['date'] = $payable->date->format('Y-m-d');
             $result['payables'][$payable->id]['description'] = $payable->name;
@@ -102,6 +103,7 @@ class ReceiptAssignment extends Component
         }
 
         foreach ($tickets as $ticket) {
+            $result['tickets'][$ticket->id]['id'] = $ticket->id;
             $result['tickets'][$ticket->id]['product'] = $ticket->product->name;
             $result['tickets'][$ticket->id]['date'] = $ticket->finished_ticket->format('Y-m-d');
             $result['tickets'][$ticket->id]['description'] = $ticket->description;
@@ -117,5 +119,15 @@ class ReceiptAssignment extends Component
                 'total' => $total,
                 'receipt_id' => $this->receipt->id
             ]);
+    }
+
+    public function removePayable($id)
+    {
+        Payable::where('id', $id)->update(['receipt_id' => null]);
+    }
+
+    public function removeTicket($ticket)
+    {
+        Ticket::where('id', $id)->update(['receipt_id' => null]);
     }
 }
