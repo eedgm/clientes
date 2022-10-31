@@ -125,7 +125,7 @@ class ReceiptAssignment extends Component
         Payable::where('id', $id)->update(['receipt_id' => null]);
     }
 
-    public function removeTicket($ticket)
+    public function removeTicket($id)
     {
         Ticket::where('id', $id)->update(['receipt_id' => null]);
     }
