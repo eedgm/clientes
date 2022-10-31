@@ -10,7 +10,6 @@ use Livewire\Component;
 
 class ReceiptAssignment extends Component
 {
-
     public $modalTitle = "Agregar pagos";
     public $showingModal = false;
     public Client $client;

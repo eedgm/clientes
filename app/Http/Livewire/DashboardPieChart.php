@@ -15,6 +15,13 @@ class DashboardPieChart extends Component
     public $person;
     public $owner;
     public $user;
+    public $status;
+    public $model;
+    public $tickets_show = null;
+
+    public $showingModal = false;
+    public $modalTitle = "Detalle";
+    public $showDataLabels = true;
 
     public $colors = [
         'Created' => '#008000',
@@ -27,6 +34,7 @@ class DashboardPieChart extends Component
 
     public function mount() {
         $this->user = Auth::user();
+        $this->showingModal = false;
         if (!$this->userHasRole($this->user, 'super-admin')) {
             $this->developer = Developer::where('user_id', $this->user->id)->get();
         }
@@ -36,10 +44,11 @@ class DashboardPieChart extends Component
         'onSliceClick' => 'handleOnSliceClick',
     ];
 
-    public $showDataLabels = true;
-
     public function handleOnSliceClick($slice) {
-        dump($slice);
+        $this->status = $slice['extras']['status_id'];
+        $this->model = $slice['extras']['model'];
+
+        $this->showingModal = true;
     }
 
     private function userHasRole($user, $roles) {
@@ -54,31 +63,42 @@ class DashboardPieChart extends Component
 
     public function render()
     {
+        $this->tickets_show = Ticket::where('statu_id', 1)->get();
+        if ($this->model == 'tickets') {
+            $this->tickets_show = Ticket::where('statu_id', $this->status)->get();
+        }
+
         $tickets = Ticket::join('status', 'tickets.statu_id', '=', 'status.id')
-            ->select('status.name', Ticket::raw('count(statu_id) as total'))->groupBy('statu_id')->get();
+            ->select('status.id', 'status.name', Ticket::raw('count(statu_id) as total'))->groupBy('statu_id')->get();
 
         $ticketsPieChartModel = $tickets->reduce(function ($ticketsPieChartModel, $data, $key) {
                 $type = $data->name;
                 $value = $data->total;
 
-                return $ticketsPieChartModel->addSlice($type, $value, $this->colors[$type]);
+                return $ticketsPieChartModel->addSlice($type, $value, $this->colors[$type], ['model' => 'tickets', 'status_id' => $data->id]);
             }, (new PieChartModel())
                 ->withOnSliceClickEvent('onSliceClick')
                 ->setDataLabelsEnabled($this->showDataLabels)
             );
 
         $tasks = Task::join('status', 'tasks.statu_id', '=', 'status.id')
-            ->select('status.name', Task::raw('count(statu_id) as total'))->groupBy('statu_id')->get();
+            ->select('status.id', 'status.name', Task::raw('count(statu_id) as total'))->groupBy('statu_id')->get();
 
         $tasksPieChartModel = $tasks->reduce(function ($tasksPieChartModel, $data, $key) {
                 $type = $data->name;
                 $value = $data->total;
 
-                return $tasksPieChartModel->addSlice($type, $value, $this->colors[$type]);
+                return $tasksPieChartModel->addSlice($type, $value, $this->colors[$type], ['model' => 'tasks', 'status_id' => $data->id]);
             }, (new PieChartModel())
                 ->withOnSliceClickEvent('onSliceClick')
                 ->setDataLabelsEnabled($this->showDataLabels)
             );
-        return view('livewire.dashboard-pie-chart', compact('tasksPieChartModel', 'ticketsPieChartModel'));
+
+        return view('livewire.dashboard-pie-chart',
+            [
+                'tasksPieChartModel' => $tasksPieChartModel,
+                'ticketsPieChartModel' => $ticketsPieChartModel,
+                'tickets_show' => $this->tickets_show,
+            ]);
     }
 }
