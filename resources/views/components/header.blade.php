@@ -15,6 +15,9 @@
         <a class="ml-5 text-blue-700 hover:underline" href="{{ route('clients.index') }}">
             Clients
         </a>
+        <a class="ml-5 text-blue-700 hover:underline" href="{{ route('tickets.index') }}">
+            Tickets
+        </a>
     </div>
 
     <div class="flex items-center">
@@ -40,7 +43,7 @@
         </div> --}}
         @if(Auth::check())
             <div class="relative text-sm">
-                Welcome back: <a class="text-blue-500 hover:underline hover:text-blue-800" href="{{ route('profile.show') }}">{{ Auth::user()->name }}</a>
+                <a class="text-blue-500 hover:underline hover:text-blue-800" href="{{ route('profile.show') }}">{{ Auth::user()->name }}</a>
             </div>
         @endif
         <form method="POST" action="{{ route('logout') }}">

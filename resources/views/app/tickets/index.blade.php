@@ -1,14 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800">
             @lang('crud.tickets.index_title')
         </h2>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-9xl mx-auto sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-9xl sm:px-6 lg:px-8">
             <x-partials.card>
-                <div class="mb-5 mt-4">
+                <div class="mt-4 mb-5">
                     <div class="flex flex-wrap justify-between">
                         <div class="md:w-1/2">
                             <form>
@@ -31,7 +31,7 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="md:w-1/2 text-right">
+                        <div class="text-right md:w-1/2">
                             @can('create', App\Models\Ticket::class)
                             <a
                                 href="{{ route('tickets.create') }}"
@@ -74,9 +74,6 @@
                                     @lang('crud.tickets.inputs.product_id')
                                 </th>
                                 <th class="px-4 py-3 text-left">
-                                    @lang('crud.tickets.inputs.receipt_id')
-                                </th>
-                                <th class="px-4 py-3 text-left">
                                     @lang('crud.tickets.inputs.person_id')
                                 </th>
                                 <th></th>
@@ -86,7 +83,7 @@
                             @forelse($tickets as $ticket)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-4 py-3 text-left">
-                                    {{ $ticket->description ?? '-' }}
+                                    {{ $ticket->excerpt() ?? '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-left">
                                     {{ optional($ticket->statu)->name ?? '-' }}
@@ -102,7 +99,7 @@
                                     {{ $ticket->total ?? '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-left">
-                                    {{ $ticket->finished_ticket ?? '-' }}
+                                    {{ $ticket->finished_ticket ? $ticket->finished_ticket->format('Y-m-d') : '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-left">
                                     {{ $ticket->comments ?? '-' }}
@@ -110,10 +107,6 @@
                                 <td class="px-4 py-3 text-left">
                                     {{ optional($ticket->product)->name ?? '-'
                                     }}
-                                </td>
-                                <td class="px-4 py-3 text-left">
-                                    {{ optional($ticket->receipt)->description
-                                    ?? '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-left">
                                     {{ optional($ticket->person)->description ??
@@ -126,11 +119,7 @@
                                     <div
                                         role="group"
                                         aria-label="Row Actions"
-                                        class="
-                                            relative
-                                            inline-flex
-                                            align-middle
-                                        "
+                                        class="relative inline-flex align-middle "
                                     >
                                         @can('update', $ticket)
                                         <a
@@ -170,11 +159,7 @@
                                                 class="button"
                                             >
                                                 <i
-                                                    class="
-                                                        icon
-                                                        ion-md-trash
-                                                        text-red-600
-                                                    "
+                                                    class="text-red-600 icon ion-md-trash"
                                                 ></i>
                                             </button>
                                         </form>
@@ -193,7 +178,7 @@
                         <tfoot>
                             <tr>
                                 <td colspan="11">
-                                    <div class="mt-10 px-4">
+                                    <div class="px-4 mt-10">
                                         {!! $tickets->render() !!}
                                     </div>
                                 </td>

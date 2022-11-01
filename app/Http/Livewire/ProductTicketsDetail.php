@@ -87,9 +87,7 @@ class ProductTicketsDetail extends Component
         $this->modalTitle = trans('crud.product_tickets.edit_title');
         $this->ticket = $ticket;
 
-        $this->ticketFinishedTicket = $this->ticket->finished_ticket->format(
-            'Y-m-d'
-        );
+        $this->ticketFinishedTicket = $this->ticket->finished_ticket ? $this->ticket->finished_ticket->format('Y-m-d') : null;
 
         $this->dispatchBrowserEvent('refresh');
 

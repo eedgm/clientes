@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use App\Models\Scopes\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -65,5 +66,10 @@ class Ticket extends Model
     public function developers()
     {
         return $this->belongsToMany(Developer::class);
+    }
+
+    public function excerpt()
+    {
+        return Str::limit($this->description, 50);
     }
 }

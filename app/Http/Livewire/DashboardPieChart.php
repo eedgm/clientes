@@ -61,6 +61,19 @@ class DashboardPieChart extends Component
         return $rol;
     }
 
+    public function updateData($name, $id, $value) {
+        $ticket = Ticket::where('id', $id)->first();
+        if ($name == 'hours') {
+            $client_cost = $ticket->product->client->cost_per_hour;
+            $total = $value * $client_cost;
+            $ticket->hours = $value;
+            $ticket->total = $total;
+            $ticket->update();
+        }
+
+        $this->dispatchBrowserEvent('refresh');
+    }
+
     public function render()
     {
         $this->tickets_show = Ticket::where('statu_id', 1)->get();

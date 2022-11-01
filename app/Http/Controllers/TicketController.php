@@ -26,7 +26,7 @@ class TicketController extends Controller
 
         $tickets = Ticket::search($search)
             ->latest()
-            ->paginate(5)
+            ->paginate(10)
             ->withQueryString();
 
         return view('app.tickets.index', compact('tickets', 'search'));
@@ -43,8 +43,8 @@ class TicketController extends Controller
         $status = Statu::pluck('name', 'id');
         $priorities = Priority::pluck('name', 'id');
         $products = Product::pluck('name', 'id');
-        $receipts = Receipt::pluck('description', 'id');
-        $people = Person::pluck('description', 'id');
+        $receipts = Receipt::pluck('number', 'id');
+        $people = Person::join('users', 'users.id', '=', 'people.user_id')->pluck('users.name', 'people.id');
 
         return view(
             'app.tickets.create',
@@ -94,7 +94,7 @@ class TicketController extends Controller
         $priorities = Priority::pluck('name', 'id');
         $products = Product::pluck('name', 'id');
         $receipts = Receipt::pluck('description', 'id');
-        $people = Person::pluck('description', 'id');
+        $people = Person::join('users', 'users.id', '=', 'people.user_id')->where('client_id', $ticket->product->client->id)->pluck('users.name', 'people.id');
 
         return view(
             'app.tickets.edit',

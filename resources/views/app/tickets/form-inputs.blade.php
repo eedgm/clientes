@@ -36,7 +36,6 @@
             name="hours"
             label="Hours"
             :value="old('hours', ($editing ? $ticket->hours : ''))"
-            max="255"
             step="0.01"
             placeholder="Hours"
         ></x-inputs.number>
@@ -47,7 +46,6 @@
             name="total"
             label="Total"
             :value="old('total', ($editing ? $ticket->total : ''))"
-            max="255"
             step="0.01"
             placeholder="Total"
         ></x-inputs.number>
@@ -58,7 +56,6 @@
             name="finished_ticket"
             label="Finished Ticket"
             value="{{ old('finished_ticket', ($editing ? optional($ticket->finished_ticket)->format('Y-m-d') : '')) }}"
-            max="255"
         ></x-inputs.date>
     </x-inputs.group>
 

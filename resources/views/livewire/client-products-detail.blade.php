@@ -89,13 +89,13 @@
             <x-partials.card class="mt-5 shadow-none bg-gray-50">
                 <h4 class="mb-3 text-sm font-bold text-gray-600">Tickets</h4>
 
-                <livewire:product-tickets-detail :product="$product" />
+                <livewire:product-tickets-detail :product="$product" :key="$product->id" />
             </x-partials.card>
             @endcan @can('view-any', App\Models\Payable::class)
             <x-partials.card class="mt-5 shadow-none bg-gray-50">
                 <h4 class="mb-3 text-sm font-bold text-gray-600">Payables</h4>
 
-                <livewire:product-payables-detail :product="$product" />
+                <livewire:product-payables-detail :product="$product" :key="$product->id" />
             </x-partials.card>
             @endcan @endif
         </div>

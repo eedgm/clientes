@@ -75,10 +75,10 @@
                                 <td class="px-4 py-3 text-left">
                                     {{ optional($ticket->priority)->name ?? '-' }}
                                 </td>
-                                <td class="px-4 py-3 text-right">
+                                <td class="px-4 py-3 text-right" data-name="hours" data-id="{{ $ticket->id }}"contenteditable wire:blur="updateData($event.target.getAttribute('data-name'), $event.target.getAttribute('data-id'), $event.target.innerHTML)">
                                     {{ $ticket->hours ?? '-' }}
                                 </td>
-                                <td class="px-4 py-3 text-right">
+                                <td class="px-4 py-3 text-right" contenteditable wire:change="$emit.updateData(total, {{ $ticket->id }})">
                                     {{ $ticket->total ?? '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-left">
