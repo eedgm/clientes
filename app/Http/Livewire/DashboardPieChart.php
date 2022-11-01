@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Task;
+use App\Models\Statu;
 use App\Models\Ticket;
 use Livewire\Component;
 use App\Models\Developer;
@@ -25,11 +26,12 @@ class DashboardPieChart extends Component
 
     public $colors = [
         'Created' => '#008000',
-        'In Progress' => '#FF0000',
+        'In Progress' => '#0000FF',
         'Completed' => '#90cdf4',
         'Waiting for client' => '#66DA26',
         'Late' => '#cbd5e0',
         'In Progress' => '#FF00FF',
+        'Inactive' => '#FF0000',
     ];
 
     public function mount() {
@@ -63,15 +65,26 @@ class DashboardPieChart extends Component
 
     public function updateData($name, $id, $value) {
         $ticket = Ticket::where('id', $id)->first();
-        if ($name == 'hours') {
+        if ($name == 'hours' && $value > 0) {
             $client_cost = $ticket->product->client->cost_per_hour;
             $total = $value * $client_cost;
             $ticket->hours = $value;
             $ticket->total = $total;
             $ticket->update();
         }
+        if ($name == 'total' && $value > 0) {
+            $ticket->total = $value;
+            $ticket->hours = $value / $ticket->product->client->cost_per_hour;
+            $ticket->update();
+        }
 
         $this->dispatchBrowserEvent('refresh');
+    }
+
+    public function changeStatus($status, $id) {
+        $ticket = Ticket::where('id', $id)->first();
+        $ticket->statu_id = $status;
+        $ticket->update();
     }
 
     public function render()
@@ -80,6 +93,8 @@ class DashboardPieChart extends Component
         if ($this->model == 'tickets') {
             $this->tickets_show = Ticket::where('statu_id', $this->status)->where('receipt_id', null)->get();
         }
+
+        $all_status = Statu::pluck('name', 'id');
 
         $tickets = Ticket::join('status', 'tickets.statu_id', '=', 'status.id')
             ->where('receipt_id', null)
@@ -109,11 +124,12 @@ class DashboardPieChart extends Component
                 ->setDataLabelsEnabled($this->showDataLabels)
             );
 
-        return view('livewire.dashboard-pie-chart',
+        return view('livewire.dashboard.dashboard-pie-chart',
             [
                 'tasksPieChartModel' => $tasksPieChartModel,
                 'ticketsPieChartModel' => $ticketsPieChartModel,
                 'tickets_show' => $this->tickets_show,
+                'all_status' => $all_status
             ]);
     }
 }

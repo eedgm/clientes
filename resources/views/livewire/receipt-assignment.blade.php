@@ -198,6 +198,9 @@
                     Descripción
                 </th>
                 <th class="px-4 py-3 text-right">
+                    Horas
+                </th>
+                <th class="px-4 py-3 text-right">
                     Costo
                 </th>
                 <th></th>
@@ -211,7 +214,8 @@
                         <td class="px-4 py-3 text-left">{{ $result['product'] }}</td>
                         <td class="px-4 py-3 text-left">{{ $result['date'] }}</td>
                         <td class="px-4 py-3 text-left">{{ $result['description'] }}</td>
-                        <td class="px-4 py-3 text-right">$ {{ $result['cost'] }}</td>
+                        <td class="px-4 py-3 text-right">{{ $result['hours'] }}</td>
+                        <td class="px-4 py-3 text-right">{{ $result['cost'] }}</td>
                         <td class="px-4 py-3 text-right">
                             <i
                                 class="cursor-pointer bx bx-x hover:text-blue-600"
@@ -228,7 +232,12 @@
                         <td class="px-4 py-3 text-left">{{ $result['product'] }}</td>
                         <td class="px-4 py-3 text-left">{{ $result['date'] }}</td>
                         <td class="px-4 py-3 text-left">{{ $result['description'] }}</td>
-                        <td class="px-4 py-3 text-right">$ {{ $result['cost'] }}</td>
+                        <td class="px-4 py-3 text-right" data-name="hours" data-id="{{ $result['id'] }}"contenteditable wire:blur="updateData($event.target.getAttribute('data-name'), $event.target.getAttribute('data-id'), $event.target.innerHTML)">
+                            {{ $result['hours'] }}
+                        </td>
+                        <td class="px-4 py-3 text-right" data-name="total" data-id="{{ $result['id'] }}"contenteditable wire:blur="updateData($event.target.getAttribute('data-name'), $event.target.getAttribute('data-id'), $event.target.innerHTML)">
+                            {{ $result['cost'] }}
+                        </td>
                         <td class="px-4 py-3 text-right">
                             <i
                                 class="cursor-pointer bx bx-x hover:text-blue-600"
@@ -243,7 +252,7 @@
     </table>
 
     <div class="w-full pr-3 text-right">
-        Total: {{ $total }}
+        Total: $ {{ $total }}
 
     </div>
 </div>

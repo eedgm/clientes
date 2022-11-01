@@ -97,6 +97,7 @@ class ReceiptAssignment extends Component
             $result['payables'][$payable->id]['product'] = $payable->product->name;
             $result['payables'][$payable->id]['date'] = $payable->date->format('Y-m-d');
             $result['payables'][$payable->id]['description'] = $payable->name;
+            $result['payables'][$payable->id]['hours'] = '-';
             $result['payables'][$payable->id]['cost'] = $payable->total;
             $total += $payable->total;
         }
@@ -106,6 +107,7 @@ class ReceiptAssignment extends Component
             $result['tickets'][$ticket->id]['product'] = $ticket->product->name;
             $result['tickets'][$ticket->id]['date'] = $ticket->finished_ticket->format('Y-m-d');
             $result['tickets'][$ticket->id]['description'] = $ticket->description;
+            $result['tickets'][$ticket->id]['hours'] = $ticket->hours;
             $result['tickets'][$ticket->id]['cost'] = $ticket->total;
             $total += $ticket->total;
         }
@@ -118,6 +120,24 @@ class ReceiptAssignment extends Component
                 'total' => $total,
                 'receipt_id' => $this->receipt->id
             ]);
+    }
+
+    public function updateData($name, $id, $value) {
+        $ticket = Ticket::where('id', $id)->first();
+        if ($name == 'hours' && $value > 0) {
+            $client_cost = $ticket->product->client->cost_per_hour;
+            $total = $value * $client_cost;
+            $ticket->hours = $value;
+            $ticket->total = $total;
+            $ticket->update();
+        }
+        if ($name == 'total' && $value > 0) {
+            $ticket->total = $value;
+            $ticket->hours = $value / $ticket->product->client->cost_per_hour;
+            $ticket->update();
+        }
+
+        $this->dispatchBrowserEvent('refresh');
     }
 
     public function removePayable($id)

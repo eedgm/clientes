@@ -23,6 +23,14 @@
         </div>
     </x-partials.card>
 
+    {{-- <x-partials.card class="w-full">
+        <x-slot name="title">
+            Kanban
+        </x-slot>
+        <livewire:kanban-tickets />
+
+    </x-partials.card> --}}
+
     <x-modal wire:model="showingModal">
         <div class="px-6 py-4">
             <div class="text-lg font-bold">{{ $modalTitle }}</div>
@@ -40,7 +48,7 @@
                             <th class="px-4 py-3 text-left">
                                 @lang('crud.product_tickets.inputs.description')
                             </th>
-                            <th class="px-4 py-3 text-left">
+                            <th class="px-4 py-3 text-left w-44">
                                 @lang('crud.product_tickets.inputs.statu_id')
                             </th>
                             <th class="px-4 py-3 text-left">
@@ -70,7 +78,14 @@
                                     {{ $ticket->description ?? '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-left">
-                                    {{ optional($ticket->statu)->name ?? '-' }}
+                                    <x-inputs.select
+                                        name="statu_id"
+                                        wire:change="changeStatus($event.target.value, {{ $ticket->id }})"
+                                    >
+                                        @foreach($all_status as $value => $label)
+                                        <option {{ $ticket->statu_id == $value ? ' selected="selected"' : '' }} value="{{ $value }}"  >{{ $label }}</option>
+                                        @endforeach
+                                    </x-inputs.select>
                                 </td>
                                 <td class="px-4 py-3 text-left">
                                     {{ optional($ticket->priority)->name ?? '-' }}
@@ -78,7 +93,7 @@
                                 <td class="px-4 py-3 text-right" data-name="hours" data-id="{{ $ticket->id }}"contenteditable wire:blur="updateData($event.target.getAttribute('data-name'), $event.target.getAttribute('data-id'), $event.target.innerHTML)">
                                     {{ $ticket->hours ?? '-' }}
                                 </td>
-                                <td class="px-4 py-3 text-right" contenteditable wire:change="$emit.updateData(total, {{ $ticket->id }})">
+                                <td class="px-4 py-3 text-right" data-name="total" data-id="{{ $ticket->id }}"contenteditable wire:blur="updateData($event.target.getAttribute('data-name'), $event.target.getAttribute('data-id'), $event.target.innerHTML)">
                                     {{ $ticket->total ?? '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-left">
