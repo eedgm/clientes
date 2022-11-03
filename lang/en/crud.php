@@ -562,6 +562,8 @@ return [
         'create_title' => 'Create Receipt',
         'edit_title' => 'Edit Receipt',
         'show_title' => 'Show Receipt',
+        'date_dashboard' => 'Date',
+        'total' => 'Total',
         'inputs' => [
             'real_date' => 'Real Date',
             'number' => 'Number',

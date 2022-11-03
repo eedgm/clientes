@@ -12,6 +12,7 @@ use Asantibanez\LivewireCharts\Models\PieChartModel;
 
 class DashboardPieChart extends Component
 {
+
     public $developer;
     public $person;
     public $owner;
@@ -44,6 +45,7 @@ class DashboardPieChart extends Component
 
     protected $listeners = [
         'onSliceClick' => 'handleOnSliceClick',
+        'refreshComponent' => '$refresh'
     ];
 
     public function handleOnSliceClick($slice) {
@@ -85,6 +87,9 @@ class DashboardPieChart extends Component
         $ticket = Ticket::where('id', $id)->first();
         $ticket->statu_id = $status;
         $ticket->update();
+
+        if ($status == 6)
+            $this->emit('refreshComponent');
     }
 
     public function render()
@@ -97,7 +102,7 @@ class DashboardPieChart extends Component
         $all_status = Statu::pluck('name', 'id');
 
         $tickets = Ticket::join('status', 'tickets.statu_id', '=', 'status.id')
-            ->where('receipt_id', null)
+            ->where('receipt_id', null)->where('statu_id', '!=', 6)
             ->select('status.id', 'status.name', Ticket::raw('count(statu_id) as total'))->groupBy('statu_id')->get();
 
         $ticketsPieChartModel = $tickets->reduce(function ($ticketsPieChartModel, $data, $key) {
@@ -111,7 +116,7 @@ class DashboardPieChart extends Component
             );
 
         $tasks = Task::join('status', 'tasks.statu_id', '=', 'status.id')
-            ->where('receipt_id', null)
+            ->where('receipt_id', null)->where('statu_id', '!=', 6)
             ->select('status.id', 'status.name', Task::raw('count(statu_id) as total'))->groupBy('statu_id')->get();
 
         $tasksPieChartModel = $tasks->reduce(function ($tasksPieChartModel, $data, $key) {

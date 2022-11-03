@@ -50,4 +50,18 @@ class Receipt extends Model
     {
         return $this->hasMany(Payable::class);
     }
+
+    public function totalTickets()
+    {
+        return $this->hasMany(Ticket::class)
+            ->selectRaw('SUM(total) as total')
+            ->groupBy('receipt_id');
+    }
+
+    public function totalPayables()
+    {
+        return $this->hasMany(Payable::class)
+            ->selectRaw('SUM(total) as total')
+            ->groupBy('receipt_id');
+    }
 }

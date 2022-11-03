@@ -1,12 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800">
             @lang('crud.receipts.show_title')
         </h2>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-9xl mx-auto sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-9xl sm:px-6 lg:px-8">
             <x-partials.card>
                 <x-slot name="title">
                     <a href="{{ route('receipts.index') }}" class="mr-4"
@@ -14,7 +14,7 @@
                     ></a>
                 </x-slot>
 
-                <div class="mt-4 px-4">
+                <div class="px-4 mt-4">
                     <div class="mb-4">
                         <h5 class="font-medium text-gray-700">
                             @lang('crud.receipts.inputs.real_date')
@@ -59,6 +59,16 @@
                         </h5>
                         <span>{{ $receipt->date_charged ?? '-' }}</span>
                     </div>
+                    <div class="mb-4">
+                        <h5 class="font-medium text-gray-700">
+                            @lang('crud.receipts.total')
+                        </h5>
+                        <span>$ {{
+                            ($receipt->totalTickets()->first() ? $receipt->totalTickets()->first()->total : 0)
+                            +
+                            ($receipt->totalPayables()->first() ? $receipt->totalPayables()->first()->total : 0)
+                            }}</span>
+                    </div>
                 </div>
 
                 <div class="mt-10">
@@ -75,6 +85,7 @@
                     @endcan
                 </div>
             </x-partials.card>
+
         </div>
     </div>
 </x-app-layout>

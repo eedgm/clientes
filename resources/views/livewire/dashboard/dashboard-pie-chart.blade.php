@@ -1,5 +1,5 @@
-<div class="flex flex-wrap w-full gap-5">
-    <x-partials.card class="w-4/12">
+<div class="grid gap-4 lg:grid-cols-3">
+    <x-partials.card class="">
         <div class="h-80 ">
             <x-slot name="title">
                 Tickets
@@ -11,7 +11,25 @@
         </div>
     </x-partials.card>
 
-    <x-partials.card class="w-4/12">
+    <x-partials.dashboard-table-card class="col-span-2" bodyClasses="p-0">
+        <div>
+            <x-slot name="title">
+                Tickets Completed without receipt
+            </x-slot>
+            <livewire:tickets-complete-dashboard />
+        </div>
+    </x-partials.dashboard-table-card>
+
+    <x-partials.dashboard-table-card class="" bodyClasses="p-0">
+        <div class="h-80">
+            <x-slot name="title">
+                Receipts
+            </x-slot>
+            <livewire:receipts-dashboard />
+        </div>
+    </x-partials.dashboard-table-card>
+
+    <x-partials.card class="">
         <div class="h-80 ">
             <x-slot name="title">
                 Tasks
@@ -22,6 +40,8 @@
                 />
         </div>
     </x-partials.card>
+
+
 
     {{-- <x-partials.card class="w-full">
         <x-slot name="title">
@@ -120,7 +140,7 @@
             <button
                 type="button"
                 class="button button-primary"
-                wire:click="save"
+                wire:click="$toggle('showingModal')"
             >
                 <i class="mr-1 icon ion-md-save"></i>
                 @lang('crud.common.save')
