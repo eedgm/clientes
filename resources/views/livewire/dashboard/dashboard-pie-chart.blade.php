@@ -29,6 +29,15 @@
         </div>
     </x-partials.dashboard-table-card>
 
+    <x-partials.dashboard-table-card class="" bodyClasses="p-0">
+        <div class="">
+            <x-slot name="title">
+                Payables
+            </x-slot>
+            <livewire:payables-dashboard />
+        </div>
+    </x-partials.dashboard-table-card>
+
     <x-partials.card class="">
         <div class="h-80 ">
             <x-slot name="title">
