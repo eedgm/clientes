@@ -43,7 +43,7 @@ $maxWidth = [
     x-on:keydown.shift.tab.prevent="prevFocusable().focus()"
     x-show="show"
     id="{{ $id }}"
-    class="fixed inset-0 z-50 px-4 py-6 overflow-y-auto jetstream-modal sm:px-0"
+    class="fixed inset-0 z-50 w-full px-4 py-6 overflow-auto scrolling-touch jetstream-modal sm:px-0"
     style="display: none;"
 >
     <div x-show="show" class="fixed inset-0 transition-all transform" x-on:click="show = false" x-transition:enter="ease-out duration-300"
@@ -55,7 +55,7 @@ $maxWidth = [
         <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
     </div>
 
-    <div x-show="show" class="mx-20 mb-6 overflow-hidden transition-all transform bg-white rounded-lg shadow-xl"
+    <div x-show="show" class="mx-1 mb-6 overflow-auto scrolling-touch transition-all transform bg-white rounded-lg shadow-xl lg:mx-20"
                     x-transition:enter="ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
