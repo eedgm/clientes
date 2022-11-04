@@ -30,14 +30,14 @@
         @livewireStyles
         @livewireChartsScripts
     </head>
-    <body class="overflow-hidden font-sans antialiased bg-gray-100 md:flex">
+    <body class="overflow-x-hidden font-sans antialiased bg-gray-100 md:flex">
         <x-sidebar />
         <div class="flex flex-col flex-1">
             {{-- @livewire('navigation-menu') --}}
 
             <x-header></x-header>
 
-            <main class="mb-auto overflow-x-auto scrolling-touch bg-gray-100 lg:flex-grow">
+            <main class="mb-auto scrolling-touch bg-gray-100 xs:overflow-x-auto lg:flex-grow">
                 <div class="py-4 pl-6 text-xl font-bold bg-white border-b border-gray-300 shadow-sm">
                     @if (isset($header))
                         <h3 class="text-3xl font-medium text-gray-700">{{ $header }}</h3>

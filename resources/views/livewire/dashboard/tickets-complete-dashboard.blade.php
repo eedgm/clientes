@@ -1,4 +1,4 @@
-<div>
+<div class="block w-full mt-4 overflow-auto scrolling-touch">
     <table class="w-full max-w-full mb-4 bg-transparent">
         <thead class="text-gray-700 bg-gray-100 border-b-2 border-gray-300">
             <tr>
@@ -12,7 +12,7 @@
                 <th class="px-4 py-3 text-left">
                     @lang('crud.product_tickets.inputs.description')
                 </th>
-                <th class="px-4 py-3 text-left w-44">
+                <th class="px-4 py-3 text-left w-60 ">
                     @lang('crud.product_tickets.inputs.statu_id')
                 </th>
                 <th class="px-4 py-3 text-right">
