@@ -1,6 +1,6 @@
-<div class="grid gap-4 lg:grid-cols-3">
+<div class="grid gap-4 m-5 xs:grid-cols-1 sm:grid-cols-1 lg:grid-cols-3">
     <x-partials.card class="">
-        <div class="h-80 ">
+        <div class="h-80">
             <x-slot name="title">
                 Tickets
             </x-slot>
@@ -11,7 +11,7 @@
         </div>
     </x-partials.card>
 
-    <x-partials.dashboard-table-card class="col-span-2" bodyClasses="p-0">
+    <x-partials.dashboard-table-card class="lg:col-span-2" bodyClasses="p-0">
         <div>
             <x-slot name="title">
                 Tickets Completed without receipt
@@ -21,7 +21,7 @@
     </x-partials.dashboard-table-card>
 
     <x-partials.dashboard-table-card class="" bodyClasses="p-0">
-        <div class="h-80">
+        <div class="">
             <x-slot name="title">
                 Receipts
             </x-slot>

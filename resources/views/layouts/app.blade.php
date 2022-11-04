@@ -30,45 +30,29 @@
         @livewireStyles
         @livewireChartsScripts
     </head>
-    <body class="font-sans antialiased">
-        <x-jet-banner />
+    <body class="overflow-hidden font-sans antialiased bg-gray-100 md:flex">
+        <x-sidebar />
+        <div class="flex flex-col flex-1">
+            {{-- @livewire('navigation-menu') --}}
 
-        <div class="min-h-screen bg-gray-100">
-            <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-gray-200">
-                <div :class="sidebarOpen ? 'block' : 'hidden'" @click="sidebarOpen = false" class="fixed inset-0 z-20 transition-opacity bg-black opacity-50"></div>
+            <x-header></x-header>
 
-                <div :class="sidebarOpen ? 'translate-x-0 ease-out' : '-translate-x-full ease-in'" class="fixed inset-y-0 left-0 z-30 overflow-y-auto transition duration-300 transform bg-green-900 w-50">
-                    <div class="flex items-center justify-center bg-white">
-                        <div class="flex items-center p-2">
-                            <a href="{{ route('dashboard') }}">
-                                <img src="/storage/clients.svg" alt="" class="w-32 h-auto">
-                            </a>
-                        </div>
-                    </div>
-
-                    <x-sidebarmenu></x-sidebarmenu>
+            <main class="mb-auto overflow-x-auto scrolling-touch bg-gray-100 lg:flex-grow">
+                <div class="py-4 pl-6 text-xl font-bold bg-white border-b border-gray-300 shadow-sm">
+                    @if (isset($header))
+                        <h3 class="text-3xl font-medium text-gray-700">{{ $header }}</h3>
+                    @endif
                 </div>
-                <div class="flex flex-col flex-1 overflow-hidden">
-                    {{-- @livewire('navigation-menu') --}}
-
-                    <x-header></x-header>
-
-                    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
-                        <div class="container py-8 mx-auto">
-                            <!-- Page Heading -->
-                            @if (isset($header))
-                                <h3 class="text-3xl font-medium text-gray-700">{{ $header }}</h3>
-                            @endif
-
-                            {{ $slot }}
-                    </main>
+                <div class="mt-2">
+                    {{ $slot }}
                 </div>
-            </div>
+            </main>
+            <footer>
+                <x-footer></x-footer>
+            </footer>
         </div>
 
-        <footer>
-            <x-footer></x-footer>
-        </footer>
+
 
         @stack('modals')
 

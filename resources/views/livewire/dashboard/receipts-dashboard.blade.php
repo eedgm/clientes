@@ -1,7 +1,7 @@
 <div>
     <table class="table w-full table-list table-striped-primary">
-        <thead class="text-gray-700 border-b-2 border-gray-200">
-            <tr>
+        <thead class="text-gray-700 bg-gray-100 border-b-2 border-gray-300">
+            <tr class="">
                 <th class="px-4 py-3 text-left lg:w-24 ">
                     @lang('crud.receipts.date_dashboard')
                 </th>

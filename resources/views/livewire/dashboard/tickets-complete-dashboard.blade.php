@@ -1,6 +1,6 @@
 <div>
     <table class="w-full max-w-full mb-4 bg-transparent">
-        <thead class="text-gray-700">
+        <thead class="text-gray-700 bg-gray-100 border-b-2 border-gray-300">
             <tr>
                 <th></th>
                 <th class="px-4 py-3 text-left">
@@ -42,7 +42,7 @@
                                 break;
                         }
                     @endphp
-                    <td><i class="bx bxs-circle {{ $class }}"></i></td>
+                    <td class="pl-3"><i class="bx bxs-circle {{ $class }}"></i></td>
                     <td class="px-4 py-3 text-left">
                         {{ $ticket->product->client->name ?? '-' }}
                     </td>
@@ -69,7 +69,11 @@
                         {{ $ticket->total ?? '-' }}
                     </td>
                     <td class="px-4 py-3 text-left">
-                        <input type="date" wire:change="completed({{ $ticket->id }}, $event.target.value)" value="{{ $ticket->finished_ticket ? date('Y-m-d', strtotime($ticket->finished_ticket)) : '' }}">
+                        <x-inputs.date
+                            name="finishedTicket"
+                            wire:change="completed({{ $ticket->id }}, $event.target.value)"
+                            value="{{ $ticket->finished_ticket ? date('Y-m-d', strtotime($ticket->finished_ticket)) : '' }}"
+                        ></x-inputs.date>
                     </td>
                 </tr>
                 @endforeach
