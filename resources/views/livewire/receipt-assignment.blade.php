@@ -197,9 +197,16 @@
                 <th class="px-4 py-3 text-left">
                     Descripción
                 </th>
-                <th class="px-4 py-3 text-right">
-                    Horas
-                </th>
+                @if ($person)
+                    <th class="px-4 py-3 text-left">
+                        Solicitado por
+                    </th>
+                @endif
+                @if ($hours)
+                    <th class="px-4 py-3 text-right">
+                        Horas
+                    </th>
+                @endif
                 <th class="px-4 py-3 text-right">
                     Costo
                 </th>
@@ -214,7 +221,12 @@
                         <td class="px-4 py-3 text-left">{{ $result['product'] }}</td>
                         <td class="px-4 py-3 text-left">{{ $result['date'] }}</td>
                         <td class="px-4 py-3 text-left">{{ $result['description'] }}</td>
-                        <td class="px-4 py-3 text-right">{{ $result['hours'] }}</td>
+                        @if ($person)
+                            <td class="px-4 py-3 text-left">{{ $result['person'] }}</td>
+                        @endif
+                        @if ($hours)
+                            <td class="px-4 py-3 text-right">{{ $result['hours'] }}</td>
+                        @endif
                         <td class="px-4 py-3 text-right">{{ $result['cost'] }}</td>
                         <td class="px-4 py-3 text-right">
                             <i
@@ -232,9 +244,14 @@
                         <td class="px-4 py-3 text-left">{{ $result['product'] }}</td>
                         <td class="px-4 py-3 text-left">{{ $result['date'] }}</td>
                         <td class="px-4 py-3 text-left">{{ $result['description'] }}</td>
-                        <td class="px-4 py-3 text-right" data-name="hours" data-id="{{ $result['id'] }}"contenteditable wire:blur="updateData($event.target.getAttribute('data-name'), $event.target.getAttribute('data-id'), $event.target.innerHTML)">
-                            {{ $result['hours'] }}
-                        </td>
+                        @if ($person)
+                            <td class="px-4 py-3 text-left">{{ $result['person'] }}</td>
+                        @endif
+                        @if ($hours)
+                            <td class="px-4 py-3 text-right" data-name="hours" data-id="{{ $result['id'] }}"contenteditable wire:blur="updateData($event.target.getAttribute('data-name'), $event.target.getAttribute('data-id'), $event.target.innerHTML)">
+                                {{ $result['hours'] }}
+                            </td>
+                        @endif
                         <td class="px-4 py-3 text-right" data-name="total" data-id="{{ $result['id'] }}"contenteditable wire:blur="updateData($event.target.getAttribute('data-name'), $event.target.getAttribute('data-id'), $event.target.innerHTML)">
                             {{ $result['cost'] }}
                         </td>

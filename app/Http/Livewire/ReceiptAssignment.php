@@ -91,6 +91,8 @@ class ReceiptAssignment extends Component
         $tickets = Ticket::where('receipt_id', $this->receipt->id)->get();
 
         $total = 0;
+        $hours = false;
+        $person = false;
 
         foreach ($payables as $payable) {
             $result['payables'][$payable->id]['id'] = $payable->id;
@@ -98,6 +100,7 @@ class ReceiptAssignment extends Component
             $result['payables'][$payable->id]['date'] = $payable->date->format('Y-m-d');
             $result['payables'][$payable->id]['description'] = $payable->name;
             $result['payables'][$payable->id]['hours'] = '-';
+            $result['payables'][$payable->id]['person'] = '-';
             $result['payables'][$payable->id]['cost'] = $payable->total;
             $total += $payable->total;
         }
@@ -108,8 +111,13 @@ class ReceiptAssignment extends Component
             $result['tickets'][$ticket->id]['date'] = $ticket->finished_ticket->format('Y-m-d');
             $result['tickets'][$ticket->id]['description'] = $ticket->description;
             $result['tickets'][$ticket->id]['hours'] = $ticket->hours;
+            $result['tickets'][$ticket->id]['person'] = $ticket->person->user->name;
             $result['tickets'][$ticket->id]['cost'] = $ticket->total;
             $total += $ticket->total;
+            if ($ticket->hours)
+                $hours = true;
+            if ($ticket->person->user->name)
+                $person = true;
         }
 
         return view('livewire.receipt-assignment',
@@ -118,7 +126,9 @@ class ReceiptAssignment extends Component
                 'tickets' => $this->tickets,
                 'results' => $result,
                 'total' => $total,
-                'receipt_id' => $this->receipt->id
+                'receipt_id' => $this->receipt->id,
+                'hours' => $hours,
+                'person' => $person,
             ]);
     }
 

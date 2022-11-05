@@ -27,7 +27,7 @@
             /* table */
 
             table { font-size: 75%; table-layout: fixed; width: 50%; }
-            table { border-collapse: separate; border-spacing: 2px; }
+            table { border-collapse: separate; border-spacing: 1px; }
             th, td { border-width: 1px; padding: 0.5em; position: relative; text-align: left; }
             th, td { border-radius: 0.25em; border-style: solid; }
             th { background: #EEE; border-color: #BBB; }
@@ -77,10 +77,10 @@
             table.inventory { clear: both; width: 100%; }
             table.inventory th { font-weight: bold; text-align: center; }
 
-            table.inventory td:nth-child(1) { width: 26%; }
-            table.inventory td:nth-child(3) { width: 38%; }
+            table.inventory td:nth-child(1) { width: 17%; }
+            table.inventory td:nth-child(3) { width: 35%; }
             table.inventory td:nth-child(2) { text-align: right; width: 12%; }
-            table.inventory td:nth-child(4) { text-align: right; width: 12%; }
+            table.inventory td:nth-child(4) { text-align: right; width: 17%; }
 
             /* table balance */
 
@@ -118,6 +118,12 @@
                         <th><span>Producto</span></th>
                         <th><span>Fecha</span></th>
 						<th><span>Concepto</span></th>
+                        @if ($person)
+                            <th><span>Solicitado por</span></th>
+                        @endif
+                        @if ($hours)
+                            <th><span>Horas</span></th>
+                        @endif
 						<th><span>Costo</span></th>¡
 					</tr>
 				</thead>
@@ -128,6 +134,12 @@
                                 <td><span>{{ $result['product'] }}</span></td>
                                 <td><span>{{ $result['date'] }}</span></td>
                                 <td><span>{{ $result['description'] }}</span></td>
+                                @if ($person)
+                                    <td><span>{{ $result['person'] }}</span></td>
+                                @endif
+                                @if ($hours)
+                                    <td><span>{{ $result['hours'] }}</span></td>
+                                @endif
                                 <td><span data-prefix>$ </span><span>{{ $result['cost'] }}</span></td>
                             </tr>
                         @endforeach
@@ -138,6 +150,12 @@
                                 <td><span>{{ $result['product'] }}</span></td>
                                 <td><span>{{ $result['date'] }}</span></td>
                                 <td><span>{{ $result['description'] }}</span></td>
+                                @if ($person)
+                                    <td><span>{{ $result['person'] }}</span></td>
+                                @endif
+                                @if ($hours)
+                                    <td><span>{{ number_format($result['hours'], 1) }}</span></td>
+                                @endif
                                 <td><span data-prefix>$ </span><span>{{ $result['cost'] }}</span></td>
                             </tr>
                         @endforeach

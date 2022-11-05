@@ -128,26 +128,38 @@ class ReceiptController extends Controller
         $tickets = Ticket::where('receipt_id', $receipt->id)->get();
 
         $total = 0;
+        $hours = false;
+        $person = false;
 
         foreach ($payables as $payable) {
+            $result['payables'][$payable->id]['id'] = $payable->id;
             $result['payables'][$payable->id]['product'] = $payable->product->name;
             $result['payables'][$payable->id]['date'] = $payable->date->format('Y-m-d');
             $result['payables'][$payable->id]['description'] = $payable->name;
+            $result['payables'][$payable->id]['hours'] = '-';
+            $result['payables'][$payable->id]['person'] = '-';
             $result['payables'][$payable->id]['cost'] = $payable->total;
             $total += $payable->total;
         }
 
         foreach ($tickets as $ticket) {
+            $result['tickets'][$ticket->id]['id'] = $ticket->id;
             $result['tickets'][$ticket->id]['product'] = $ticket->product->name;
             $result['tickets'][$ticket->id]['date'] = $ticket->finished_ticket->format('Y-m-d');
             $result['tickets'][$ticket->id]['description'] = $ticket->description;
+            $result['tickets'][$ticket->id]['hours'] = $ticket->hours;
+            $result['tickets'][$ticket->id]['person'] = $ticket->person->user->name;
             $result['tickets'][$ticket->id]['cost'] = $ticket->total;
             $total += $ticket->total;
+            if ($ticket->hours)
+                $hours = true;
+            if ($ticket->person->user->name)
+                $person = true;
         }
 
-        $name = 'estado-de-cuenta-'.$receipt->client->name.'-'.$receipt->number;
+        $name = 'Estado de cuenta-'.$receipt->client->name.'-'.$receipt->number;
 
-        $pdf = Pdf::loadView('app.receipts.invoice', ['results' => $result, 'receipt' => $receipt, 'total' => $total, 'name' => $name]);
+        $pdf = Pdf::loadView('app.receipts.invoice', ['results' => $result, 'receipt' => $receipt, 'total' => $total, 'name' => $name, 'hours' => $hours, 'person' => $person]);
         return $pdf->download($name.'.pdf');
     }
 }
