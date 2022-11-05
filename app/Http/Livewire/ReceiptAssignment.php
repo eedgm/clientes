@@ -111,12 +111,12 @@ class ReceiptAssignment extends Component
             $result['tickets'][$ticket->id]['date'] = $ticket->finished_ticket->format('Y-m-d');
             $result['tickets'][$ticket->id]['description'] = $ticket->description;
             $result['tickets'][$ticket->id]['hours'] = $ticket->hours;
-            $result['tickets'][$ticket->id]['person'] = $ticket->person->user->name;
+            $result['tickets'][$ticket->id]['person'] = $ticket->person ? $ticket->person->user->name : '-';
             $result['tickets'][$ticket->id]['cost'] = $ticket->total;
             $total += $ticket->total;
             if ($ticket->hours)
                 $hours = true;
-            if ($ticket->person->user->name)
+            if ($ticket->person)
                 $person = true;
         }
 
