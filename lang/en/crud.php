@@ -672,7 +672,7 @@ return [
         'edit_title' => 'Edit Task',
         'show_title' => 'Show Task',
         'inputs' => [
-            'name' => 'Name',
+            'text' => 'Name',
             'hours' => 'Hours',
             'statu_id' => 'Statu',
             'priority_id' => 'Priority',

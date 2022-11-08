@@ -28,7 +28,7 @@ class VersionUpdateRequest extends FormRequest
             'user_id' => ['required', 'exists:users,id'],
             'attachment' => ['file', 'max:1024', 'nullable'],
             'total' => ['required', 'numeric'],
-            'time' => ['required', 'date'],
+            'time' => ['nullable', 'numeric'],
             'cost_per_hour' => ['required', 'numeric'],
             'hour_per_day' => ['required', 'numeric'],
             'months_to_pay' => ['required', 'numeric'],
@@ -36,6 +36,7 @@ class VersionUpdateRequest extends FormRequest
             'company_gain' => ['required', 'numeric'],
             'bank_tax' => ['required', 'numeric'],
             'first_payment' => ['required', 'numeric'],
+            'hours' => ['nullable', 'numeric'],
         ];
     }
 }

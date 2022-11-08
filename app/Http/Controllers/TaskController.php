@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\Statu;
-use App\Models\Version;
 use App\Models\Receipt;
+use App\Models\Version;
 use App\Models\Priority;
+use App\Models\Proposal;
 use Illuminate\Http\Request;
 use App\Http\Requests\TaskStoreRequest;
 use App\Http\Requests\TaskUpdateRequest;
@@ -29,6 +30,60 @@ class TaskController extends Controller
             ->withQueryString();
 
         return view('app.tasks.index', compact('tasks', 'search'));
+    }
+
+    public function addGanttTask(Request $request) {
+        $task = new Task();
+
+        $task->proposal_id = $request->proposal_id;
+        $task->statu_id = 1;
+        $task->priority_id = $request->priority_id;
+        $task->hours = $request->hours;
+        $task->text = $request->text;
+        $task->start_date = $request->start_date;
+        $task->duration = $request->duration;
+        $task->progress = $request->has("progress") ? $request->progress : 0;
+        $task->parent = $request->parent;
+
+        $task->save();
+
+        return response()->json([
+            "action"=> "inserted",
+            "tid" => $task->id
+        ]);
+    }
+
+    public function updateGanttTask(Request $request, Task $task){
+        $task->text = $request->text;
+        $task->priority_id = $request->priority_id;
+        $task->hours = $request->hours;
+        $task->start_date = $request->start_date;
+        $task->duration = $request->duration;
+        $task->progress = $request->has("progress") ? $request->progress : 0;
+        $task->parent = $request->parent;
+
+        $task->save();
+
+        return response()->json([
+            "action"=> "updated"
+        ]);
+    }
+
+    public function destroyGanttTask(Task $task){
+        $task->delete();
+
+        return response()->json([
+            "action"=> "deleted"
+        ]);
+    }
+
+    public function getTasks(Request $request, Proposal $proposal)
+    {
+        $tasks = $proposal->tasks;
+
+        return response()->json([
+            "data" => $tasks,
+        ]);
     }
 
     /**

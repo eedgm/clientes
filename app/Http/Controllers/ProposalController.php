@@ -28,6 +28,17 @@ class ProposalController extends Controller
         return view('app.proposals.index', compact('proposals', 'search'));
     }
 
+    public function gantt(Request $request, Proposal $proposal)
+    {
+        return view('app.proposals.gantt', compact('proposal'));
+    }
+
+    public function board(Request $request)
+    {
+        $proposals = Proposal::get();
+        return view('app.proposals.board', compact('proposals'));
+    }
+
     /**
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response

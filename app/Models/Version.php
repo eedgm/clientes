@@ -24,13 +24,10 @@ class Version extends Model
         'company_gain',
         'bank_tax',
         'first_payment',
+        'hours'
     ];
 
     protected $searchableFields = ['*'];
-
-    protected $casts = [
-        'time' => 'date',
-    ];
 
     public function proposal()
     {
@@ -42,9 +39,9 @@ class Version extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function tasks()
+    public function user()
     {
-        return $this->hasMany(Task::class);
+        return $this->belongsTo(User::class);
     }
 
     public function people()

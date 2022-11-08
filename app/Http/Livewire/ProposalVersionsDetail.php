@@ -35,7 +35,7 @@ class ProposalVersionsDetail extends Component
         'versionAttachment' => ['file', 'max:1024', 'nullable'],
         'version.user_id' => ['required', 'exists:users,id'],
         'version.total' => ['required', 'numeric'],
-        'versionTime' => ['required', 'date'],
+        'versionTime' => ['nullable', 'numeric'],
         'version.cost_per_hour' => ['required', 'numeric'],
         'version.hour_per_day' => ['required', 'numeric'],
         'version.months_to_pay' => ['required', 'numeric'],
@@ -43,6 +43,7 @@ class ProposalVersionsDetail extends Component
         'version.company_gain' => ['required', 'numeric'],
         'version.bank_tax' => ['required', 'numeric'],
         'version.first_payment' => ['required', 'numeric'],
+        'version.hours' => ['nullable', 'numeric'],
     ];
 
     public function mount(Proposal $proposal)

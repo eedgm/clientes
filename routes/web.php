@@ -49,6 +49,13 @@ Route::prefix('/')
     ->group(function () {
         Route::get('/client/receipt/pdf/{receipt}', [ReceiptController::class, 'createPDF'])->name('client.receipt');
 
+        Route::get('proposals/gantt/{proposal}', [ProposalController::class, 'gantt'])->name('gantt');
+        Route::get('proposals/board', [ProposalController::class, 'board'])->name('board');
+        Route::get('/proposal/tasks/{proposal}', [TaskController::class, 'getTasks']);
+        Route::post('/tasks/task', [TaskController::class, 'addGanttTask']);
+        Route::put('/tasks/task/update/{task}', [TaskController::class, 'updateGanttTask']);
+        Route::put('/tasks/task/delete/{task}', [TaskController::class, 'destroyGanttTask']);
+
         Route::resource('roles', RoleController::class);
         Route::resource('permissions', PermissionController::class);
 

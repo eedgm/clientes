@@ -58,13 +58,22 @@
     </x-inputs.group>
 
     <x-inputs.group class="w-full lg:w-4/12">
-        <x-inputs.date
+        <x-inputs.number
             name="time"
             label="Time"
-            value="{{ old('time', ($editing ? optional($version->time)->format('Y-m-d') : '')) }}"
-            max="255"
+            value="{{ old('time', ($editing ? $version->time : '')) }}"
+        ></x-inputs.number>
+    </x-inputs.group>
+
+    <x-inputs.group class="w-full lg:w-4/12">
+        <x-inputs.number
+            name="hours"
+            label="Cost Per Hour"
+            :value="old('hours', ($editing ? $version->hours : ''))"
+            step="0.01"
+            placeholder="Hours"
             required
-        ></x-inputs.date>
+        ></x-inputs.number>
     </x-inputs.group>
 
     <x-inputs.group class="w-full lg:w-4/12">

@@ -8,7 +8,7 @@
         @endcan @can('delete-any', App\Models\Version::class)
         <button
             class="button button-danger"
-             {{ empty($selected) ? 'disabled' : '' }} 
+                {{ empty($selected) ? 'disabled' : '' }}
             onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
             wire:click="destroySelected"
         >

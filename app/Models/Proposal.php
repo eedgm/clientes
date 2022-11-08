@@ -24,4 +24,9 @@ class Proposal extends Model
     {
         return $this->hasMany(Version::class);
     }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
 }

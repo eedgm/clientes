@@ -66,6 +66,10 @@
                         </div>
                     </form>
                 </div>
+
+                <div>
+                    <a class="m-3 text-2xl text-white" href="{{ route('board') }}"><i class="bx bx-detail"></i></a>
+                </div>
             </div>
             <div class="items-stretch hidden md:flex">
                 <!-- Profile Menu DT -->
