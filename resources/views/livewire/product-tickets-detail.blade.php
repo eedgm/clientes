@@ -94,7 +94,6 @@
                             name="ticket.comments"
                             label="Comments"
                             wire:model="ticket.comments"
-                            maxlength="255"
                         ></x-inputs.textarea>
                     </x-inputs.group>
 

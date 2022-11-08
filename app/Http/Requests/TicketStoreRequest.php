@@ -24,13 +24,13 @@ class TicketStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'description' => ['required', 'max:255', 'string'],
+            'description' => ['required', 'string'],
             'statu_id' => ['required', 'exists:status,id'],
             'priority_id' => ['required', 'exists:priorities,id'],
             'hours' => ['nullable', 'numeric'],
             'total' => ['nullable', 'numeric'],
             'finished_ticket' => ['nullable', 'date'],
-            'comments' => ['nullable', 'max:255', 'string'],
+            'comments' => ['nullable', 'string'],
             'product_id' => ['required', 'exists:products,id'],
             'receipt_id' => ['nullable', 'exists:receipts,id'],
             'person_id' => ['nullable', 'exists:people,id'],

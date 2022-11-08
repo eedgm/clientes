@@ -33,7 +33,7 @@ class ProductTicketsDetail extends Component
     public $modalTitle = 'New Ticket';
 
     protected $rules = [
-        'ticket.description' => ['required', 'max:255', 'string'],
+        'ticket.description' => ['required', 'string'],
         'ticket.statu_id' => ['required', 'exists:status,id'],
         'ticket.priority_id' => ['required', 'exists:priorities,id'],
         'ticket.hours' => ['nullable', 'numeric'],
