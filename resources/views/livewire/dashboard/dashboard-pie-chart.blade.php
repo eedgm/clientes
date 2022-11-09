@@ -1,54 +1,89 @@
-<div class="grid grid-cols-1 gap-4 m-5 sm:grid-cols-1 lg:grid-cols-3">
-    <x-partials.card class="">
-        <div class="h-80">
-            <x-slot name="title">
-                Tickets
-            </x-slot>
-            <livewire:livewire-pie-chart
-                    key="{{ $ticketsPieChartModel->reactiveKey() }}"
-                    :pie-chart-model="$ticketsPieChartModel"
-                />
-        </div>
-    </x-partials.card>
+<div>
+    <div class="grid">
+        <div class="flex flex-col items-stretch justify-center h-full" x-data="{tab: 1}">
+            <div class="z-10 flex justify-start -space-x-px">
+                <a
+                    href="!#0"
+                    @click.prevent="tab = 1"
+                    :class="{'cursor-default border-b-0 bg-white': tab === 1, 'text-gray-600 bg-gray-200 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:shadow-outline': tab !== 1}"
+                    class="block px-6 py-4 text-base font-semibold leading-none text-black uppercase align-middle border border-gray-400 rounded-tl-lg shadow-none outline-none"
+                    >
+                    <i class="text-xl bx bxs-dashboard"></i>
+                </a>
+                <a
+                    href="!#0"
+                    @click.prevent="tab = 2"
+                    :class="{'cursor-default border-b-0 bg-white': tab === 2, 'text-gray-600 bg-gray-200 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:shadow-outline': tab !== 2}"
+                    class="block px-6 py-4 text-base font-semibold leading-none text-black uppercase align-middle border border-gray-400 shadow-none outline-none"
+                    >
+                    <i class="text-xl bx bx-columns"></i>
+                </a>
+            </div>
 
-    <x-partials.dashboard-table-card class="col-span-1 lg:col-span-2" bodyClasses="p-0">
-        <div>
-            <x-slot name="title">
-                Tickets Completed without receipt
-            </x-slot>
-            <livewire:tickets-complete-dashboard />
-        </div>
-    </x-partials.dashboard-table-card>
+            <div x-show="tab === 1" class="z-0 border border-gray-400 rounded-md rounded-tl-none bg-gradient-to-b from-white via-gray-100 to-gray-200">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-1 lg:grid-cols-3">
+                    <x-partials.card class="">
+                        <div class="h-80">
+                            <x-slot name="title">
+                                Tickets
+                            </x-slot>
+                            <livewire:livewire-pie-chart
+                                    key="{{ $ticketsPieChartModel->reactiveKey() }}"
+                                    :pie-chart-model="$ticketsPieChartModel"
+                                />
+                        </div>
+                    </x-partials.card>
 
-    <x-partials.dashboard-table-card class="" bodyClasses="p-0">
-        <div class="">
-            <x-slot name="title">
-                Receipts
-            </x-slot>
-            <livewire:receipts-dashboard />
-        </div>
-    </x-partials.dashboard-table-card>
+                    <x-partials.dashboard-table-card class="col-span-1 lg:col-span-2" bodyClasses="p-0">
+                        <div>
+                            <x-slot name="title">
+                                Tickets Completed without receipt
+                            </x-slot>
+                            <livewire:tickets-complete-dashboard />
+                        </div>
+                    </x-partials.dashboard-table-card>
 
-    <x-partials.dashboard-table-card class="" bodyClasses="p-0">
-        <div class="">
-            <x-slot name="title">
-                Payables
-            </x-slot>
-            <livewire:payables-dashboard />
-        </div>
-    </x-partials.dashboard-table-card>
+                    <x-partials.dashboard-table-card class="" bodyClasses="p-0">
+                        <div class="">
+                            <x-slot name="title">
+                                Receipts
+                            </x-slot>
+                            <livewire:receipts-dashboard />
+                        </div>
+                    </x-partials.dashboard-table-card>
 
-    <x-partials.card class="">
-        <div class="h-80 ">
-            <x-slot name="title">
-                Tasks
-            </x-slot>
-            <livewire:livewire-pie-chart
-                    key="{{ $tasksPieChartModel->reactiveKey() }}"
-                    :pie-chart-model="$tasksPieChartModel"
-                />
+                    <x-partials.dashboard-table-card class="" bodyClasses="p-0">
+                        <div class="">
+                            <x-slot name="title">
+                                Payables
+                            </x-slot>
+                            <livewire:payables-dashboard />
+                        </div>
+                    </x-partials.dashboard-table-card>
+
+                    <x-partials.card class="">
+                        <div class="h-80 ">
+                            <x-slot name="title">
+                                Tasks
+                            </x-slot>
+                            <livewire:livewire-pie-chart
+                                    key="{{ $tasksPieChartModel->reactiveKey() }}"
+                                    :pie-chart-model="$tasksPieChartModel"
+                                />
+                        </div>
+                    </x-partials.card>
+                </div>
+            </div>
+            <div x-show="tab === 2" class="border border-gray-400 rounded-md rounded-tl-none bg-gradient-to-br from-white via-white to-yellow-100">
+                <livewire:kanban-tickets />
+            </div>
+
         </div>
-    </x-partials.card>
+    </div>
+
+
+
+
 
 
 

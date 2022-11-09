@@ -84,7 +84,7 @@
         <div class="px-6 py-4 text-left">
             <div class="text-lg font-bold">{{ $modalTitle }}</div>
             <div class="grid grid-cols-2 gap-4 mt-5">
-                <div class="text-sm">
+                <div class="grid grid-cols-2 text-sm">
                     <x-inputs.group class="w-full">
                         <x-inputs.number
                             name="version.hours"
