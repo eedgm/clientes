@@ -24,6 +24,13 @@
         gantt.config.work_time = true;  // removes non-working time from calculations
         gantt.config.skip_off_time = true;    // hides non-working time in the chart
 
+        gantt.config.columns = [
+            {name:"text",       label:"Task name",  width:"*", tree:true },
+            {name:"start_date", label:"Start time", align:"center" },
+            {name:"hours",      label:"Hours",   align:"center" },
+            {name:"add",        label:"",           width:44 }
+        ];
+
         gantt.templates.scale_cell_class = function(date){
             if(date.getDay()==0||date.getDay()==6){
                 return "weekend";
