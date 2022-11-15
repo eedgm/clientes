@@ -30,7 +30,7 @@
 
             <div x-show="tab === 1" class="border border-gray-400 rounded-md rounded-tl-none bg-gradient-to-br from-white via-white to-cyan-100">
                 <div class="grid grid-cols-1 gap-4 py-10 sm:grid-cols-1 lg:grid-cols-2 grid-auto-flow">
-                    <x-partials.dashboard-table-card class="h-full col-span-1 md:col-span-2 lg:h-48" bodyClasses="p-0">
+                    <x-partials.dashboard-table-card class="h-full col-span-1 md:col-span-2 lg:h-44" bodyClasses="p-0">
                         <div class="">
                             <livewire:incomes-total />
                         </div>

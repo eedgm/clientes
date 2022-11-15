@@ -35,10 +35,7 @@
                     </td>
                     <td class="px-4 py-3 text-right">
                         $ {{
-                            $value =
-                                ($receipt->totalTickets()->first() ? $receipt->totalTickets()->first()->total : 0)
-                                +
-                                ($receipt->totalPayables()->first() ? $receipt->totalPayables()->first()->total : 0)
+                            $value = ($receipt->tickets->sum('total')) + ($receipt->payables->sum('total'));
                         }}
                         @php
                             $total += $value;

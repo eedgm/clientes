@@ -5,8 +5,8 @@
                 Last Month Income
             </h4>
 
-            <div class="text-4xl text-center text-white lg:text-8xl">
-                $ {{ $last_month_income }}
+            <div class="text-4xl text-center text-white lg:text-7xl">
+                $ {{ number_format($last_month_income, 2) }}
             </div>
         </x-partials.card>
 
@@ -15,8 +15,8 @@
                 This Month Income
             </h4>
 
-            <div class="text-4xl text-center text-white lg:text-8xl">
-                $ {{ $this_month_income }}
+            <div class="text-4xl text-center text-white lg:text-7xl">
+                $ {{ number_format($this_month_income, 2) }}
             </div>
         </x-partials.card>
 
@@ -25,8 +25,8 @@
                 Tickets Without Receipt
             </h4>
 
-            <div class="text-4xl text-center text-white lg:text-8xl">
-                $ {{ $tickets_total }}
+            <div class="text-4xl text-center text-white lg:text-7xl">
+                $ {{ number_format($tickets_total, 2) }}
             </div>
         </x-partials.card>
     </div>

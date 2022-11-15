@@ -34,12 +34,12 @@ class IncomesTotal extends Component
 
         $last_month_income = 0;
         foreach ($receipts_last_month_income as $receipt) {
-            $last_month_income = ($receipt->tickets->sum('total')) + ($receipt->payables->sum('total'));
+            $last_month_income += ($receipt->tickets->sum('total')) + ($receipt->payables->sum('total'));
         }
 
         $this_month_income = 0;
         foreach ($receipts_this_month_income as $receipt) {
-            $this_month_income = ($receipt->tickets->sum('total')) + ($receipt->payables->sum('total'));
+            $this_month_income += ($receipt->tickets->sum('total')) + ($receipt->payables->sum('total'));
         }
 
         $tickets_total = 0;
