@@ -25,7 +25,7 @@
         gantt.config.skip_off_time = true;    // hides non-working time in the chart
 
         gantt.config.columns = [
-            {name:"text",       label:"Task name",  width:"*", tree:true },
+            {name:"text",       label:"Task name",  width:"300", tree:true },
             {name:"start_date", label:"Start time", align:"center" },
             {name:"hours",      label:"Hours",   align:"center" },
             {name:"add",        label:"",           width:44 }
