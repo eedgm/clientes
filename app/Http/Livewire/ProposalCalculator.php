@@ -17,6 +17,7 @@ class ProposalCalculator extends Component
     public Proposal $proposal;
     public Version $version;
     public $receipts;
+    public $receipts_count;
     public $versionTime;
 
     public $versionAttachment;
@@ -135,6 +136,7 @@ class ProposalCalculator extends Component
         $this->version = $version;
 
         $this->receipts = $this->version->receipts;
+        $this->receipts_count = $this->receipts->count();
 
         $this->hours = $version->hours;
 
@@ -189,7 +191,7 @@ class ProposalCalculator extends Component
                 'real_date' => date('Y-m-d'),
                 'manual_value' => $first_payment]
             );
-            for ($i=0; $i < $number; $i++) {
+            for ($i=0; $i < $number - 1; $i++) {
                 Receipt::create([
                     'number' => 0,
                     'version_id' => $this->version->id,
@@ -199,6 +201,9 @@ class ProposalCalculator extends Component
                 );
             }
         }
+
+        $this->receipts = Receipt::where('version_id', $this->version->id)->get();
+        $this->receipts_count = $this->receipts->count();
     }
 
     public function seeVersions()
@@ -208,7 +213,6 @@ class ProposalCalculator extends Component
 
     public function render()
     {
-
         $this->usersForSelect = $this->proposal->client->people;
         return view('livewire.proposal-calculator', ['proposal' => $this->proposal, 'hours' => $this->hours]);
     }

@@ -270,7 +270,7 @@
                 </div>
             </div>
 
-            @if ($receipts)
+            @if ($receipts_count > 0)
                 <table class="table w-full table-list table-striped-primary">
                     <thead class="text-gray-700 bg-gray-100 border-b-2 border-gray-300">
                         <tr class="">
