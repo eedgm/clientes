@@ -564,6 +564,7 @@ return [
         'show_title' => 'Show Receipt',
         'date_dashboard' => 'Date',
         'total' => 'Total',
+        'value' => 'Value',
         'inputs' => [
             'real_date' => 'Real Date',
             'number' => 'Number',

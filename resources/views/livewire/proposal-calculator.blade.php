@@ -270,6 +270,62 @@
                 </div>
             </div>
 
+            @if ($receipts)
+                <table class="table w-full table-list table-striped-primary">
+                    <thead class="text-gray-700 bg-gray-100 border-b-2 border-gray-300">
+                        <tr class="">
+                            <th class="px-4 py-3 text-left">
+                                @lang('crud.receipts.date_dashboard')
+                            </th>
+                            <th class="px-4 py-3 text-right">
+                                #
+                            </th>
+                            <th class="px-4 py-3 text-left">
+                                @lang('crud.receipts.inputs.client_id')
+                            </th>
+                            <th class="px-4 py-3 text-right lg:w-32">
+                                @lang('crud.receipts.total')
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-600">
+                            @foreach ($receipts as $receipt)
+                            <tr class="hover:bg-gray-100 odd:bg-white even:bg-blue-50">
+                                <td class="px-4 py-3 text-left">
+                                    {{ $receipt->real_date->format('M d') ?? '-' }}
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    @can('edit', $receipt)
+                                        <x-links href="{{ route('receipts.edit', $receipt->id) }}">{{ $receipt->number ?? '-' }}</x-links>
+                                    @else
+                                        {{ $receipt->number ?? '-' }}
+                                    @endcan
+                                </td>
+                                <td class="px-4 py-3 text-left">
+                                    {{ optional($receipt->client)->name ?? '-'
+                                    }}
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    $ {{
+                                        $receipt->manual_value ?? ($receipt->tickets->sum('total')) + ($receipt->payables->sum('total'));
+                                    }}
+                                </td>
+                            </tr>
+                            @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div class="mt-5 ml-3">
+                    <button
+                        type="button"
+                        class="button"
+                        wire:click="generateReceipts"
+                    >
+                        <i class="bx bx-receipt"></i>
+                        Generate Receipts
+                    </button>
+                </div>
+            @endif
         </div>
 
         <div class="flex justify-between px-6 py-4 bg-gray-50">

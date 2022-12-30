@@ -35,7 +35,7 @@
                     </td>
                     <td class="px-4 py-3 text-right">
                         $ {{
-                            $value = ($receipt->tickets->sum('total')) + ($receipt->payables->sum('total'));
+                            $value = $receipt->manual_value ?? ($receipt->tickets->sum('total')) + ($receipt->payables->sum('total'));
                         }}
                         @php
                             $total += $value;

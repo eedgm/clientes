@@ -11,13 +11,24 @@
         ></x-inputs.date>
     </x-inputs.group>
 
-    <x-inputs.group class="w-full">
+    <x-inputs.group class="w-full lg:w-6/12">
         <x-inputs.number
             name="number"
             label="Number"
             :value="old('number', ($editing ? $receipt->number : ''))"
             max="255"
             placeholder="Number"
+            required
+        ></x-inputs.number>
+    </x-inputs.group>
+
+    <x-inputs.group class="w-full lg:w-6/12">
+        <x-inputs.number
+            name="manual_value"
+            label="Manual Value"
+            :value="old('manual_value', ($editing ? $receipt->manual_value : ''))"
+            max="255"
+            placeholder="Manual Value"
             required
         ></x-inputs.number>
     </x-inputs.group>

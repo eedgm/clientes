@@ -28,7 +28,6 @@
         </script> --}}
 
         @livewireStyles
-        @livewireChartsScripts
     </head>
     <body class="overflow-x-hidden font-sans antialiased bg-gray-100 md:flex">
         <x-sidebar />

@@ -21,6 +21,8 @@ class Receipt extends Model
         'charged',
         'reference_charged',
         'date_charged',
+        'manual_value',
+        'version_id'
     ];
 
     protected $searchableFields = ['*'];
@@ -49,6 +51,11 @@ class Receipt extends Model
     public function payables()
     {
         return $this->hasMany(Payable::class);
+    }
+
+    public function version()
+    {
+        return $this->belongsTo(Version::class);
     }
 
     public function totalTickets()

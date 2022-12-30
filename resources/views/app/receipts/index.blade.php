@@ -1,14 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800">
             @lang('crud.receipts.index_title')
         </h2>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-9xl mx-auto sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-9xl sm:px-6 lg:px-8">
             <x-partials.card>
-                <div class="mb-5 mt-4">
+                <div class="mt-4 mb-5">
                     <div class="flex flex-wrap justify-between">
                         <div class="md:w-1/2">
                             <form>
@@ -31,7 +31,7 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="md:w-1/2 text-right">
+                        <div class="text-right md:w-1/2">
                             @can('create', App\Models\Receipt::class)
                             <a
                                 href="{{ route('receipts.create') }}"
@@ -56,10 +56,10 @@
                                     @lang('crud.receipts.inputs.number')
                                 </th>
                                 <th class="px-4 py-3 text-left">
-                                    @lang('crud.receipts.inputs.description')
-                                </th>
-                                <th class="px-4 py-3 text-left">
                                     @lang('crud.receipts.inputs.client_id')
+                                </th>
+                                <th class="px-4 py-3 text-right">
+                                    @lang('crud.receipts.value')
                                 </th>
                                 <th class="px-4 py-3 text-left">
                                     @lang('crud.receipts.inputs.charged')
@@ -77,17 +77,17 @@
                             @forelse($receipts as $receipt)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-4 py-3 text-left">
-                                    {{ $receipt->real_date ?? '-' }}
+                                    {{ $receipt->real_date->format('Y-m-d') ?? '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-right">
                                     {{ $receipt->number ?? '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-left">
-                                    {{ $receipt->description ?? '-' }}
-                                </td>
-                                <td class="px-4 py-3 text-left">
                                     {{ optional($receipt->client)->name ?? '-'
                                     }}
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    $ {{ $receipt->manual_value ?? ($receipt->tickets->sum('total')) + ($receipt->payables->sum('total')) }}
                                 </td>
                                 <td class="px-4 py-3 text-left">
                                     {{ $receipt->charged ?? '-' }}
@@ -105,11 +105,7 @@
                                     <div
                                         role="group"
                                         aria-label="Row Actions"
-                                        class="
-                                            relative
-                                            inline-flex
-                                            align-middle
-                                        "
+                                        class="relative inline-flex align-middle "
                                     >
                                         @can('update', $receipt)
                                         <a
@@ -149,11 +145,7 @@
                                                 class="button"
                                             >
                                                 <i
-                                                    class="
-                                                        icon
-                                                        ion-md-trash
-                                                        text-red-600
-                                                    "
+                                                    class="text-red-600 icon ion-md-trash"
                                                 ></i>
                                             </button>
                                         </form>
@@ -172,7 +164,7 @@
                         <tfoot>
                             <tr>
                                 <td colspan="8">
-                                    <div class="mt-10 px-4">
+                                    <div class="px-4 mt-10">
                                         {!! $receipts->render() !!}
                                     </div>
                                 </td>

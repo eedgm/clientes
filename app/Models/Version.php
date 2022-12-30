@@ -48,4 +48,9 @@ class Version extends Model
     {
         return $this->belongsToMany(Person::class);
     }
+
+    public function receipts()
+    {
+        return $this->hasMany(Receipt::class);
+    }
 }

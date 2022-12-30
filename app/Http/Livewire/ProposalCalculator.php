@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Receipt;
 use App\Models\Version;
 use Livewire\Component;
 use App\Models\Proposal;
@@ -15,6 +16,7 @@ class ProposalCalculator extends Component
 
     public Proposal $proposal;
     public Version $version;
+    public $receipts;
     public $versionTime;
 
     public $versionAttachment;
@@ -132,6 +134,8 @@ class ProposalCalculator extends Component
         $this->modalTitle = trans('crud.proposal_versions.edit_title');
         $this->version = $version;
 
+        $this->receipts = $this->version->receipts;
+
         $this->hours = $version->hours;
 
         $this->calculateValues();
@@ -163,6 +167,40 @@ class ProposalCalculator extends Component
         $this->price_month_divided = 0;
     }
 
+    public function generateReceipts()
+    {
+        $number = $this->version->months_to_pay;
+        $first_payment = $this->version->first_payment;
+        $total = $this->version->total;
+        $subtotal = $total - $first_payment;
+        if ($subtotal == 0) {
+            Receipt::create([
+                'number' => 0,
+                'version_id' => $this->version->id,
+                'client_id' => $this->version->proposal->client->id,
+                'real_date' => date('Y-m-d'),
+                'manual_value' => $total]
+            );
+        } else {
+            Receipt::create([
+                'number' => 0,
+                'version_id' => $this->version->id,
+                'client_id' => $this->version->proposal->client->id,
+                'real_date' => date('Y-m-d'),
+                'manual_value' => $first_payment]
+            );
+            for ($i=0; $i < $number; $i++) {
+                Receipt::create([
+                    'number' => 0,
+                    'version_id' => $this->version->id,
+                    'client_id' => $this->version->proposal->client->id,
+                    'real_date' => date('Y-m-d'),
+                    'manual_value' => $subtotal]
+                );
+            }
+        }
+    }
+
     public function seeVersions()
     {
         $this->showingVersionModal = true;
@@ -170,6 +208,7 @@ class ProposalCalculator extends Component
 
     public function render()
     {
+
         $this->usersForSelect = $this->proposal->client->people;
         return view('livewire.proposal-calculator', ['proposal' => $this->proposal, 'hours' => $this->hours]);
     }
