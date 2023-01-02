@@ -27,7 +27,6 @@
             name="manual_value"
             label="Manual Value"
             :value="old('manual_value', ($editing ? $receipt->manual_value : ''))"
-            max="255"
             placeholder="Manual Value"
         ></x-inputs.number>
     </x-inputs.group>
