@@ -230,6 +230,11 @@
                         <td class="px-4 py-3 text-right">{{ $result['cost'] }}</td>
                         <td class="px-4 py-3 text-right">
                             <i
+                                class="cursor-pointer bx bx-pencil hover:text-blue-600"
+                                wire:click="editPayable({{ $result['id'] }})"
+                                >
+                            </i>
+                            <i
                                 class="cursor-pointer bx bx-x hover:text-blue-600"
                                 wire:click="removePayable({{ $result['id'] }})"
                                 >
@@ -248,11 +253,11 @@
                             <td class="px-4 py-3 text-left">{{ $result['person'] }}</td>
                         @endif
                         @if ($hours)
-                            <td class="px-4 py-3 text-right" data-name="hours" data-id="{{ $result['id'] }}"contenteditable wire:blur="updateData($event.target.getAttribute('data-name'), $event.target.getAttribute('data-id'), $event.target.innerHTML)">
+                            <td class="px-4 py-3 text-right" data-name="hours" data-id="{{ $result['id'] }}" contenteditable wire:blur="updateData($event.target.getAttribute('data-name'), $event.target.getAttribute('data-id'), $event.target.innerHTML)">
                                 {{ $result['hours'] }}
                             </td>
                         @endif
-                        <td class="px-4 py-3 text-right" data-name="total" data-id="{{ $result['id'] }}"contenteditable wire:blur="updateData($event.target.getAttribute('data-name'), $event.target.getAttribute('data-id'), $event.target.innerHTML)">
+                        <td class="px-4 py-3 text-right" data-name="total" data-id="{{ $result['id'] }}" contenteditable wire:blur="updateData($event.target.getAttribute('data-name'), $event.target.getAttribute('data-id'), $event.target.innerHTML)">
                             {{ $result['cost'] }}
                         </td>
                         <td class="px-4 py-3 text-right">
@@ -272,4 +277,120 @@
         Total: $ {{ $total }}
 
     </div>
+
+    <x-modal wire:model="showingModalEdit">
+        <div class="px-6 py-4">
+            <div class="text-lg font-bold">{{ $modalTitle }}</div>
+
+            <div class="mt-5">
+                <div>
+                    <x-inputs.group class="w-full">
+                        <x-inputs.text
+                            name="payable.name"
+                            label="Name"
+                            wire:model="payable.name"
+                            maxlength="255"
+                            placeholder="Name"
+                        ></x-inputs.text>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full">
+                        <x-inputs.date
+                            name="payableDate"
+                            label="Date"
+                            wire:model="payableDate"
+                            max="255"
+                        ></x-inputs.date>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full">
+                        <x-inputs.number
+                            name="payable.cost"
+                            label="Cost"
+                            wire:model="payable.cost"
+                            max="255"
+                            step="0.01"
+                            placeholder="Cost"
+                        ></x-inputs.number>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full">
+                        <x-inputs.number
+                            name="payable.margin"
+                            label="Margin"
+                            wire:model="payable.margin"
+                            max="255"
+                            step="0.01"
+                            placeholder="Margin"
+                        ></x-inputs.number>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full">
+                        <x-inputs.number
+                            name="payable.total"
+                            label="Total"
+                            wire:model="payable.total"
+                            max="255"
+                            step="0.01"
+                            placeholder="Total"
+                        ></x-inputs.number>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full">
+                        <x-inputs.select
+                            name="payable.supplier_id"
+                            label="Supplier"
+                            wire:model="payable.supplier_id"
+                        >
+                            <option value="null" disabled>Please select the Supplier</option>
+                            @foreach($suppliersForSelect as $value => $label)
+                            <option value="{{ $value }}"  >{{ $label }}</option>
+                            @endforeach
+                        </x-inputs.select>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full">
+                        <x-inputs.text
+                            name="payable.supplier_id_reference"
+                            label="Supplier Id Reference"
+                            wire:model="payable.supplier_id_reference"
+                            maxlength="255"
+                            placeholder="Supplier Id Reference"
+                        ></x-inputs.text>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full">
+                        <x-inputs.select
+                            name="payable.periodicity"
+                            label="Periodicity"
+                            wire:model="payable.periodicity"
+                        >
+                            <option value="month" {{ optional($payable)->periodicity == 'month' ? 'selected' : '' }} >Month</option>
+                            <option value="year" {{ optional($payable)->periodicity == 'year' ? 'selected' : '' }} >Year</option>
+                        </x-inputs.select>
+                    </x-inputs.group>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-between px-6 py-4 bg-gray-50">
+            <button
+                type="button"
+                class="button"
+                wire:click="$toggle('showingModalEdit')"
+            >
+                <i class="mr-1 icon ion-md-close"></i>
+                @lang('crud.common.cancel')
+            </button>
+
+            <button
+                type="button"
+                class="button button-primary"
+                wire:click="savePayable"
+            >
+                <i class="mr-1 icon ion-md-save"></i>
+                @lang('crud.common.save')
+            </button>
+        </div>
+    </x-modal>
 </div>

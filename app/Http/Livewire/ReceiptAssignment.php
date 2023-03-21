@@ -2,31 +2,55 @@
 
 namespace App\Http\Livewire;
 
+use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Ticket;
 use App\Models\Payable;
 use App\Models\Receipt;
 use Livewire\Component;
+use App\Models\Supplier;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ReceiptAssignment extends Component
 {
+    use AuthorizesRequests;
+
     public $modalTitle = "Agregar pagos";
     public $showingModal = false;
+    public $modalTitleEdit = "Editar pagos";
+    public $showingModalEdit = false;
     public Client $client;
+    public Payable $payable;
     public $payables = null;
     public $tickets = null;
     public $receipt = null;
+    public $payableDate;
+    public $suppliersForSelect = [];
 
     public $allSelectedPayables = false;
     public $selectedPayable = [];
     public $allSelectedTickets = false;
     public $selectedTicket = [];
 
+    protected $rules = [
+        'payable.name' => ['required', 'max:255', 'string'],
+        'payableDate' => ['required', 'date'],
+        'payable.cost' => ['required', 'numeric'],
+        'payable.margin' => ['required', 'numeric'],
+        'payable.total' => ['required', 'numeric'],
+        'payable.supplier_id' => ['required', 'exists:suppliers,id'],
+        'payable.supplier_id_reference' => ['nullable', 'max:255', 'string'],
+        'payable.periodicity' => ['required', 'in:month,year'],
+    ];
+
     public function mount(Receipt $receipt)
     {
         $this->showingModal = false;
+        $this->showingModalEdit = false;
         $this->client = $receipt->client;
         $this->receipt = $receipt;
+
+        $this->suppliersForSelect = Supplier::pluck('name', 'id');
     }
 
     public function newPayment()
@@ -76,12 +100,12 @@ class ReceiptAssignment extends Component
     {
         $products = $this->client->products->modelKeys();
         $this->payables = Payable::whereIn('product_id', $products)
-            ->where('date', '<=', now())
+            ->where('date', '<=', Carbon::now()->addMonth(2))
             ->where('receipt_id', null)
             ->get();
 
         $this->tickets = Ticket::whereIn('product_id', $products)
-            ->where('finished_ticket', '<=', now())
+            ->where('finished_ticket', '<=', Carbon::now())
             ->where('receipt_id', null)
             ->where('statu_id', 6)
             ->get();
@@ -148,6 +172,34 @@ class ReceiptAssignment extends Component
         }
 
         $this->dispatchBrowserEvent('refresh');
+    }
+
+    public function editPayable(Payable $payable)
+    {
+        $this->modalTitleEdit = trans('crud.product_payables.edit_title');
+        $this->payable = $payable;
+
+        $this->payableDate = $this->payable->date->format('Y-m-d');
+        $this->showingModalEdit = true;
+    }
+
+    public function savePayable()
+    {
+        $this->validate();
+
+        if (!$this->payable->product_id) {
+            $this->authorize('create', Payable::class);
+
+            $this->payable->product_id = $this->product->id;
+        } else {
+            $this->authorize('update', $this->payable);
+        }
+
+        $this->payable->date = \Carbon\Carbon::parse($this->payableDate);
+
+        $this->payable->save();
+
+        $this->showingModalEdit = false;
     }
 
     public function removePayable($id)
