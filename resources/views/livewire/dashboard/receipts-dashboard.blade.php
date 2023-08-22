@@ -11,6 +11,9 @@
                 <th class="px-4 py-3 text-left">
                     @lang('crud.receipts.inputs.client_id')
                 </th>
+                <th class="px-4 py-3 text-left">
+                    @lang('crud.receipts.products')
+                </th>
                 <th class="px-4 py-3 text-right lg:w-32">
                     @lang('crud.receipts.total')
                 </th>
@@ -33,6 +36,7 @@
                         {{ optional($receipt->client)->name ?? '-'
                         }}
                     </td>
+                    <x-receipts-products :receipt="$receipt" />
                     <td class="px-4 py-3 text-right">
                         $ {{
                             $value = $receipt->manual_value ?? ($receipt->tickets->sum('total')) + ($receipt->payables->sum('total'));

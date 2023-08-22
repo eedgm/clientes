@@ -31,6 +31,7 @@ class ReceiptStoreRequest extends FormRequest
             'charged' => ['required', 'boolean'],
             'reference_charged' => ['nullable', 'max:255', 'string'],
             'date_charged' => ['nullable', 'date'],
+            'manual_value' => ['nullable', 'numeric'],
         ];
     }
 }

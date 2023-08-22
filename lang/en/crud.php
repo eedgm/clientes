@@ -565,6 +565,7 @@ return [
         'date_dashboard' => 'Date',
         'total' => 'Total',
         'value' => 'Value',
+        'products' => 'Products',
         'inputs' => [
             'real_date' => 'Real Date',
             'number' => 'Number',

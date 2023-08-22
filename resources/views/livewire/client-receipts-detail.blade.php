@@ -82,7 +82,7 @@
             </div>
         </div>
 
-        <div class="px-6 py-4 bg-gray-50 flex justify-between">
+        <div class="flex justify-between px-6 py-4 bg-gray-50">
             <button
                 type="button"
                 class="button"
@@ -103,11 +103,11 @@
         </div>
     </x-modal>
 
-    <div class="block w-full overflow-auto scrolling-touch mt-4">
+    <div class="block w-full mt-4 overflow-auto scrolling-touch">
         <table class="w-full max-w-full mb-4 bg-transparent">
             <thead class="text-gray-700">
                 <tr>
-                    <th class="px-4 py-3 text-left w-1">
+                    <th class="w-1 px-4 py-3 text-left">
                         <input
                             type="checkbox"
                             wire:model="allSelected"
@@ -120,6 +120,9 @@
                     </th>
                     <th class="px-4 py-3 text-left">
                         @lang('crud.client_receipts.inputs.description')
+                    </th>
+                    <th class="px-4 py-3 text-left">
+                        @lang('crud.client_receipts.products')
                     </th>
                     <th class="px-4 py-3 text-left">
                         @lang('crud.client_receipts.inputs.real_date')
@@ -152,6 +155,7 @@
                     <td class="px-4 py-3 text-left">
                         {{ $receipt->description ?? '-' }}
                     </td>
+                    <x-receipts-products :receipt="$receipt" />
                     <td class="px-4 py-3 text-left">
                         {{ $receipt->real_date ?? '-' }}
                     </td>
@@ -187,7 +191,7 @@
             <tfoot>
                 <tr>
                     <td colspan="7">
-                        <div class="mt-10 px-4">{{ $receipts->render() }}</div>
+                        <div class="px-4 mt-10">{{ $receipts->render() }}</div>
                     </td>
                 </tr>
             </tfoot>
