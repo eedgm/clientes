@@ -29,29 +29,25 @@
 
         @livewireStyles
     </head>
-    <body class="overflow-x-hidden font-sans antialiased bg-gray-100 md:flex">
-        <x-sidebar />
-        <div class="flex flex-col flex-1">
-            {{-- @livewire('navigation-menu') --}}
+    <body class="h-full overflow-x-hidden font-sans antialiased bg-gray-100">
+        <div class="flex bg-gray-300" x-data="{ isSidebarExpanded: $persist(true) }">
+            <x-dashboard.sidebar />
 
-            <x-header></x-header>
-
-            <main class="mb-auto scrolling-touch bg-gray-100 xs:overflow-x-auto lg:flex-grow">
-                <div class="py-4 pl-6 text-xl font-bold bg-white border-b border-gray-300 shadow-sm">
-                    @if (isset($header))
-                        <h3 class="text-3xl font-medium text-gray-700">{{ $header }}</h3>
-                    @endif
-                </div>
-                <div class="mt-2">
+            <div class="flex flex-col flex-1">
+                <x-dashboard.header />
+                <main class="flex-1 p-6 scrolling-touch bg-gray-100 xs:overflow-x-auto lg:flex-grow">
+                    <div class="py-4 pl-6 text-xl font-bold bg-white border-b border-gray-300 shadow-sm">
+                        @if (isset($header))
+                            <h3 class="text-3xl font-medium text-gray-700">{{ $header }}</h3>
+                        @endif
+                    </div>
                     {{ $slot }}
-                </div>
-            </main>
-            <footer>
-                <x-footer></x-footer>
-            </footer>
+                </main>
+                <footer>
+                    <x-footer></x-footer>
+                </footer>
+            </div>
         </div>
-
-
 
         @stack('modals')
 

@@ -19,7 +19,7 @@ x-data="{ open: $persist(false) }" x-on:togglesidebar.window=" open = !open" x-s
 <nav class="px-4 pt-4 overflow-y-scroll max-h-[calc(100vh-64px)]"">
     <ul class="flex flex-col space-y-2">
 
-        <x-sidebarmenu />
+        <x-dashboard.sidebarmenu />
 
     </ul>
 </nav>

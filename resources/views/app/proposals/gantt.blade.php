@@ -1,11 +1,13 @@
 <x-proposal-layout>
 
     <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800">
-            Projects
-        </h2>
-        <div class="text-right mt-[-25px] mr-5">
-            <livewire:proposal-calculator :proposal="$proposal" />
+        <div class="w-[calc(100%-1rem)]">
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                Projects
+            </h2>
+            <div class="text-right mt-[-25px] mr-5">
+                <livewire:proposal-calculator :proposal="$proposal" />
+            </div>
         </div>
     </x-slot>
 
@@ -27,7 +29,7 @@
         .gantt_task_line.low .gantt_task_content { color: #fff; }
     </style>
 
-    <div id="gantt_here" class="w-screen h-screen"></div>
+    <div id="gantt_here" class="h-screen w-[calc(100%-1rem)]"></div>
     <script type="text/javascript">
         var isMobile = {
             Android: function() {
