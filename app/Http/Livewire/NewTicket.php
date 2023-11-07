@@ -27,6 +27,8 @@ class NewTicket extends Component
     public $showingModal = false;
     public $modalTitle = 'New Ticket';
 
+    protected $listeners = ['refreshComponent' => '$refresh'];
+
     protected $rules = [
         'ticket_client_id' => ['required', 'exists:clients,id'],
         'ticket.product_id' => ['required', 'exists:products,id'],
@@ -72,6 +74,8 @@ class NewTicket extends Component
         $this->authorize('create', Ticket::class);
 
         $this->ticket->save();
+
+        $this->emit('refreshComponent');
 
         $this->showingModal = false;
     }

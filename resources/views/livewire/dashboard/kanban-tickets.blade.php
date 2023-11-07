@@ -2,6 +2,7 @@
     <div class="hidden">
         <div class="bg-yellow-100"></div>
         <div class="bg-purple-100"></div>
+        <div class="bg-sky-100"></div>
     </div>
     <div class="antialiased sans-serif">
         <div class="flex flex-col min-h-screen">
@@ -17,7 +18,6 @@
                                     <h2 class="font-medium text-gray-800">{{ $st->name }}</h2>
                                     <a wire:click.prevent="addTicket({{ $st->id }})" href="#" class="inline-flex items-center text-sm font-medium">
                                         <i class="bx bx-plus"></i>
-                                        Add Task
                                     </a>
                                 </div>
 

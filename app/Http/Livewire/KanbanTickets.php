@@ -26,6 +26,8 @@ class KanbanTickets extends Component
     public $editing = false;
     public $modalTitle = 'New Ticket';
 
+    protected $listeners = ['refreshComponent' => '$refresh'];
+
     protected $rules = [
         'ticket_client_id' => ['required', 'exists:clients,id'],
         'ticket.product_id' => ['required', 'exists:products,id'],
