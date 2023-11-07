@@ -50,7 +50,7 @@
                         {{ $ticket->product->name ?? '-' }}
                     </td>
                     <td class="px-4 py-3 text-left">
-                        {{ $ticket->description ?? '-' }}
+                        {{ Str::limit($ticket->description, 100) ?? '-' }}
                     </td>
                     <td class="px-4 py-3 text-left">
                         <x-inputs.select

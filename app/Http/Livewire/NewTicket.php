@@ -77,6 +77,9 @@ class NewTicket extends Component
 
         $this->emit('refreshComponent');
 
+        $this->ticket_client_id = null;
+        $this->products = [];
+
         $this->showingModal = false;
     }
 

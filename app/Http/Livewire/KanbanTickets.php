@@ -20,6 +20,7 @@ class KanbanTickets extends Component
     public $newStatus;
     public $moveTicket;
     public $colors = [];
+    public $icons = [];
     public $ticket_client_id;
     public $ticketFinishedTicket;
 
@@ -53,6 +54,15 @@ class KanbanTickets extends Component
             4 => 'bg-red-100',
             5 => 'bg-purple-100',
             6 => 'bg-sky-100'
+        ];
+
+        $this->icons = [
+            1 => 'bx-file-blank text-blue-500',
+            2 => 'bx-key text-green-500',
+            3 => 'bx-alarm-off text-yellow-500',
+            4 => 'bx-layer-minus text-red-500',
+            5 => 'bx-bell text-purple-500',
+            6 => 'bx-dollar text-sky-500'
         ];
     }
 
@@ -99,6 +109,9 @@ class KanbanTickets extends Component
         }
 
         $this->ticket->save();
+
+        $this->ticket_client_id = null;
+        $this->products = [];
 
         $this->showingModal = false;
     }

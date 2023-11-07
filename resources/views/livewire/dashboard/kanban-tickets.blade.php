@@ -1,8 +1,8 @@
 <div>
     <div class="hidden">
-        <div class="bg-yellow-100"></div>
-        <div class="bg-purple-100"></div>
-        <div class="bg-sky-100"></div>
+        <div class="text-blue-500 bg-yellow-100"></div>
+        <div class="text-purple-500 bg-purple-100"></div>
+        <div class="bg-sky-100 text-sky-500"></div>
     </div>
     <div class="antialiased sans-serif">
         <div class="flex flex-col min-h-screen">
@@ -15,7 +15,7 @@
                         <div class="flex-shrink-0 w-1/3 px-4 md:w-1/4 lg:w-1/6">
                             <div class="pb-4 overflow-x-hidden overflow-y-auto border-t-8 border-red-400 rounded-lg shadow bg-gray-50" style="min-height: 100px">
                                 <div class="sticky top-0 flex items-center justify-between px-4 py-2">
-                                    <h2 class="font-medium text-gray-800">{{ $st->name }}</h2>
+                                    <h2 class="font-medium text-gray-800"><i class="bx {{ $icons[$st->id] }}"></i> {{ $st->name }}</h2>
                                     <a wire:click.prevent="addTicket({{ $st->id }})" href="#" class="inline-flex items-center text-sm font-medium">
                                         <i class="bx bx-plus"></i>
                                     </a>
@@ -33,6 +33,8 @@
                                                 >
                                                     <div class="text-xs text-gray-800">{{ $ticket->product->client->name }} / {{ $ticket->product->name }}</div>
                                                     <div class="text-gray-800">{{ Str::limit($ticket->description, 150) }}</div>
+                                                    <hr class="h-px my-2 bg-gray-400 border-0" />
+                                                    <div class="text-xs">Hours: {{ $ticket->hours ?? '-' }} / Cost: {{ $ticket->total ?? '-' }}</div>
                                                     <div class="text-right">
                                                         <i class="text-xs bx bx-pencil" wire:click="edit({{ $ticket->id }})"></i>
                                                         <button
