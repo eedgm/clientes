@@ -1,14 +1,8 @@
-<header class="sticky top-0 z-50 grid h-20 grid-cols-2 pl-6 bg-gray-800">
+<header class="sticky top-0 z-50 grid grid-cols-2 pl-6 bg-gray-800 h-14">
     <div class="flex items-center">
 
         <button class="p-2 mr-2 -ml-2" @click="isSidebarExpanded = !isSidebarExpanded">
         <i class="w-6 h-6 text-3xl text-white transform bx bx-menu-alt-left" :class="isSidebarExpanded ? 'rotate-90' : 'rotate-0'"></i>
-        {{-- <svg viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 transform" :class="isSidebarExpanded ? 'rotate-180' : 'rotate-0'">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-            <line x1="4" y1="6" x2="14" y2="6" />
-            <line x1="4" y1="18" x2="14" y2="18" />
-            <path d="M4 12h17l-3 -3m0 6l3 -3" />
-        </svg> --}}
         </button>
         <div class="hidden lg:block">
             <!-- Search -->
@@ -29,8 +23,9 @@
             </form>
         </div>
 
-        <div>
+        <div class="flex items-center">
             <a class="m-3 text-2xl text-white" href="{{ route('board') }}"><i class="bx bx-detail"></i></a>
+            <livewire:new-ticket />
         </div>
     </div>
 

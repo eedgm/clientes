@@ -1,28 +1,28 @@
 <div>
     <div class="grid">
-        <div class="flex flex-col items-stretch justify-center h-full" x-data="{tab: 1}">
-            <div class="z-10 flex justify-start -space-x-px">
+        <div class="flex flex-col items-stretch justify-center h-full" x-data="{tab: $persist(1)}">
+            <div class="z-10 flex justify-start mt-2 -space-x-px">
                 <a
                     href="!#0"
                     @click.prevent="tab = 1"
-                    :class="{'cursor-default border-b-0 bg-white': tab === 1, 'text-gray-600 bg-gray-200 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:shadow-outline': tab !== 1}"
-                    class="block px-6 py-4 text-base font-semibold leading-none text-black uppercase align-middle border border-gray-400 shadow-none outline-none"
+                    :class="{'cursor-default border-b-0 bg-green-700 text-white': tab === 1, 'text-gray-600 bg-green-100 hover:bg-green-100 hover:text-gray-700 focus:outline-none focus:shadow-outline': tab !== 1}"
+                    class="block px-6 py-1 text-base font-semibold leading-none uppercase align-middle border border-gray-400 rounded-tl-lg shadow-none outline-none"
                     >
                     <i class="text-xl bx bx-dollar"></i>
                 </a>
                 <a
                     href="!#0"
                     @click.prevent="tab = 2"
-                    :class="{'cursor-default border-b-0 bg-white': tab === 2, 'text-gray-600 bg-gray-200 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:shadow-outline': tab !== 2}"
-                    class="block px-6 py-4 text-base font-semibold leading-none text-black uppercase align-middle border border-gray-400 rounded-tl-lg shadow-none outline-none"
+                    :class="{'cursor-default border-b-0 bg-red-700 text-white': tab === 2, 'text-gray-600 bg-red-100 hover:bg-red-100 hover:text-gray-700 focus:outline-none focus:shadow-outline': tab !== 2}"
+                    class="block px-6 py-1 text-base font-semibold leading-none uppercase align-middle border border-red-400 shadow-none outline-none"
                     >
                     <i class="text-xl bx bx-purchase-tag"></i>
                 </a>
                 <a
                     href="!#0"
                     @click.prevent="tab = 3"
-                    :class="{'cursor-default border-b-0 bg-white': tab === 3, 'text-gray-600 bg-gray-200 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:shadow-outline': tab !== 3}"
-                    class="block px-6 py-4 text-base font-semibold leading-none text-black uppercase align-middle border border-gray-400 shadow-none outline-none"
+                    :class="{'cursor-default border-b-0 bg-blue-700 text-white': tab === 3, 'text-gray-600 bg-blue-100 hover:bg-blue-100 hover:text-gray-700 focus:outline-none focus:shadow-outline': tab !== 3}"
+                    class="block px-6 py-1 text-base font-semibold leading-none uppercase align-middle border border-blue-400 rounded-tr-lg shadow-none outline-none"
                     >
                     <i class="text-xl bx bx-columns"></i>
                 </a>
@@ -91,7 +91,7 @@
                     </x-partials.card>
                 </div>
             </div>
-            <div x-show="tab === 3" class="border border-gray-400 rounded-md rounded-tl-none bg-gradient-to-br from-white via-white to-yellow-100">
+            <div x-show="tab === 3" class="border border-gray-400 rounded-md rounded-tl-none bg-gradient-to-br from-sky-100 via-white to-cyan-100">
                 <livewire:kanban-tickets />
             </div>
 

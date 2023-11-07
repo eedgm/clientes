@@ -51,6 +51,7 @@ Route::prefix('/')
 
         Route::get('proposals/gantt/{proposal}', [ProposalController::class, 'gantt'])->name('gantt');
         Route::get('proposals/board', [ProposalController::class, 'board'])->name('board');
+        Route::delete('proposals/destroy-dashboard/{proposal}', [ProposalController::class, 'destroyDashboard'])->name('destroy-dashboard');
         Route::get('/proposal/tasks/{proposal}', [TaskController::class, 'getTasks']);
         Route::post('/tasks/task', [TaskController::class, 'addGanttTask']);
         Route::put('/tasks/task/update/{task}', [TaskController::class, 'updateGanttTask']);

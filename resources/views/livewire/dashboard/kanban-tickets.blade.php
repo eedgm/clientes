@@ -1,15 +1,19 @@
 <div>
+    <div class="hidden">
+        <div class="bg-yellow-100"></div>
+        <div class="bg-purple-100"></div>
+    </div>
     <div class="antialiased sans-serif">
         <div class="flex flex-col min-h-screen">
             <div class="flex-1">
 
-            <div class="container px-4 py-4 mx-auto">
+            <div class="px-4 py-4 mx-auto">
                 <div class="py-2 md:py-8">
                     <div class="flex pb-2 -mx-4 overflow-x-auto">
                         @foreach ($status as $st)
-                        <div class="flex-shrink-0 w-1/2 px-4 md:w-1/4">
-                            <div class="pb-4 overflow-x-hidden overflow-y-auto bg-gray-100 border-t-8 rounded-lg shadow" style="min-height: 100px">
-                                <div class="sticky top-0 flex items-center justify-between px-4 py-2 bg-gray-100">
+                        <div class="flex-shrink-0 w-1/3 px-4 md:w-1/4 lg:w-1/6">
+                            <div class="pb-4 overflow-x-hidden overflow-y-auto border-t-8 border-red-400 rounded-lg shadow bg-gray-50" style="min-height: 100px">
+                                <div class="sticky top-0 flex items-center justify-between px-4 py-2">
                                     <h2 class="font-medium text-gray-800">{{ $st->name }}</h2>
                                     <a wire:click.prevent="addTicket({{ $st->id }})" href="#" class="inline-flex items-center text-sm font-medium">
                                         <i class="bx bx-plus"></i>
@@ -18,13 +22,27 @@
                                 </div>
 
                                 <div class="px-4">
-                                    <div @dragover="onDragOver(event)" @drop="onDrop(event, board)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)" class="pt-2 pb-20 rounded-lg">
+                                    <div @dragenter="$wire.onDragEnter(event, {{ $st->id }})" class="pt-2 pb-20 rounded-lg">
                                         @foreach ($tickets as $ticket)
                                             @if ($ticket->statu_id == $st->id)
                                             <div>
-                                                <div class="p-2 mb-3 bg-white rounded-lg shadow" draggable="true" @dragstart="onDragStart(event, {{ $ticket->id }})">
+                                                <div
+                                                    class="p-2 mb-3 rounded-lg shadow {{ $colors[$st->id] }}"
+                                                    draggable="true"
+                                                    @dragend="$wire.onDragEnd(event, {{ $ticket->id }})"
+                                                >
                                                     <div class="text-xs text-gray-800">{{ $ticket->product->client->name }} / {{ $ticket->product->name }}</div>
-                                                    <div class="text-gray-800">{{ $ticket->description }}</div>
+                                                    <div class="text-gray-800">{{ Str::limit($ticket->description, 150) }}</div>
+                                                    <div class="text-right">
+                                                        <i class="text-xs bx bx-pencil" wire:click="edit({{ $ticket->id }})"></i>
+                                                        <button
+                                                            onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
+                                                            wire:click="delete({{ $ticket->id }})"
+                                                        >
+                                                            <i class="text-xs bx bx-trash"></i>
+                                                        </button>
+
+                                                    </div>
                                                 </div>
                                             </div>
                                             @endif
@@ -47,10 +65,122 @@
             <div class="text-lg font-bold">{{ $modalTitle }}</div>
 
             <div class="mt-5">
+                <div class="flex flex-wrap">
+                    <x-inputs.group class="w-full md:w-1/2">
+                        <x-inputs.select
+                            name="ticket_client_id"
+                            label="Client"
+                            wire:model="ticket_client_id"
+                            wire:change="selectProducts"
+                        >
+                            <option value="null" disabled>Please select the Client</option>
+                            @foreach($clients as $value => $label)
+                            <option value="{{ $value }}"  >{{ $label }}</option>
+                            @endforeach
+                        </x-inputs.select>
+                    </x-inputs.group>
 
+                    <x-inputs.group class="w-full md:w-1/2">
+                        <x-inputs.select
+                            name="ticket.product_id"
+                            label="Product"
+                            wire:model="ticket.product_id"
+                        >
+                            <option value="null" disabled>Please select the Product</option>
+                            @if (!is_null($products))
+                                @foreach($products as $value => $label)
+                                <option value="{{ $value }}"  >{{ $label }}</option>
+                                @endforeach
+                            @endif
+                        </x-inputs.select>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full">
+                        <x-inputs.textarea
+                            name="ticket.description"
+                            label="Description"
+                            wire:model="ticket.description"
+                            maxlength="255"
+                        ></x-inputs.textarea>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full md:w-1/5">
+                        <x-inputs.select
+                            name="ticket.statu_id"
+                            label="Statu"
+                            wire:model="ticket.statu_id"
+                        >
+                            <option value="null" disabled>Please select the Statu</option>
+                            @foreach($statusForSelect as $value => $label)
+                            <option value="{{ $value }}"  >{{ $label }}</option>
+                            @endforeach
+                        </x-inputs.select>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full md:w-1/5">
+                        <x-inputs.select
+                            name="ticket.priority_id"
+                            label="Priority"
+                            wire:model="ticket.priority_id"
+                        >
+                            <option value="null" disabled>Please select the Priority</option>
+                            @foreach($prioritiesForSelect as $value => $label)
+                            <option value="{{ $value }}"  >{{ $label }}</option>
+                            @endforeach
+                        </x-inputs.select>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full md:w-1/5">
+                        <x-inputs.date
+                            name="ticketFinishedTicket"
+                            label="Finished Ticket"
+                            wire:model="ticketFinishedTicket"
+                            max="255"
+                        ></x-inputs.date>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full md:w-1/5">
+                        <x-inputs.number
+                            name="ticket.hours"
+                            label="Hours"
+                            wire:model="ticket.hours"
+                            max="255"
+                            step="0.01"
+                            placeholder="Hours"
+                        ></x-inputs.number>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full md:w-1/5">
+                        <x-inputs.number
+                            name="ticket.total"
+                            label="Total"
+                            wire:model="ticket.total"
+                            step="0.01"
+                            placeholder="Total"
+                        ></x-inputs.number>
+                    </x-inputs.group>
+
+                    <x-inputs.group class="w-full">
+                        <x-inputs.textarea
+                            name="ticket.comments"
+                            label="Comments"
+                            wire:model="ticket.comments"
+                        ></x-inputs.textarea>
+                    </x-inputs.group>
+                </div>
             </div>
 
+            @if($editing) @can('view-any', App\Models\Attachment::class)
+            <x-partials.card class="mt-5 shadow-none bg-gray-50">
+                <h4 class="mb-3 text-sm font-bold text-gray-600">
+                    Attachments
+                </h4>
+
+                <livewire:ticket-attachments-detail :ticket="$ticket" />
+            </x-partials.card>
+            @endcan @endif
         </div>
+
         <div class="flex justify-between px-6 py-4 bg-gray-50">
             <button
                 type="button"
@@ -64,7 +194,7 @@
             <button
                 type="button"
                 class="button button-primary"
-                wire:click="$toggle('showingModal')"
+                wire:click="save"
             >
                 <i class="mr-1 icon ion-md-save"></i>
                 @lang('crud.common.save')

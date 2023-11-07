@@ -128,4 +128,15 @@ class ProposalController extends Controller
             ->route('proposals.index')
             ->withSuccess(__('crud.common.removed'));
     }
+
+    public function destroyDashboard(Request $request, Proposal $proposal)
+    {
+        $this->authorize('delete', $proposal);
+
+        $proposal->delete();
+
+        return redirect()
+            ->route('board')
+            ->withSuccess(__('crud.common.removed'));
+    }
 }

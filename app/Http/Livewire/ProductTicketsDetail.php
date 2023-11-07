@@ -39,7 +39,7 @@ class ProductTicketsDetail extends Component
         'ticket.hours' => ['nullable', 'numeric'],
         'ticket.total' => ['nullable', 'numeric'],
         'ticketFinishedTicket' => ['nullable', 'date'],
-        'ticket.comments' => ['nullable', 'max:255', 'string'],
+        'ticket.comments' => ['nullable', 'string'],
         'ticket.person_id' => ['nullable', 'exists:people,id'],
     ];
 
