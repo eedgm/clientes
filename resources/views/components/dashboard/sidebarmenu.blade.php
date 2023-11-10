@@ -28,7 +28,7 @@
 @if (Auth::user()->can('create', Spatie\Permission\Models\Role::class) ||
             Auth::user()->can('create', Spatie\Permission\Models\Permission::class))
     <!-- Section Devider -->
-    <div class="hidden pt-4 pb-1 pl-0 mb-4 text-xs text-white section md:block">
+    <div class="pt-4 pb-1 pl-0 mb-4 text-xs text-white section" :class="isSidebarExpanded ? 'md:block' : 'hidden group-hover:md:block'">
         Permissions
     </div>
     <hr>

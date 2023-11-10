@@ -25,6 +25,7 @@ class Ticket extends Model
         'product_id',
         'receipt_id',
         'person_id',
+        'progress'
     ];
 
     protected $searchableFields = ['*'];

@@ -1,6 +1,6 @@
 <aside
-    class="sticky top-0 z-50 flex flex-col h-screen text-gray-300 transition-all duration-300 ease-in-out bg-gray-800"
-    :class="isSidebarExpanded ? 'w-64' : 'w-16 md:w-20'"
+    class="sticky top-0 z-50 flex flex-col h-screen text-gray-300 transition-all duration-300 ease-in-out bg-gray-800 group"
+    :class="isSidebarExpanded ? 'w-52' : 'w-16 md:w-20 hover:w-52'"
     >
     <a
         href="{{ route('dashboard') }}"

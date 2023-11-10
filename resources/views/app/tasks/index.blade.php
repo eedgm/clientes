@@ -1,14 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800">
             @lang('crud.tasks.index_title')
         </h2>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-9xl mx-auto sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-9xl sm:px-6 lg:px-8">
             <x-partials.card>
-                <div class="mb-5 mt-4">
+                <div class="mt-4 mb-5">
                     <div class="flex flex-wrap justify-between">
                         <div class="md:w-1/2">
                             <form>
@@ -31,7 +31,7 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="md:w-1/2 text-right">
+                        <div class="text-right md:w-1/2">
                             @can('create', App\Models\Task::class)
                             <a
                                 href="{{ route('tasks.create') }}"
@@ -50,7 +50,7 @@
                         <thead class="text-gray-700">
                             <tr>
                                 <th class="px-4 py-3 text-left">
-                                    @lang('crud.tasks.inputs.name')
+                                    @lang('crud.tasks.inputs.text')
                                 </th>
                                 <th class="px-4 py-3 text-right">
                                     @lang('crud.tasks.inputs.hours')
@@ -77,7 +77,7 @@
                             @forelse($tasks as $task)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-4 py-3 text-left">
-                                    {{ $task->name ?? '-' }}
+                                    {{ $task->text ?? '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-right">
                                     {{ $task->hours ?? '-' }}
@@ -106,11 +106,7 @@
                                     <div
                                         role="group"
                                         aria-label="Row Actions"
-                                        class="
-                                            relative
-                                            inline-flex
-                                            align-middle
-                                        "
+                                        class="relative inline-flex align-middle "
                                     >
                                         @can('update', $task)
                                         <a
@@ -150,11 +146,7 @@
                                                 class="button"
                                             >
                                                 <i
-                                                    class="
-                                                        icon
-                                                        ion-md-trash
-                                                        text-red-600
-                                                    "
+                                                    class="text-red-600  icon ion-md-trash"
                                                 ></i>
                                             </button>
                                         </form>
@@ -173,7 +165,7 @@
                         <tfoot>
                             <tr>
                                 <td colspan="8">
-                                    <div class="mt-10 px-4">
+                                    <div class="px-4 mt-10">
                                         {!! $tasks->render() !!}
                                     </div>
                                 </td>

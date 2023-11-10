@@ -51,6 +51,7 @@ class NewTicket extends Component
     public function createTicket()
     {
         $this->ticket = new Ticket();
+        $this->ticket->statu_id = 1;
         $this->showingModal = true;
     }
 

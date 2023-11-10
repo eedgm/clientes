@@ -23,6 +23,9 @@ class KanbanTickets extends Component
     public $icons = [];
     public $ticket_client_id;
     public $ticketFinishedTicket;
+    public $status;
+
+    public $ticketStatusSelected = null;
 
     public $editing = false;
     public $modalTitle = 'New Ticket';
@@ -38,6 +41,7 @@ class KanbanTickets extends Component
         'ticketFinishedTicket' => ['nullable', 'date'],
         'ticket.hours' => ['nullable', 'numeric'],
         'ticket.total' => ['nullable', 'numeric'],
+        'ticket.progress' => ['nullable', 'numeric'],
         'ticket.comments' => ['nullable', 'max:255', 'string'],
     ];
 
@@ -47,6 +51,7 @@ class KanbanTickets extends Component
         $this->prioritiesForSelect = Priority::pluck('name', 'id');
         $this->clients = Client::pluck('name', 'id');
         $this->ticketFinishedTicket = null;
+        $this->status = Statu::all();
         $this->colors = [
             1 => 'bg-blue-100',
             2 => 'bg-green-100',
@@ -70,6 +75,7 @@ class KanbanTickets extends Component
     {
         $this->ticket = new Ticket();
         $this->ticket->statu_id = $status->id;
+        $this->ticket->progress = 0;
         $this->showingModal = true;
     }
 
@@ -84,12 +90,18 @@ class KanbanTickets extends Component
             $product = Product::where('id', $this->ticket->product_id)->first();
             $this->ticket->total = $value ? $value * $product->client->cost_per_hour : '';
         }
+
+        if ($name == 'ticket.statu_id') {
+            $this->ticketStatusSelected = $this->ticket->statu_id;
+        }
     }
 
     public function edit(Ticket $ticket)
     {
         $this->editing = true;
         $this->ticket = $ticket;
+        $this->ticket->progress = $this->ticket->progress ?? 0;
+        $this->ticketStatusSelected = $this->ticket->statu_id;
         $this->ticket_client_id = $this->ticket->product->client->id;
         $this->products = Product::where('client_id', $this->ticket_client_id)->pluck('name', 'id');
         $this->ticketFinishedTicket = $this->ticket->finished_ticket ? $this->ticket->finished_ticket->format('Y-m-d') : null;
@@ -136,9 +148,8 @@ class KanbanTickets extends Component
 
     public function render()
     {
-        $status = Statu::all();
         $tickets = Ticket::whereNull('receipt_id')->get();
 
-        return view('livewire.dashboard.kanban-tickets', compact('status', 'tickets'));
+        return view('livewire.dashboard.kanban-tickets', compact('tickets'));
     }
 }

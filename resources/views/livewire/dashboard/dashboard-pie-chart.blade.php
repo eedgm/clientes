@@ -16,16 +16,24 @@
                     :class="{'cursor-default border-b-0 bg-red-700 text-white': tab === 2, 'text-gray-600 bg-red-100 hover:bg-red-100 hover:text-gray-700 focus:outline-none focus:shadow-outline': tab !== 2}"
                     class="block px-6 py-1 text-base font-semibold leading-none uppercase align-middle border border-red-400 shadow-none outline-none"
                     >
-                    <i class="text-xl bx bx-purchase-tag"></i>
+                    <i class="text-xl bx bx-pie-chart-alt-2"></i>
                 </a>
                 <a
                     href="!#0"
                     @click.prevent="tab = 3"
                     :class="{'cursor-default border-b-0 bg-blue-700 text-white': tab === 3, 'text-gray-600 bg-blue-100 hover:bg-blue-100 hover:text-gray-700 focus:outline-none focus:shadow-outline': tab !== 3}"
-                    class="block px-6 py-1 text-base font-semibold leading-none uppercase align-middle border border-blue-400 rounded-tr-lg shadow-none outline-none"
+                    class="block px-6 py-1 text-base font-semibold leading-none uppercase align-middle border border-blue-400 shadow-none outline-none"
                     >
-                    <i class="text-xl bx bx-columns"></i>
+                    <i class="text-xl bx bx-file"></i>
                 </a>
+                {{-- <a
+                    href="!#0"
+                    @click.prevent="tab = 4"
+                    :class="{'cursor-default border-b-0 bg-orange-700 text-white': tab === 4, 'text-gray-600 bg-blue-100 hover:bg-orange-100 hover:text-gray-700 focus:outline-none focus:shadow-outline': tab !== 4}"
+                    class="block px-6 py-1 text-base font-semibold leading-none uppercase align-middle border border-orange-400 rounded-tr-lg shadow-none outline-none"
+                    >
+                    <i class="text-xl bx bx-task"></i>
+                </a> --}}
             </div>
 
             <div x-show="tab === 1" class="border border-gray-400 rounded-md rounded-tl-none bg-gradient-to-br from-white via-white to-cyan-100">
@@ -94,7 +102,9 @@
             <div x-show="tab === 3" class="border border-gray-400 rounded-md rounded-tl-none bg-gradient-to-br from-sky-100 via-white to-cyan-100">
                 <livewire:kanban-tickets />
             </div>
-
+            {{-- <div x-show="tab === 4" class="border border-gray-400 rounded-md rounded-tl-none bg-gradient-to-br from-sky-100 via-white to-cyan-100">
+                <livewire:kanban-tasks />
+            </div> --}}
         </div>
     </div>
 

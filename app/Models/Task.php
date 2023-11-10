@@ -13,11 +13,11 @@ class Task extends Model
     use Searchable;
     use SoftDeletes;
 
-    protected $appends = ["open"];
+    // protected $appends = ["open"];
 
-    public function getOpenAttribute(){
-        return true;
-    }
+    // public function getOpenAttribute(){
+    //     return true;
+    // }
 
     protected $fillable = [
         'text',
@@ -43,6 +43,11 @@ class Task extends Model
     public function priority()
     {
         return $this->belongsTo(Priority::class);
+    }
+
+    public function proposal()
+    {
+        return $this->belongsTo(Proposal::class);
     }
 
     public function attaches()
