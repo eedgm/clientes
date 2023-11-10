@@ -5,13 +5,13 @@
         <div class="bg-sky-100 text-sky-500"></div>
     </div>
     <div class="antialiased sans-serif">
-        <h1 class="w-full p-2 -mb-5 bg-gray-300">Tickets</h1>
-        <div class="flex flex-col min-h-screen">
+        <h1 class="w-full p-2 -mb-5 bg-gray-300">Kanban Tickets</h1>
+        <div class="flex w-full min-h-screen">
             <div class="px-4 py-4 mx-auto">
                 <div class="py-2 md:py-8">
-                    <div class="flex pb-2 -mx-4 overflow-x-auto">
+                    <div class="flex flex-wrap pb-2 -mx-4 overflow-x-auto">
                         @foreach ($status as $st)
-                        <div class="flex-shrink-0 w-1/3 px-4 md:w-1/4 lg:w-1/6">
+                        <div class="flex-shrink-0 w-full px-4 mb-5 md:w-1/3 lg:w-1/6 md:mb-0">
                             <div class="pb-4 overflow-x-hidden overflow-y-auto border-t-8 border-red-400 rounded-lg shadow bg-gray-50" style="min-height: 100px">
                                 <div class="sticky top-0 flex items-center justify-between px-4 py-2">
                                     <h2 class="font-medium text-gray-800"><i class="bx {{ $icons[$st->id] }}"></i> {{ $st->name }}</h2>
@@ -37,12 +37,12 @@
                                                         <div class="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: {{ $ticket->progress ?? 0 }}%"> {{ $ticket->progress ?? 0 }}%</div>
                                                     </div>
                                                     <div class="text-right">
-                                                        <i class="text-xs bx bx-pencil" wire:click="edit({{ $ticket->id }})"></i>
+                                                        <i class="text-lg bx bx-pencil" wire:click="edit({{ $ticket->id }})"></i>
                                                         <button
                                                             onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
                                                             wire:click="delete({{ $ticket->id }})"
                                                         >
-                                                            <i class="text-xs bx bx-trash"></i>
+                                                            <i class="text-lg bx bx-trash"></i>
                                                         </button>
 
                                                     </div>
