@@ -43,7 +43,6 @@
             <div class="relative px-4 text-sm text-gray-400 bg-gray-700 cursor-pointer hover:text-white"
                 x-data="{open: false}">
                 <div class="flex items-center min-h-full" @click="open = !open">
-
                     @if(Auth::check())
                         <div class="flex flex-col ml-4">
                             {{ Auth::user()->name }}

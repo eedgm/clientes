@@ -121,9 +121,9 @@
                         @if ($person)
                             <th><span>Solicitado por</span></th>
                         @endif
-                        @if ($hours)
+                        {{-- @if ($hours)
                             <th><span>Horas</span></th>
-                        @endif
+                        @endif --}}
 						<th><span>Costo</span></th>¡
 					</tr>
 				</thead>
@@ -153,9 +153,9 @@
                                 @if ($person)
                                     <td><span>{{ $result['person'] }}</span></td>
                                 @endif
-                                @if ($hours)
+                                {{-- @if ($hours)
                                     <td><span>{{ number_format($result['hours'], 1) }}</span></td>
-                                @endif
+                                @endif --}}
                                 <td><span data-prefix>$ </span><span>{{ $result['cost'] }}</span></td>
                             </tr>
                         @endforeach

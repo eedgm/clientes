@@ -108,12 +108,6 @@
         </div>
     </div>
 
-
-
-
-
-
-
     {{-- <x-partials.card class="w-full">
         <x-slot name="title">
             Kanban
