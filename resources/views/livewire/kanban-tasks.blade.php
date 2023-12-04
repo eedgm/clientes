@@ -5,7 +5,7 @@
         <div class="bg-sky-100 text-sky-500"></div>
     </div>
     <div class="antialiased sans-serif">
-        <h1 class="w-full p-2 -mb-5 bg-gray-300">Tasks</h1>
+        <h1 class="w-full p-2 -mb-5 bg-cyan-200">Tasks for {{ $proposal->description }}</h1>
         <div class="flex flex-col min-h-screen">
             <div class="px-4 py-4 mx-auto">
                 <div class="py-2 md:py-8">

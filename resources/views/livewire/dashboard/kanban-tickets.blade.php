@@ -5,7 +5,7 @@
         <div class="bg-sky-100 text-sky-500"></div>
     </div>
     <div class="antialiased sans-serif">
-        <h1 class="w-full p-2 -mb-5 bg-gray-300">Kanban Tickets</h1>
+        <h1 class="w-full p-2 -mb-5 bg-gray-100">Kanban Tickets</h1>
         <div class="flex w-full min-h-screen">
             <div class="px-4 py-4 mx-auto">
                 <div class="py-2 md:py-8">

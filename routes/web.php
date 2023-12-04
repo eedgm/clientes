@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Livewire\KanbanTasks;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IconController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\StatuController;
@@ -56,6 +57,7 @@ Route::prefix('/')
         Route::post('/tasks/task', [TaskController::class, 'addGanttTask']);
         Route::put('/tasks/task/update/{task}', [TaskController::class, 'updateGanttTask']);
         Route::put('/tasks/task/delete/{task}', [TaskController::class, 'destroyGanttTask']);
+        Route::get('proposal/kanban/{proposal}', KanbanTasks::class)->name('proposal.kanban');
 
         Route::resource('roles', RoleController::class);
         Route::resource('permissions', PermissionController::class);

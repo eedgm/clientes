@@ -103,6 +103,7 @@
 
                     <div class="text-right">
                         <a href="{{ route('gantt', $proposal->id) }}"><i class="inline text-xl text-white bx bx-objects-horizontal-right"></i></a>
+                        <a href="{{ route('proposal.kanban', $proposal->id) }}"><i class="inline text-xl text-white bx bx-columns"></i></a>
                         @can('delete', $proposal)
                         <form
                             action="{{ route('destroy-dashboard', $proposal) }}"

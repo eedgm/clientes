@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Task;
 use App\Models\Client;
 use App\Models\Proposal;
 use Illuminate\Http\Request;
@@ -134,6 +135,8 @@ class ProposalController extends Controller
         $this->authorize('delete', $proposal);
 
         $proposal->delete();
+
+        Task::where('proposal_id', $proposal->id)->delete();
 
         return redirect()
             ->route('board')

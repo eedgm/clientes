@@ -50,11 +50,11 @@
             <div class="flex flex-col flex-1">
                 <x-dashboard.header />
                 <main class="flex-1 p-6">
-                    <div class="py-4 pl-6 text-xl font-bold bg-white border-b border-gray-300 shadow-sm">
-                        @if (isset($header))
+                    @if (isset($header))
+                        <div class="py-4 pl-6 text-xl font-bold bg-white border-b border-gray-300 shadow-sm">
                             <h3 class="text-3xl font-medium text-gray-700">{{ $header }}</h3>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
                     {{ $slot }}
                 </main>
                 <footer>

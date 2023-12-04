@@ -6,6 +6,7 @@ use App\Models\Task;
 use App\Models\Statu;
 use Livewire\Component;
 use App\Models\Priority;
+use App\Models\Proposal;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class KanbanTasks extends Component
@@ -19,6 +20,7 @@ class KanbanTasks extends Component
     public $icons = [];
     public $task_client_id;
     public $status;
+    public $proposal;
 
     public $taskStatusSelected = null;
 
@@ -28,7 +30,6 @@ class KanbanTasks extends Component
     protected $listeners = ['refreshComponent' => '$refresh'];
 
     protected $rules = [
-        'task_proposal_id' => ['required', 'exists:clients,id'],
         'task.text' => ['required', 'string'],
         'task.statu_id' => ['required', 'exists:status,id'],
         'task.priority_id' => ['required', 'exists:priorities,id'],
@@ -38,7 +39,8 @@ class KanbanTasks extends Component
         'task.comments' => ['nullable', 'max:255', 'string'],
     ];
 
-    public function mount() {
+    public function mount(Proposal $proposal) {
+        $this->proposal = $proposal;
         $this->showingModal = false;
         $this->statusForSelect = Statu::pluck('name', 'id');
         $this->prioritiesForSelect = Priority::pluck('name', 'id');
@@ -118,7 +120,7 @@ class KanbanTasks extends Component
 
     public function render()
     {
-        $tasks = Task::whereNull('receipt_id')->get();
+        $tasks = Task::whereNull('receipt_id')->where('proposal_id', $this->proposal->id)->get();
         return view('livewire.kanban-tasks', compact('tasks'));
     }
 }
