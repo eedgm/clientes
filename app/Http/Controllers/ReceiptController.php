@@ -25,7 +25,7 @@ class ReceiptController extends Controller
 
         $receipts = Receipt::search($search)
             ->latest()
-            ->paginate(5)
+            ->paginate(15)
             ->withQueryString();
 
         return view('app.receipts.index', compact('receipts', 'search'));

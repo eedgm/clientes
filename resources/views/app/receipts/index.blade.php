@@ -5,8 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="mx-auto max-w-9xl sm:px-6 lg:px-8">
+    <div class="py-5">
+        <div class="mx-auto">
             <x-partials.card>
                 <div class="mt-4 mb-5">
                     <div class="flex flex-wrap justify-between">
