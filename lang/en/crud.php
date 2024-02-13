@@ -355,6 +355,7 @@ return [
             'supplier_id_reference' => 'Supplier Id Reference',
             'periodicity' => 'Periodicity',
             'receipt_id' => 'Receipt',
+            'client_id' => 'Client',
         ],
     ],
 

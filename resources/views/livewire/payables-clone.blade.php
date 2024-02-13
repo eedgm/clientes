@@ -143,31 +143,31 @@
             <thead class="text-gray-700">
                 <tr>
                     <th class="px-4 py-3 text-left">
-                        @lang('crud.supplier_payables.inputs.name')
+                        @lang('crud.payables.inputs.name')
                     </th>
                     <th class="px-4 py-3 text-left">
-                        @lang('crud.supplier_payables.inputs.date')
+                        @lang('crud.payables.inputs.date')
                     </th>
                     <th class="px-4 py-3 text-right">
-                        @lang('crud.supplier_payables.inputs.cost')
+                        @lang('crud.payables.inputs.cost')
                     </th>
                     <th class="px-4 py-3 text-right">
-                        @lang('crud.supplier_payables.inputs.margin')
+                        @lang('crud.payables.inputs.margin')
                     </th>
                     <th class="px-4 py-3 text-right">
-                        @lang('crud.supplier_payables.inputs.total')
+                        @lang('crud.payables.inputs.total')
                     </th>
                     <th class="px-4 py-3 text-left">
-                        @lang('crud.supplier_payables.inputs.product_id')
+                        @lang('crud.payables.inputs.product_id')
                     </th>
                     <th class="px-4 py-3 text-left">
-                        @lang('crud.supplier_payables.inputs.supplier_id_reference')
+                        @lang('crud.payables.inputs.client_id')
                     </th>
                     <th class="px-4 py-3 text-left">
-                        @lang('crud.supplier_payables.inputs.periodicity')
+                        @lang('crud.payables.inputs.periodicity')
                     </th>
                     <th class="px-4 py-3 text-left">
-                        @lang('crud.supplier_payables.inputs.receipt_id')
+                        @lang('crud.payables.inputs.receipt_id')
                     </th>
                     <th></th>
                 </tr>
@@ -194,7 +194,7 @@
                         {{ optional($payable->product)->name ?? '-' }}
                     </td>
                     <td class="px-4 py-3 text-left">
-                        {{ $payable->supplier_id_reference ?? '-' }}
+                        {{ $payable->product->client->name ?? '-' }}
                     </td>
                     <td class="px-4 py-3 text-left">
                         {{ $payable->periodicity ?? '-' }}
@@ -240,31 +240,31 @@
             <thead class="text-gray-700">
                 <tr>
                     <th class="px-4 py-3 text-left">
-                        @lang('crud.supplier_payables.inputs.name')
+                        @lang('crud.payables.inputs.name')
                     </th>
                     <th class="px-4 py-3 text-left">
-                        @lang('crud.supplier_payables.inputs.date')
+                        @lang('crud.payables.inputs.date')
                     </th>
                     <th class="px-4 py-3 text-right">
-                        @lang('crud.supplier_payables.inputs.cost')
+                        @lang('crud.payables.inputs.cost')
                     </th>
                     <th class="px-4 py-3 text-right">
-                        @lang('crud.supplier_payables.inputs.margin')
+                        @lang('crud.payables.inputs.margin')
                     </th>
                     <th class="px-4 py-3 text-right">
-                        @lang('crud.supplier_payables.inputs.total')
+                        @lang('crud.payables.inputs.total')
                     </th>
                     <th class="px-4 py-3 text-left">
-                        @lang('crud.supplier_payables.inputs.product_id')
+                        @lang('crud.payables.inputs.product_id')
                     </th>
                     <th class="px-4 py-3 text-left">
-                        @lang('crud.supplier_payables.inputs.supplier_id_reference')
+                        @lang('crud.payables.inputs.client_id')
                     </th>
                     <th class="px-4 py-3 text-left">
-                        @lang('crud.supplier_payables.inputs.periodicity')
+                        @lang('crud.payables.inputs.periodicity')
                     </th>
                     <th class="px-4 py-3 text-left">
-                        @lang('crud.supplier_payables.inputs.receipt_id')
+                        @lang('crud.payables.inputs.receipt_id')
                     </th>
                     <th></th>
                 </tr>
@@ -291,7 +291,7 @@
                         {{ optional($payable->product)->name ?? '-' }}
                     </td>
                     <td class="px-4 py-3 text-left">
-                        {{ $payable->supplier_id_reference ?? '-' }}
+                        {{ $payable->product->client->name ?? '-' }}
                     </td>
                     <td class="px-4 py-3 text-left">
                         {{ $payable->periodicity ?? '-' }}
