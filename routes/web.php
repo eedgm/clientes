@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Livewire\KanbanTasks;
+use App\Http\Livewire\PayablesClone;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\HomeController;
@@ -58,6 +59,7 @@ Route::prefix('/')
         Route::put('/tasks/task/update/{task}', [TaskController::class, 'updateGanttTask']);
         Route::put('/tasks/task/delete/{task}', [TaskController::class, 'destroyGanttTask']);
         Route::get('proposal/kanban/{proposal}', KanbanTasks::class)->name('proposal.kanban');
+        Route::get('payables/clone', PayablesClone::class)->name('payables.clone');
 
         Route::resource('roles', RoleController::class);
         Route::resource('permissions', PermissionController::class);

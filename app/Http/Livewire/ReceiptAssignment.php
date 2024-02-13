@@ -100,7 +100,7 @@ class ReceiptAssignment extends Component
     {
         $products = $this->client->products->modelKeys();
         $this->payables = Payable::whereIn('product_id', $products)
-            ->where('date', '<=', Carbon::now()->addMonth(2))
+            ->where('date', '<=', Carbon::now()->addMonth(5))
             ->where('receipt_id', null)
             ->get();
 

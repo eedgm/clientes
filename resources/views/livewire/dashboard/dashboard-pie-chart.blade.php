@@ -56,7 +56,7 @@
                     <x-partials.dashboard-table-card class="" bodyClasses="p-0">
                         <div class="">
                             <x-slot name="title">
-                                Payables
+                                Payables 5 months
                             </x-slot>
                             <livewire:payables-dashboard />
                         </div>

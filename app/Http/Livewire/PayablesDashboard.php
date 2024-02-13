@@ -11,7 +11,7 @@ class PayablesDashboard extends Component
     public function render()
     {
         $total = 0;
-        $payables = Payable::where('receipt_id', null)->where('date', '<=', Carbon::now()->addMonth(2))->get();
+        $payables = Payable::where('receipt_id', null)->where('date', '<=', Carbon::now()->addMonth(5))->get();
         return view('livewire.dashboard/payables-dashboard', compact('payables', 'total'));
     }
 }

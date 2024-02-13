@@ -23,6 +23,11 @@
         Suppliers
     </x-dashboard.sidebar-link>
 @endcan
+@can('view-any', App\Models\Payable::class)
+    <x-dashboard.sidebar-link href="{{ route('payables.clone') }}" :active="request()->routeIs('payables.clone')" icon="{{ 'bxs-wallet-alt' }}">
+        Payables
+    </x-dashboard.sidebar-link>
+@endcan
 
 
 @if (Auth::user()->can('create', Spatie\Permission\Models\Role::class) ||
