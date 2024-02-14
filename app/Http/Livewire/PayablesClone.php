@@ -96,7 +96,7 @@ class PayablesClone extends Component
     public function updated($name, $value)
     {
         if ($name == 'payable.cost' ) {
-            $this->payable->margin = 0;
+            $this->payable->margin = '';
         }
         if ($name == 'payable.margin') {
             if ($value >= 0) {
