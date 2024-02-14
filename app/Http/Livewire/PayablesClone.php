@@ -138,9 +138,7 @@ class PayablesClone extends Component
 
             $this->editing = false;
         } else {
-            $this->payable->cloned = true;
-
-            $this->payable->save();
+            Payable::where('id', $this->payable->id)->update(['cloned' => 1]);
 
             Payable::create([
                 'name' => $this->payable->name,
