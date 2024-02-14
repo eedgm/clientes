@@ -34,6 +34,7 @@ class PayableUpdateRequest extends FormRequest
             'supplier_id_reference' => ['nullable', 'max:255', 'string'],
             'periodicity' => ['required', 'in:month,year'],
             'receipt_id' => ['nullable', 'exists:receipts,id'],
+            'cloned' => ['nullable', 'boolean'],
         ];
     }
 }

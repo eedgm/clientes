@@ -271,7 +271,7 @@
             </thead>
             <tbody class="text-gray-600">
                 @foreach ($payables_with_receipt as $payable)
-                <tr class="hover:bg-gray-200">
+                <tr class="hover:bg-gray-200 {{ $payable->cloned ? 'bg-green-100' : '' }}">
                     <td class="px-4 py-3 text-left">
                         {{ $payable->name ?? '-' }}
                     </td>

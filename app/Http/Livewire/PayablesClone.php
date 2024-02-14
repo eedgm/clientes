@@ -138,7 +138,10 @@ class PayablesClone extends Component
 
             $this->editing = false;
         } else {
-            $this->payable->date = \Carbon\Carbon::parse($this->payableDate);
+            $this->payable->cloned = true;
+
+            $this->payable->save();
+
             Payable::create([
                 'name' => $this->payable->name,
                 'date' => $this->payable->date,
@@ -148,7 +151,7 @@ class PayablesClone extends Component
                 'product_id' => $this->payable->product_id,
                 'supplier_id' => $this->payable->supplier_id,
                 'supplier_id_reference' => $this->payable->supplier_id_reference,
-                'periodicity' => $this->payable->periodicity
+                'periodicity' => $this->payable->periodicity,
             ]);
         }
 

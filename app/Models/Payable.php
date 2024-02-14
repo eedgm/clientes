@@ -22,6 +22,7 @@ class Payable extends Model
         'supplier_id_reference',
         'periodicity',
         'receipt_id',
+        'cloned',
     ];
 
     protected $searchableFields = ['*'];
