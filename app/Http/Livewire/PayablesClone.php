@@ -18,6 +18,7 @@ class PayablesClone extends Component
 
     public $selected = [];
     public $cloning = false;
+    public $editing = false;
     public $allSelected = false;
     public $showingModal = false;
 
