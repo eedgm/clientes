@@ -314,6 +314,16 @@
                                 <i class="text-xl text-green-600 bx bx-refresh hover:text-green-800"></i>
                             </button>
                             @endcan
+                            @can('delete', $payable)
+                            <button
+                                type="button"
+                                class="button button-danger"
+                                onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
+                                wire:click="deletePayable({{ $payable->id }})"
+                            >
+                                <i class="text-xl text-white bx bx-trash"></i>
+                            </button>
+                            @endcan
                         </div>
                     </td>
                 </tr>

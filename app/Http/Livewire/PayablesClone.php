@@ -142,7 +142,7 @@ class PayablesClone extends Component
 
             Payable::create([
                 'name' => $this->payable->name,
-                'date' => $this->payable->date,
+                'date' => \Carbon\Carbon::parse($this->payableDate),
                 'cost' => $this->payable->cost,
                 'margin' => $this->payable->margin,
                 'total' => $this->payable->total,

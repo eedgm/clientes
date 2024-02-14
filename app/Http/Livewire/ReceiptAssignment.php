@@ -102,6 +102,7 @@ class ReceiptAssignment extends Component
         $this->payables = Payable::whereIn('product_id', $products)
             ->where('date', '<=', Carbon::now()->addMonth(5))
             ->where('receipt_id', null)
+            ->orderBy('product_id', 'ASC')
             ->get();
 
         $this->tickets = Ticket::whereIn('product_id', $products)
@@ -111,8 +112,8 @@ class ReceiptAssignment extends Component
             ->get();
 
         $result = [];
-        $payables = Payable::where('receipt_id', $this->receipt->id)->get();
-        $tickets = Ticket::where('receipt_id', $this->receipt->id)->get();
+        $payables = Payable::where('receipt_id', $this->receipt->id)->orderBy('product_id', 'ASC')->get();
+        $tickets = Ticket::where('receipt_id', $this->receipt->id)->orderBy('product_id', 'ASC')->get();
 
         $total = 0;
         $hours = false;
@@ -144,8 +145,7 @@ class ReceiptAssignment extends Component
                 $person = true;
         }
 
-        return view('livewire.receipt-assignment',
-            [
+        return view('livewire.receipt-assignment', [
                 'payables' => $this->payables,
                 'tickets' => $this->tickets,
                 'results' => $result,
@@ -153,7 +153,8 @@ class ReceiptAssignment extends Component
                 'receipt_id' => $this->receipt->id,
                 'hours' => $hours,
                 'person' => $person,
-            ]);
+            ]
+        );
     }
 
     public function updateData($name, $id, $value) {
@@ -210,5 +211,12 @@ class ReceiptAssignment extends Component
     public function removeTicket($id)
     {
         Ticket::where('id', $id)->update(['receipt_id' => null]);
+    }
+
+    private function sortBy($array, $field, $direction = SORT_ASC)
+    {
+        $columns = array_column($array, $field);
+        array_multisort($columns, $direction, $array);
+        return $array;
     }
 }

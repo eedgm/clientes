@@ -85,7 +85,7 @@
                 </div>
             </div>
 
-            @if($editing) @can('view-any', App\Models\Ticket::class)
+            {{-- @if($editing) @can('view-any', App\Models\Ticket::class)
             <x-partials.card class="mt-5 shadow-none bg-gray-50">
                 <h4 class="mb-3 text-sm font-bold text-gray-600">Tickets</h4>
 
@@ -97,7 +97,7 @@
 
                 <livewire:product-payables-detail :product="$product" :key="$product->id" />
             </x-partials.card>
-            @endcan @endif
+            @endcan @endif --}}
         </div>
 
         <div class="flex justify-between px-6 py-4 bg-gray-50">
