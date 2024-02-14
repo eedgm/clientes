@@ -124,8 +124,8 @@ class ReceiptController extends Controller
     public function createPDF(Receipt $receipt)
     {
         $result = [];
-        $payables = Payable::where('receipt_id', $receipt->id)->get();
-        $tickets = Ticket::where('receipt_id', $receipt->id)->get();
+        $payables = Payable::where('receipt_id', $receipt->id)->orderBy('product_id', 'ASC')->get();
+        $tickets = Ticket::where('receipt_id', $receipt->id)->orderBy('product_id', 'ASC')->get();
 
         $total = 0;
         $hours = false;
