@@ -29,7 +29,7 @@
         .gantt_task_line.low .gantt_task_content { color: #fff; }
     </style>
 
-    <div id="gantt_here" class="h-screen w-[calc(100%-1rem)]"></div>
+    <div id="gantt_here" class="h-[700px] w-[calc(100%-1rem)]"></div>
     <script type="text/javascript">
         var isMobile = {
             Android: function() {
