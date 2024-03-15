@@ -24,6 +24,7 @@ class KanbanTickets extends Component
     public $ticket_client_id;
     public $ticketFinishedTicket;
     public $status;
+    public $selectedStatus = [];
 
     public $ticketStatusSelected = null;
 
@@ -69,6 +70,10 @@ class KanbanTickets extends Component
             5 => 'bx-bell text-purple-500',
             6 => 'bx-dollar text-sky-500'
         ];
+
+        foreach ($this->status as $status) {
+            $this->selectedStatus[$status->id] = 1;
+        }
     }
 
     public function addTicket(Statu $status)
@@ -144,6 +149,11 @@ class KanbanTickets extends Component
     {
         $ticket->statu_id = $this->newStatus;
         $ticket->save();
+    }
+
+    public function toggleView(Statu $status)
+    {
+        $this->selectedStatus[$status->id] = !$this->selectedStatus[$status->id];
     }
 
     public function render()
