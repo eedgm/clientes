@@ -21,10 +21,10 @@
                     @endforeach
                 </div>
                 <div class="py-2 md:py-8">
-                    <div class="flex flex-wrap pb-2 -mx-4 overflow-x-auto">
+                    <div class="grid grid-cols-1 pb-2 -mx-4 overflow-x-auto md:grid-cols-3 lg:grid-cols-6">
                         @foreach ($status as $st)
                         @if ($selectedStatus[$st->id])
-                        <div class="flex-shrink-0 w-full px-4 mb-5 md:w-1/3 lg:w-1/6 md:mb-0">
+                        <div class="col-span-1 px-4 mb-5 md:mb-0">
                             <div class="pb-4 overflow-x-hidden overflow-y-auto border-t-8 border-red-400 rounded-lg shadow bg-gray-50" style="min-height: 100px">
                                 <div class="sticky top-0 flex items-center justify-between px-4 py-2">
                                     <h2 class="font-medium text-gray-800"><i class="bx {{ $icons[$st->id] }}"></i> {{ $st->name }}</h2>
