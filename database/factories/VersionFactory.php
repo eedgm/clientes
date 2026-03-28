@@ -2,8 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Proposal;
+use App\Models\User;
 use App\Models\Version;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class VersionFactory extends Factory
@@ -31,10 +32,11 @@ class VersionFactory extends Factory
             'months_to_pay' => $this->faker->randomNumber(1),
             'unexpected' => $this->faker->randomNumber(1),
             'company_gain' => $this->faker->randomNumber(1),
+            'seller_commission_percentage' => $this->faker->randomFloat(2, 0, 100),
             'bank_tax' => $this->faker->randomNumber(1),
             'first_payment' => $this->faker->randomNumber(1),
-            'proposal_id' => \App\Models\Proposal::factory(),
-            'user_id' => \App\Models\User::factory(),
+            'proposal_id' => Proposal::factory(),
+            'user_id' => User::factory(),
         ];
     }
 }

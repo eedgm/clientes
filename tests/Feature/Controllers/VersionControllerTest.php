@@ -2,14 +2,13 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\Proposal;
 use App\Models\User;
 use App\Models\Version;
-
-use App\Models\Proposal;
-
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 class VersionControllerTest extends TestCase
 {
@@ -23,7 +22,7 @@ class VersionControllerTest extends TestCase
             User::factory()->create(['email' => 'admin@admin.com'])
         );
 
-        $this->seed(\Database\Seeders\PermissionsSeeder::class);
+        $this->seed(PermissionsSeeder::class);
 
         $this->withoutExceptionHandling();
     }
@@ -122,6 +121,7 @@ class VersionControllerTest extends TestCase
             'months_to_pay' => $this->faker->randomNumber(1),
             'unexpected' => $this->faker->randomNumber(1),
             'company_gain' => $this->faker->randomNumber(1),
+            'seller_commission_percentage' => $this->faker->randomFloat(2, 0, 100),
             'bank_tax' => $this->faker->randomNumber(1),
             'first_payment' => $this->faker->randomNumber(1),
             'proposal_id' => $proposal->id,

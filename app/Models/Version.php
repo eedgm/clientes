@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Models\Scopes\Searchable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Version extends Model
 {
@@ -22,9 +22,10 @@ class Version extends Model
         'months_to_pay',
         'unexpected',
         'company_gain',
+        'seller_commission_percentage',
         'bank_tax',
         'first_payment',
-        'hours'
+        'hours',
     ];
 
     protected $searchableFields = ['*'];

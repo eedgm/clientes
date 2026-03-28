@@ -34,6 +34,7 @@ class VersionUpdateRequest extends FormRequest
             'months_to_pay' => ['required', 'numeric'],
             'unexpected' => ['required', 'numeric'],
             'company_gain' => ['required', 'numeric'],
+            'seller_commission_percentage' => ['nullable', 'numeric'],
             'bank_tax' => ['required', 'numeric'],
             'first_payment' => ['required', 'numeric'],
             'hours' => ['nullable', 'numeric'],
