@@ -36,6 +36,8 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+        @stack('styles')
+
         {{-- <script type="module">
             import hotwiredTurbo from 'https://cdn.skypack.dev/@hotwired/turbo';
         </script> --}}

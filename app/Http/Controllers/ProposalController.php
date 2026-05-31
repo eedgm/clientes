@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
-use App\Models\Client;
-use App\Models\Proposal;
-use Illuminate\Http\Request;
 use App\Http\Requests\ProposalStoreRequest;
 use App\Http\Requests\ProposalUpdateRequest;
+use App\Models\Client;
+use App\Models\Priority;
+use App\Models\Proposal;
+use App\Models\Statu;
+use App\Models\Task;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 
 class ProposalController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -31,18 +34,110 @@ class ProposalController extends Controller
 
     public function gantt(Request $request, Proposal $proposal)
     {
-        return view('app.proposals.gantt', compact('proposal'));
+        $this->authorize('view', $proposal);
+
+        $priorities = Priority::query()
+            ->orderBy('id')
+            ->get(['id', 'name']);
+
+        $statuses = Statu::query()
+            ->orderBy('id')
+            ->get(['id', 'name']);
+
+        $height = (int) $request->get('height', 700);
+        $height = max(420, min($height, 1200));
+
+        $zoomLevels = [
+            [
+                'key' => 'day',
+                'label' => 'Day',
+                'scale_height' => 27,
+                'scales' => [
+                    ['unit' => 'day', 'step' => 1, 'format' => '%d %M'],
+                ],
+            ],
+            [
+                'key' => 'week',
+                'label' => 'Week',
+                'scale_height' => 50,
+                'scales' => [
+                    ['unit' => 'week', 'step' => 1, 'format' => 'Week #%W'],
+                    ['unit' => 'day', 'step' => 1, 'format' => '%D'],
+                ],
+            ],
+            [
+                'key' => 'month',
+                'label' => 'Month',
+                'scale_height' => 50,
+                'scales' => [
+                    ['unit' => 'month', 'step' => 1, 'format' => '%F %Y'],
+                    ['unit' => 'week', 'step' => 1, 'format' => 'Week #%W'],
+                ],
+            ],
+        ];
+
+        $ganttConfig = [
+            'proposal_id' => $proposal->id,
+            'csrf_token' => csrf_token(),
+            'height' => $height,
+            'date_format' => '%Y-%m-%d %H:%i:%s',
+            'grid' => [
+                'desktop_width' => 300,
+                'mobile_width' => 170,
+            ],
+            'zoom_levels' => $zoomLevels,
+            'default_zoom' => 'week',
+            'lightbox' => [
+                'priorities' => $priorities
+                    ->map(fn ($priority) => [
+                        'key' => $priority->id,
+                        'label' => $priority->name,
+                    ])
+                    ->values(),
+                'statuses' => $statuses
+                    ->map(fn ($status) => [
+                        'key' => $status->id,
+                        'label' => $status->name,
+                    ])
+                    ->values(),
+                'default_priority_id' => $priorities->first()->id ?? null,
+                'default_statu_id' => $statuses->first()->id ?? null,
+            ],
+            'routes' => [
+                'load' => route('proposal.tasks', $proposal),
+                'create' => route('tasks.gantt.store'),
+                'update' => route('tasks.gantt.update', ['task' => '__TASK__']),
+                'delete' => route('tasks.gantt.destroy', ['task' => '__TASK__']),
+            ],
+            'priority_class_map' => $priorities
+                ->mapWithKeys(function ($priority) {
+                    $name = Str::of($priority->name)->lower()->value();
+
+                    if (str_contains($name, 'high') || str_contains($name, 'alta')) {
+                        return [(string) $priority->id => 'high'];
+                    }
+
+                    if (str_contains($name, 'low') || str_contains($name, 'baja')) {
+                        return [(string) $priority->id => 'low'];
+                    }
+
+                    return [(string) $priority->id => 'medium'];
+                })
+                ->all(),
+        ];
+
+        return view('app.proposals.gantt', compact('proposal', 'ganttConfig'));
     }
 
     public function board(Request $request)
     {
         $proposals = Proposal::get();
+
         return view('app.proposals.board', compact('proposals'));
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create(Request $request)
     {
@@ -54,8 +149,7 @@ class ProposalController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\ProposalStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(ProposalStoreRequest $request)
     {
@@ -71,9 +165,7 @@ class ProposalController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Proposal $proposal
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Proposal $proposal)
     {
@@ -83,9 +175,7 @@ class ProposalController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Proposal $proposal
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Request $request, Proposal $proposal)
     {
@@ -97,9 +187,7 @@ class ProposalController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\ProposalUpdateRequest $request
-     * @param \App\Models\Proposal $proposal
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(ProposalUpdateRequest $request, Proposal $proposal)
     {
@@ -115,9 +203,7 @@ class ProposalController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Proposal $proposal
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Proposal $proposal)
     {

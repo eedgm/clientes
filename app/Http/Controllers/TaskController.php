@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
-use App\Models\Statu;
-use App\Models\Receipt;
-use App\Models\Version;
-use App\Models\Priority;
-use App\Models\Proposal;
-use Illuminate\Http\Request;
+use App\Http\Requests\GanttTaskStoreRequest;
+use App\Http\Requests\GanttTaskUpdateRequest;
 use App\Http\Requests\TaskStoreRequest;
 use App\Http\Requests\TaskUpdateRequest;
+use App\Models\Priority;
+use App\Models\Proposal;
+use App\Models\Receipt;
+use App\Models\Statu;
+use App\Models\Task;
+use App\Models\Version;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class TaskController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -32,63 +34,61 @@ class TaskController extends Controller
         return view('app.tasks.index', compact('tasks', 'search'));
     }
 
-    public function addGanttTask(Request $request) {
-        $task = new Task();
+    public function addGanttTask(GanttTaskStoreRequest $request)
+    {
+        $this->authorize('create', Task::class);
 
-        $task->proposal_id = $request->proposal_id;
-        $task->statu_id = 1;
-        $task->priority_id = $request->priority_id;
-        $task->hours = $request->hours;
-        $task->text = $request->text;
-        $task->start_date = $request->start_date;
-        $task->duration = $request->duration;
-        $task->progress = $request->has("progress") ? $request->progress : 0;
-        $task->parent = $request->parent;
+        $validated = $request->validated();
+        $validated['progress'] = $validated['progress'] ?? 0;
+        $validated['parent'] = $validated['parent'] ?? 0;
 
-        $task->save();
+        $task = Task::create($validated);
 
         return response()->json([
-            "action"=> "inserted",
-            "tid" => $task->id
+            'action' => 'inserted',
+            'tid' => $task->id,
+        ], 201);
+    }
+
+    public function updateGanttTask(GanttTaskUpdateRequest $request, Task $task)
+    {
+        $this->authorize('update', $task);
+
+        $validated = $request->validated();
+
+        unset($validated['proposal_id']);
+
+        $task->update($validated);
+
+        return response()->json([
+            'action' => 'updated',
         ]);
     }
 
-    public function updateGanttTask(Request $request, Task $task){
-        $task->text = $request->text;
-        $task->priority_id = $request->priority_id;
-        $task->hours = $request->hours;
-        $task->start_date = $request->start_date;
-        $task->duration = $request->duration;
-        $task->progress = $request->has("progress") ? $request->progress : 0;
-        $task->parent = $request->parent;
+    public function destroyGanttTask(Task $task)
+    {
+        $this->authorize('delete', $task);
 
-        $task->save();
-
-        return response()->json([
-            "action"=> "updated"
-        ]);
-    }
-
-    public function destroyGanttTask(Task $task){
         $task->delete();
 
         return response()->json([
-            "action"=> "deleted"
+            'action' => 'deleted',
         ]);
     }
 
     public function getTasks(Request $request, Proposal $proposal)
     {
-        $tasks = $proposal->tasks;
+        $this->authorize('view', $proposal);
+
+        $tasks = $proposal->tasks()->get();
 
         return response()->json([
-            "data" => $tasks,
+            'data' => $tasks,
         ]);
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create(Request $request)
     {
@@ -106,8 +106,7 @@ class TaskController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\TaskStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(TaskStoreRequest $request)
     {
@@ -123,9 +122,7 @@ class TaskController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Task $task
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Task $task)
     {
@@ -135,9 +132,7 @@ class TaskController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Task $task
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Request $request, Task $task)
     {
@@ -155,9 +150,7 @@ class TaskController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\TaskUpdateRequest $request
-     * @param \App\Models\Task $task
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(TaskUpdateRequest $request, Task $task)
     {
@@ -173,9 +166,7 @@ class TaskController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Task $task
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Task $task)
     {

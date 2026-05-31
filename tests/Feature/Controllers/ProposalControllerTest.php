@@ -2,14 +2,15 @@
 
 namespace Tests\Feature\Controllers;
 
-use App\Models\User;
-use App\Models\Proposal;
-
 use App\Models\Client;
-
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\Priority;
+use App\Models\Proposal;
+use App\Models\Statu;
+use App\Models\User;
+use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 class ProposalControllerTest extends TestCase
 {
@@ -23,7 +24,7 @@ class ProposalControllerTest extends TestCase
             User::factory()->create(['email' => 'admin@admin.com'])
         );
 
-        $this->seed(\Database\Seeders\PermissionsSeeder::class);
+        $this->seed(PermissionsSeeder::class);
 
         $this->withoutExceptionHandling();
     }
@@ -101,6 +102,28 @@ class ProposalControllerTest extends TestCase
             ->assertOk()
             ->assertViewIs('app.proposals.edit')
             ->assertViewHas('proposal');
+    }
+
+    /**
+     * @test
+     */
+    public function it_displays_gantt_view_with_server_side_config_and_assets()
+    {
+        $proposal = Proposal::factory()->create();
+        Priority::factory()->count(2)->create();
+        Statu::factory()->count(2)->create();
+
+        $response = $this->get(route('gantt', $proposal));
+
+        $response
+            ->assertOk()
+            ->assertViewIs('app.proposals.gantt')
+            ->assertViewHas('proposal')
+            ->assertViewHas('ganttConfig')
+            ->assertSee('id="gantt-config"', false)
+            ->assertSee('data-gantt-zoom-select', false)
+            ->assertSee('proposal-gantt.css', false)
+            ->assertSee('proposal-gantt.js', false);
     }
 
     /**

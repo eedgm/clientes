@@ -6,7 +6,9 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
+                'resources/css/proposal-gantt.css',
                 'resources/js/app.js',
+                'resources/js/proposal-gantt.js',
             ],
             refresh: [
                 ...refreshPaths,

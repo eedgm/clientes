@@ -1,31 +1,30 @@
 <?php
 
+use App\Http\Controllers\AttachController;
+use App\Http\Controllers\AttachmentController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ColorController;
+use App\Http\Controllers\DeveloperController;
+use App\Http\Controllers\IconController;
+use App\Http\Controllers\PayableController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PersonController;
+use App\Http\Controllers\PriorityController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProposalController;
+use App\Http\Controllers\ReceiptController;
+use App\Http\Controllers\RolController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SkillController;
+use App\Http\Controllers\StatuController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\VersionController;
 use App\Http\Livewire\KanbanTasks;
 use App\Http\Livewire\PayablesClone;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RolController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\IconController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\TaskController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\ColorController;
-use App\Http\Controllers\SkillController;
-use App\Http\Controllers\StatuController;
-use App\Http\Controllers\AttachController;
-use App\Http\Controllers\ClientController;
-use App\Http\Controllers\PersonController;
-use App\Http\Controllers\TicketController;
-use App\Http\Controllers\PayableController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ReceiptController;
-use App\Http\Controllers\VersionController;
-use App\Http\Controllers\PriorityController;
-use App\Http\Controllers\ProposalController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\DeveloperController;
-use App\Http\Controllers\AttachmentController;
-use App\Http\Controllers\PermissionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,10 +53,10 @@ Route::prefix('/')
         Route::get('proposals/gantt/{proposal}', [ProposalController::class, 'gantt'])->name('gantt');
         Route::get('proposals/board', [ProposalController::class, 'board'])->name('board');
         Route::delete('proposals/destroy-dashboard/{proposal}', [ProposalController::class, 'destroyDashboard'])->name('destroy-dashboard');
-        Route::get('/proposal/tasks/{proposal}', [TaskController::class, 'getTasks']);
-        Route::post('/tasks/task', [TaskController::class, 'addGanttTask']);
-        Route::put('/tasks/task/update/{task}', [TaskController::class, 'updateGanttTask']);
-        Route::put('/tasks/task/delete/{task}', [TaskController::class, 'destroyGanttTask']);
+        Route::get('/proposal/tasks/{proposal}', [TaskController::class, 'getTasks'])->name('proposal.tasks');
+        Route::post('/tasks/task', [TaskController::class, 'addGanttTask'])->name('tasks.gantt.store');
+        Route::put('/tasks/task/update/{task}', [TaskController::class, 'updateGanttTask'])->name('tasks.gantt.update');
+        Route::put('/tasks/task/delete/{task}', [TaskController::class, 'destroyGanttTask'])->name('tasks.gantt.destroy');
         Route::get('proposal/kanban/{proposal}', KanbanTasks::class)->name('proposal.kanban');
         Route::get('payables/clone', PayablesClone::class)->name('payables.clone');
 
