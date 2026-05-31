@@ -43,7 +43,7 @@ class KanbanTickets extends Component
         'ticket.hours' => ['nullable', 'numeric'],
         'ticket.total' => ['nullable', 'numeric'],
         'ticket.progress' => ['nullable', 'numeric'],
-        'ticket.comments' => ['nullable', 'max:255', 'string'],
+        'ticket.comments' => ['nullable', 'string'],
     ];
 
     public function mount() {

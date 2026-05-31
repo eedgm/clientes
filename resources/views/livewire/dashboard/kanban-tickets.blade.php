@@ -116,7 +116,6 @@
                             name="ticket.description"
                             label="Description"
                             wire:model="ticket.description"
-                            maxlength="255"
                         ></x-inputs.textarea>
                     </x-inputs.group>
 
