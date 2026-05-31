@@ -1,176 +1,248 @@
 <x-proposal-layout>
 
+    @push('styles')
+        @vite('resources/css/proposal-gantt.css')
+        <style>
+            [x-cloak] { display: none !important; }
+        </style>
+    @endpush
+
+    @push('scripts')
+        @vite('resources/js/proposal-gantt.js')
+    @endpush
+
     <x-slot name="header">
-        <div class="w-[calc(100%-1rem)]">
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Projects
-            </h2>
-            <div class="text-right mt-[-25px] mr-5">
+        <div class="w-full flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30">
+                    <i class="bx bx-gantt text-white text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800 leading-tight">Projects</h2>
+                    <p class="text-xs text-gray-500 font-medium">{{ $proposal->product_name }}</p>
+                </div>
+            </div>
+
+            <div x-data="{ showTasksModal: false }" class="flex items-center gap-4">
+                <button
+                    type="button"
+                    class="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition-all duration-200 hover:from-indigo-500 hover:to-indigo-400 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 active:translate-y-0"
+                    @click="showTasksModal = true"
+                >
+                    <i class="bx bx-list-check text-lg group-hover:rotate-6 transition-transform"></i>
+                    Tasks
+                    <span class="ml-1 rounded-full bg-white/20 px-2 py-0.5 text-xs">{{ $proposal->tasks->count() }}</span>
+                </button>
+
                 <livewire:proposal-calculator :proposal="$proposal" />
+
+                <div
+                    x-show="showTasksModal"
+                    x-init="$watch('showTasksModal', value => { if (value) document.body.classList.add('overflow-y-hidden'); else document.body.classList.remove('overflow-y-hidden') })"
+                    x-on:close.stop="showTasksModal = false"
+                    x-on:keydown.escape.window="showTasksModal = false"
+                    class="fixed inset-0 z-50 w-full px-4 py-6 overflow-auto scrolling-touch jetstream-modal sm:px-0"
+                    style="display: none;"
+                    x-cloak
+                >
+                    <div
+                        x-show="showTasksModal"
+                        x-on:click="showTasksModal = false"
+                        x-transition:enter="ease-out duration-300"
+                        x-transition:enter-start="opacity-0"
+                        x-transition:enter-end="opacity-100"
+                        x-transition:leave="ease-in duration-200"
+                        x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0"
+                        class="fixed inset-0"
+                    >
+                        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
+                    </div>
+
+                    <div
+                        x-show="showTasksModal"
+                        x-transition:enter="ease-out duration-300"
+                        x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                        x-transition:leave="ease-in duration-200"
+                        x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                        x-transition:leave-end="opacity-0 translate-y-8 scale-95"
+                        class="relative mx-auto max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+                    >
+                        <div class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-500 px-8 py-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+                                        <i class="bx bx-list-check text-2xl text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-white">Todas las Tareas</h3>
+                                        <p class="mt-1 text-indigo-100">{{ $proposal->product_name }}</p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition-all duration-200 hover:bg-white/20 hover:rotate-90"
+                                    @click="showTasksModal = false"
+                                >
+                                    <i class="bx bx-x text-xl"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            @php
+                                $totalHours = $proposal->tasks->sum('hours');
+                                $totalRealHours = $proposal->tasks->sum('real_hours');
+                                $completedTasks = $proposal->tasks->filter(fn($t) => $t->statu && $t->statu->name === 'completado')->count();
+                            @endphp
+                            <div class="mb-6 grid grid-cols-3 gap-4">
+                                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 text-center">
+                                    <div class="text-2xl font-bold text-gray-900">{{ $proposal->tasks->count() }}</div>
+                                    <div class="text-sm text-gray-500">Total Tareas</div>
+                                </div>
+                                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 text-center">
+                                    <div class="text-2xl font-bold text-indigo-600">{{ number_format($totalHours, 1) }}</div>
+                                    <div class="text-sm text-gray-500">Horas Planificadas</div>
+                                </div>
+                                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 text-center">
+                                    <div class="text-2xl font-bold {{ $totalRealHours > $totalHours ? 'text-amber-600' : 'text-emerald-600' }}">{{ number_format($totalRealHours, 1) }}</div>
+                                    <div class="text-sm text-gray-500">Horas Reales</div>
+                                </div>
+                            </div>
+
+                            <div class="overflow-hidden rounded-xl border border-gray-200">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Tarea</th>
+                                            <th class="px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Horas</th>
+                                            <th class="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-gray-600">Estado</th>
+                                            <th class="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-gray-600">Prioridad</th>
+                                            <th class="px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Reales</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 bg-white">
+                                        @forelse ($proposal->tasks as $task)
+                                        <tr class="group transition-colors duration-200 hover:bg-indigo-50/50">
+                                            <td class="px-4 py-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+                                                        <i class="bx bx-task"></i>
+                                                    </div>
+                                                    <span class="font-medium text-gray-900">{{ $task->text ?? '-' }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-4 text-right">
+                                                <span class="font-mono text-sm font-medium text-gray-700">{{ $task->hours ?? '-' }}</span>
+                                            </td>
+                                            <td class="px-4 py-4 text-center">
+                                                @if($task->statu)
+                                                    @php
+                                                        $statusColors = [
+                                                            'completado' => 'bg-emerald-100 text-emerald-700 ring-emerald-200',
+                                                            'en progreso' => 'bg-blue-100 text-blue-700 ring-blue-200',
+                                                            'pendiente' => 'bg-gray-100 text-gray-700 ring-gray-200',
+                                                        ];
+                                                        $colorClass = $statusColors[strtolower($task->statu->name)] ?? 'bg-gray-100 text-gray-700 ring-gray-200';
+                                                    @endphp
+                                                    <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset {{ $colorClass }}">
+                                                        {{ $task->statu->name }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-gray-400">-</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-4 py-4 text-center">
+                                                @if($task->priority)
+                                                    @php
+                                                        $priorityColors = [
+                                                            'alta' => 'bg-red-100 text-red-700 ring-red-200',
+                                                            'media' => 'bg-amber-100 text-amber-700 ring-amber-200',
+                                                            'baja' => 'bg-green-100 text-green-700 ring-green-200',
+                                                        ];
+                                                        $pColorClass = $priorityColors[strtolower($task->priority->name)] ?? 'bg-gray-100 text-gray-700 ring-gray-200';
+                                                    @endphp
+                                                    <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset {{ $pColorClass }}">
+                                                        {{ $task->priority->name }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-gray-400">-</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-4 py-4 text-right">
+                                                <span class="font-mono text-sm font-medium {{ $task->real_hours > $task->hours ? 'text-amber-600' : 'text-gray-700' }}">
+                                                    {{ $task->real_hours ?? '-' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="5" class="px-6 py-16 text-center">
+                                                <div class="flex flex-col items-center justify-center">
+                                                    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+                                                        <i class="bx bx-task text-3xl text-gray-400"></i>
+                                                    </div>
+                                                    <p class="text-sm font-medium text-gray-500">No hay tareas para este proyecto</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4">
+                            <button
+                                type="button"
+                                class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
+                                @click="showTasksModal = false"
+                            >
+                                <i class="bx bx-x"></i>
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </x-slot>
 
-    <style>
-        .weekend{ background: #f4f7f4 !important;}
-        .gantt_section_time {margin-bottom:5px;}
-        .gantt_section_time .gantt_time_selects select {background-position: right 0.1rem center !important;}
-        .gantt_section_time .gantt_time_selects select:nth-child(1) {width: 35px;}
-        .gantt_section_time .gantt_time_selects select:nth-child(2) {width: 85px;}
-        .gantt_section_time .gantt_time_selects select:nth-child(3) {width: 52px;}
-        /* common styles for overriding borders/progress color */
-        .gantt_task_line{ border-color: rgba(0, 0, 0, 0.25); }
-        .gantt_task_line .gantt_task_progress { background-color: rgba(0, 0, 0, 0.25); }
-        .gantt_task_line.high { background-color: #f40303; }
-        .gantt_task_line.high .gantt_task_content { color: #fff; }
-        .gantt_task_line.medium { background-color: #378122; }
-        .gantt_task_line.medium .gantt_task_content { color: #fff; }
-        .gantt_task_line.low { background-color: #e157de; }
-        .gantt_task_line.low .gantt_task_content { color: #fff; }
-    </style>
+    <div class="gantt-page">
+        <div class="mb-6 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 text-sm font-medium text-gray-500">
+                    <i class="bx bx-sliders text-indigo-500"></i>
+                    <span>Filtros</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="inline-flex items-center gap-2 rounded-xl border border-gray-200/80 bg-white px-4 py-2 shadow-sm">
+                    <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Zoom</span>
+                    <div class="h-5 w-px bg-gray-200"></div>
+                    <button type="button" class="group flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-gray-500 transition-all duration-200 hover:border-gray-200 hover:bg-gray-50 hover:text-indigo-600" data-gantt-zoom-step="-1">
+                        <i class="bx bx-minus text-sm group-hover:scale-110 transition-transform"></i>
+                    </button>
+                    <select id="gantt-zoom-level" class="h-8 rounded-lg border-gray-200 bg-transparent px-3 text-sm font-medium text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-300 cursor-pointer" data-gantt-zoom-select>
+                        @foreach ($ganttConfig['zoom_levels'] as $zoomLevel)
+                            <option value="{{ $zoomLevel['key'] }}" @selected($ganttConfig['default_zoom'] === $zoomLevel['key'])>
+                                {{ $zoomLevel['label'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <button type="button" class="group flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-gray-500 transition-all duration-200 hover:border-gray-200 hover:bg-gray-50 hover:text-indigo-600" data-gantt-zoom-step="1">
+                        <i class="bx bx-plus text-sm group-hover:scale-110 transition-transform"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-    <div id="gantt_here" class="h-[700px] w-[calc(100%-1rem)]"></div>
-    <script type="text/javascript">
-        var isMobile = {
-            Android: function() {
-                return navigator.userAgent.match(/Android/i);
-            },
-            BlackBerry: function() {
-                return navigator.userAgent.match(/BlackBerry/i);
-            },
-            iOS: function() {
-                return navigator.userAgent.match(/iPhone|iPad|iPod/i);
-            },
-            Opera: function() {
-                return navigator.userAgent.match(/Opera Mini/i);
-            },
-            Windows: function() {
-                return navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i);
-            },
-            any: function() {
-                return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
-            }
-        };
+        <div class="gantt-wrapper rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+            <div id="gantt_here" style="height: {{ $ganttConfig['height'] }}px;"></div>
+        </div>
+    </div>
 
-        let width = 300;
-        if (isMobile.any()) {
-            width = 150;
-        }
-
-        gantt.config.date_format = "%Y-%m-%d %H:%i:%s";
-        gantt.config.work_time = true;  // removes non-working time from calculations
-        gantt.config.skip_off_time = true;    // hides non-working time in the chart
-
-        gantt.config.columns = [
-            {name:"text",       label:"Task name",  width:width, tree:true, resize:true},
-            {name:"start_date", label:"Start time", align:"center", resize:true},
-            {name:"hours",      label:"Hours",   align:"center", resize:true},
-            {name:"add",        label:"",           width:44 }
-        ];
-
-        gantt.templates.scale_cell_class = function(date){
-            if(date.getDay()==0||date.getDay()==6){
-                return "weekend";
-            }
-        };
-        gantt.templates.timeline_cell_class = function(task,date){
-            if(date.getDay()==0||date.getDay()==6){
-                return "weekend" ;
-            }
-        };
-
-        var opts = [
-            { key: 1, label: 'High' },
-            { key: 2, label: 'Normal' },
-            { key: 3, label: 'Low' }
-        ];
-
-        gantt.locale.labels.section_priority_id = "Priority";
-        gantt.locale.labels.section_hours = "Hours";
-
-        gantt.config.lightbox.sections = [
-            {name:"description", height:50, map_to:"text", type:"textarea", focus:true},
-            {name:"priority_id", height:34, map_to:"priority_id", type:"select", options:opts, default_value: 1},
-            {name:"hours",       height:50, map_to:"hours", type:"textarea"},
-            {name:"time",        height:35, map_to:"auto", type:"duration"},
-        ];
-
-        gantt.config.order_branch = true;// order tasks only inside a branch
-        gantt.config.order_branch_free = true;
-
-
-        gantt.init("gantt_here");
-
-
-        var drag_id = null;
-        gantt.attachEvent("onRowDragStart", function(id, target, e) {
-            drag_id = id;
-            return true;
-        });
-        gantt.attachEvent("onRowDragEnd", function(id, target) {
-            drag_id = null;
-            gantt.render();
-        });
-
-        gantt.templates.grid_row_class = function(start, end, task){
-            if(drag_id && task.id != drag_id){
-                if(task.$level != gantt.getTask(drag_id).$level)
-                    return "cant-drop";
-                }
-            return "";
-        };
-
-        gantt.load('/proposal/tasks/{{ $proposal->id }}')
-
-        gantt.templates.task_class  = function(start, end, task){
-            switch (task.priority_id){
-                case 1:
-                    return "high";
-                    break;
-                case 2:
-                    return "medium";
-                    break;
-                case 3:
-                    return "low";
-                    break;
-            }
-        };
-
-        var dp = gantt.createDataProcessor(function(entity, action, data, id) {
-            data._token = "{{ csrf_token() }}"
-            data.proposal_id = '{{ $proposal->id }}'
-            data.start_date = getFormattedDate(data.start_date)
-            switch(action) {
-                case "create":
-                return gantt.ajax.post(
-                        "/tasks/" + entity,
-                        data
-                );
-                break;
-                case "update":
-                return gantt.ajax.put(
-                        "/tasks/" + entity + "/update/" + id,
-                        data
-                    );
-                break;
-                case "delete":
-                return gantt.ajax.put(
-                        "/tasks/" + entity + "/delete/" + id,
-                        data
-                );
-                break;
-            }
-        });
-
-        function getFormattedDate(date) {
-
-                const dt = new Date(date);
-                    const padL = (nr, len = 2, chr = `0`) => `${nr}`.padStart(2, chr);
-                    return `${
-                        dt.getFullYear()}-${
-                        padL(dt.getMonth()+1)}-${
-                        padL(dt.getDate())} 00:00:00`
-            }
-    </script>
+    <script type="application/json" id="gantt-config">@json($ganttConfig)</script>
 
 </x-proposal-layout>
