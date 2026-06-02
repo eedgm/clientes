@@ -58,7 +58,7 @@ class ProposalBoard extends Component
 
     public function render()
     {
-        $proposals = Proposal::get();
+        $proposals = Proposal::orderBy('created_at', 'desc')->get();
         return view('livewire.proposal-board', compact('proposals'));
     }
 }

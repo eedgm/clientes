@@ -81,7 +81,7 @@
     </x-modal>
 
     <div class="block w-full mt-4 overflow-auto scrolling-touch">
-        <div class="grid items-start grid-cols-1 gap-4 m-5 sm:grid-cols-1 lg:grid-cols-3">
+        <div class="grid items-start grid-cols-1 gap-4 m-5 sm:grid-cols-1 lg:grid-cols-4">
             @foreach ($proposals as $proposal)
                 <x-partials.card class="text-white bg-gradient-to-tr from-gray-700 via-gray-900 to-black">
                     <x-slot name="title">
