@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Developer;
 use App\Models\Person;
 use App\Models\Proposal;
 use App\Models\Receipt;
@@ -85,6 +86,13 @@ class ProposalCalculator extends Component
 
     public $versions;
 
+    /**
+     * Per-developer cost override for the current version, keyed by
+     * developer id. Synced to the `developer_version` pivot on save
+     * and applied with the same precedence as the calculator.
+     */
+    public $developerOverrides = [];
+
     protected $rules = [
         'versionAttachment' => ['file', 'max:1024', 'nullable'],
         'version.user_id' => ['required', 'exists:users,id'],
@@ -108,6 +116,8 @@ class ProposalCalculator extends Component
         'responsiblePerson.phone' => ['nullable', 'max:255', 'string'],
         'responsiblePerson.skype' => ['nullable', 'max:255', 'string'],
         'responsiblePerson.rol_id' => ['nullable', 'exists:rols,id'],
+        'developerOverrides' => ['nullable', 'array'],
+        'developerOverrides.*' => ['nullable', 'numeric', 'min:0'],
     ];
 
     public function mount(Proposal $proposal)
@@ -118,6 +128,7 @@ class ProposalCalculator extends Component
         $this->proposal = $proposal;
         $this->rolsForSelect = Rol::pluck('name', 'id');
         $this->versions = $proposal->versions;
+        $this->developerOverrides = [];
         $this->resetResponsibleData();
     }
 
@@ -138,6 +149,18 @@ class ProposalCalculator extends Component
         $this->dispatchBrowserEvent('refresh');
     }
 
+    /**
+     * Recalculate when any per-developer cost override changes. Livewire
+     * fires this for nested `wire:model` updates like
+     * `developerOverrides.5`, which do not trigger `updated()`.
+     */
+    public function updatedDeveloperOverrides()
+    {
+        $this->calculateValues();
+
+        $this->dispatchBrowserEvent('refresh');
+    }
+
     public function addNewVersion()
     {
         $this->editing = false;
@@ -148,9 +171,10 @@ class ProposalCalculator extends Component
         $this->responsiblePersonId = null;
         $this->receipts_count = 0;
         $this->showingModal = true;
-        $this->hours = $this->proposal->tasks->sum('hours');
+        $this->hours = $this->proposalTotalHours();
         $this->version->hours = $this->hours;
         $this->version->seller_commission_percentage = 0;
+        $this->developerOverrides = [];
 
         $this->calculateValues();
     }
@@ -297,6 +321,7 @@ class ProposalCalculator extends Component
 
         $this->version->save();
         $this->syncResponsiblePeople();
+        $this->syncDeveloperOverrides();
 
         $this->uploadIteration++;
 
@@ -311,7 +336,7 @@ class ProposalCalculator extends Component
     {
         $this->editing = true;
         $this->modalTitle = trans('crud.proposal_versions.edit_title');
-        $this->version = $version;
+        $this->version = $version->load('developers');
 
         $this->receipts = $this->version->receipts;
         $this->receipts_count = $this->receipts->count();
@@ -325,6 +350,14 @@ class ProposalCalculator extends Component
             })
             ->toArray();
         $this->responsiblePersonId = null;
+        $this->developerOverrides = $this->version
+            ->developers
+            ->mapWithKeys(function ($developer) {
+                return [
+                    (int) $developer->id => $developer->pivot->cost_per_hour,
+                ];
+            })
+            ->all();
 
         $this->calculateValues();
 
@@ -349,7 +382,16 @@ class ProposalCalculator extends Component
 
         $this->unexpected = $hours * ($unexpectedPercentage / 100);
         $this->total_hours = $hours + $this->unexpected;
-        $this->price = $this->total_hours * $costPerHour;
+
+        $perDeveloperBaseCost = $this->perDeveloperAssignmentCost(
+            $this->version,
+            $this->proposal
+        );
+
+        $this->price = $perDeveloperBaseCost > 0
+            ? $perDeveloperBaseCost
+            : $this->total_hours * $costPerHour;
+
         $this->company_gain = $this->price * ($companyGainPercentage / 100);
         $this->price_with_gain = $this->price + $this->company_gain;
         $this->price_with_bank_tax = $this->price_with_gain +
@@ -364,6 +406,203 @@ class ProposalCalculator extends Component
 
         $this->version->first_payment = $this->price_month_divided;
         $this->version->total = $this->total_with_seller_commission;
+    }
+
+    /**
+     * Sum of (assignment.hours * effective developer cost) for every
+     * developer assigned to a task of the proposal. The effective
+     * cost prefers the per-version override and falls back to the
+     * developer's base cost.
+     *
+     * Returns 0 when no task has developer assignment hours, so the
+     * caller can keep the legacy "version cost_per_hour" math in
+     * place.
+     */
+    private function perDeveloperAssignmentCost(
+        Version $version,
+        Proposal $proposal
+    ): float {
+        $overrides = $this->currentDeveloperOverrides();
+
+        $baseQuery = $proposal->tasks()
+            ->whereHas('developers', function ($query) {
+                $query->where('developer_task.hours', '!=', null);
+            });
+
+        if ($baseQuery->doesntExist()) {
+            return 0.0;
+        }
+
+        $total = 0.0;
+
+        $proposal->tasks()->with('developers')->each(function ($task) use ($overrides, $version, &$total) {
+            foreach ($task->developers as $developer) {
+                $hours = $developer->pivot->hours;
+
+                if ($hours === null) {
+                    continue;
+                }
+
+                $effectiveCost = $this->effectiveDeveloperCost(
+                    $developer,
+                    $overrides,
+                    (float) ($version->cost_per_hour ?? 0)
+                );
+
+                $total += (float) $hours * $effectiveCost;
+            }
+        });
+
+        return $total;
+    }
+
+    /**
+     * Per-developer internal-cost summary for the current proposal
+     * and version.
+     *
+     * The effective hourly cost follows the documented precedence:
+     * version-specific override → developer base cost → version
+     * `cost_per_hour` legacy fallback. Subtotal is the developer's
+     * accumulated proposal hours multiplied by the effective cost.
+     */
+    public function getDeveloperSummariesProperty(): Collection
+    {
+        $overrides = $this->currentDeveloperOverrides();
+        $fallbackCost = (float) ($this->version->cost_per_hour ?? 0);
+
+        $hoursByDeveloper = [];
+        $hasAssignments = false;
+
+        $this->proposal->tasks()->with('developers')->each(function ($task) use (&$hoursByDeveloper, &$hasAssignments) {
+            foreach ($task->developers as $developer) {
+                if ($developer->pivot->hours === null) {
+                    continue;
+                }
+
+                $developerId = (int) $developer->id;
+                $hoursByDeveloper[$developerId] =
+                    ($hoursByDeveloper[$developerId] ?? 0.0) + (float) $developer->pivot->hours;
+                $hasAssignments = true;
+            }
+        });
+
+        if (! $hasAssignments) {
+            return collect();
+        }
+
+        $developers = Developer::with('user:id,name')
+            ->whereIn('id', array_keys($hoursByDeveloper))
+            ->get()
+            ->keyBy('id');
+
+        return collect($hoursByDeveloper)
+            ->map(function (float $hours, int $developerId) use ($developers, $overrides, $fallbackCost) {
+                $developer = $developers->get($developerId);
+
+                $baseCost = $developer ? (float) ($developer->cost_per_hour ?? 0) : 0.0;
+                $overrideRaw = $overrides[$developerId] ?? null;
+                $override = $overrideRaw === null || $overrideRaw === ''
+                    ? null
+                    : (float) $overrideRaw;
+
+                $effectiveCost = $override ?? ($baseCost > 0 ? $baseCost : $fallbackCost);
+
+                return [
+                    'id' => $developerId,
+                    'name' => optional($developer?->user)->name ?? '—',
+                    'proposal_hours' => round($hours, 2),
+                    'base_cost_per_hour' => $baseCost,
+                    'version_cost_per_hour' => $override,
+                    'effective_cost_per_hour' => (float) $effectiveCost,
+                    'subtotal' => round($hours * (float) $effectiveCost, 2),
+                ];
+            })
+            ->sortBy('name')
+            ->values();
+    }
+
+    /**
+     * Map of current override values keyed by developer id. Reads
+     * from the form state when editing/creating a version so the
+     * calculator reactively tracks user changes, and falls back to
+     * the persisted pivot on the loaded version otherwise.
+     */
+    private function currentDeveloperOverrides(): array
+    {
+        if (is_array($this->developerOverrides) && ! empty($this->developerOverrides)) {
+            return collect($this->developerOverrides)
+                ->mapWithKeys(function ($value, $key) {
+                    return [(int) $key => $value];
+                })
+                ->all();
+        }
+
+        if (! isset($this->version) || ! $this->version->exists) {
+            return [];
+        }
+
+        return $this->version
+            ->developers()
+            ->get()
+            ->mapWithKeys(function ($developer) {
+                return [
+                    (int) $developer->id => $developer->pivot->cost_per_hour,
+                ];
+            })
+            ->all();
+    }
+
+    /**
+     * Resolve the effective hourly cost for a developer following the
+     * override → base → version fallback precedence.
+     */
+    private function effectiveDeveloperCost(
+        $developer,
+        array $overrides,
+        float $fallbackCost
+    ): float {
+        $developerId = (int) $developer->id;
+        $override = $overrides[$developerId] ?? null;
+
+        if ($override !== null && $override !== '') {
+            return (float) $override;
+        }
+
+        $base = (float) ($developer->cost_per_hour ?? 0);
+
+        return $base > 0 ? $base : $fallbackCost;
+    }
+
+    /**
+     * Effective proposal hours using the same fallback rule that the
+     * gantt lightbox uses. Legacy tasks without assignment hours keep
+     * their `tasks.hours` value.
+     */
+    private function proposalTotalHours(): float
+    {
+        $total = 0.0;
+        $hasAssignmentHours = false;
+
+        $this->proposal->tasks()->with('developers')->each(function ($task) use (&$total, &$hasAssignmentHours) {
+            $sum = 0.0;
+            $taskHasHours = false;
+
+            foreach ($task->developers as $developer) {
+                if ($developer->pivot->hours !== null) {
+                    $sum += (float) $developer->pivot->hours;
+                    $taskHasHours = true;
+                }
+            }
+
+            if ($taskHasHours) {
+                $total += $sum;
+                $hasAssignmentHours = true;
+            } else {
+                $total += (float) $task->hours;
+            }
+        });
+
+        return $hasAssignmentHours ? $total : (float) $this->proposal->tasks->sum('hours');
     }
 
     private function clearCalculator()
@@ -437,6 +676,38 @@ class ProposalCalculator extends Component
         if ($peopleToDetach->isNotEmpty()) {
             $this->version->people()->detach($peopleToDetach->all());
         }
+    }
+
+    /**
+     * Persist the per-developer cost overrides for the current
+     * version. Entries with an empty value clear the override and
+     * fall back to the developer's base cost.
+     */
+    private function syncDeveloperOverrides(): void
+    {
+        if (! $this->version->exists) {
+            return;
+        }
+
+        $overrides = collect($this->developerOverrides ?? [])
+            ->mapWithKeys(function ($value, $key) {
+                return [(int) $key => $value];
+            })
+            ->all();
+
+        if (empty($overrides)) {
+            return;
+        }
+
+        $sync = [];
+
+        foreach ($overrides as $developerId => $cost) {
+            $sync[$developerId] = $cost === null || $cost === ''
+                ? ['cost_per_hour' => null]
+                : ['cost_per_hour' => (float) $cost];
+        }
+
+        $this->version->developers()->syncWithoutDetaching($sync);
     }
 
     public function getSelectedResponsiblePeopleProperty(): Collection

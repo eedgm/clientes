@@ -26,6 +26,7 @@ class DeveloperStoreRequest extends FormRequest
         return [
             'user_id' => ['required', 'exists:users,id'],
             'rol_id' => ['required', 'exists:rols,id'],
+            'cost_per_hour' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 }

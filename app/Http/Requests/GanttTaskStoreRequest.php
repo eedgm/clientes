@@ -30,7 +30,7 @@ class GanttTaskStoreRequest extends FormRequest
             'text' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'date'],
             'duration' => ['required', 'integer', 'min:0'],
-            'hours' => ['required', 'numeric', 'min:0'],
+            'hours' => ['nullable', 'numeric', 'min:0'],
             'priority_id' => ['required', 'exists:priorities,id'],
             'statu_id' => ['required', 'exists:status,id'],
             'progress' => ['nullable', 'numeric', 'between:0,1'],

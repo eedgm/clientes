@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Version;
-use App\Models\Proposal;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\VersionDeveloperCostsRequest;
 use App\Http\Requests\VersionStoreRequest;
 use App\Http\Requests\VersionUpdateRequest;
+use App\Models\Proposal;
+use App\Models\User;
+use App\Models\Version;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 
 class VersionController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -31,8 +32,7 @@ class VersionController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create(Request $request)
     {
@@ -45,8 +45,7 @@ class VersionController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\VersionStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(VersionStoreRequest $request)
     {
@@ -67,9 +66,7 @@ class VersionController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Version $version
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Version $version)
     {
@@ -79,9 +76,7 @@ class VersionController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Version $version
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Request $request, Version $version)
     {
@@ -97,9 +92,7 @@ class VersionController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\VersionUpdateRequest $request
-     * @param \App\Models\Version $version
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(VersionUpdateRequest $request, Version $version)
     {
@@ -124,9 +117,7 @@ class VersionController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Version $version
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Version $version)
     {
@@ -141,5 +132,54 @@ class VersionController extends Controller
         return redirect()
             ->route('versions.index')
             ->withSuccess(__('crud.common.removed'));
+    }
+
+    /**
+     * Sync per-developer cost overrides for this version.
+     *
+     * Payload shape: { overrides: [{ developer_id, cost_per_hour }] }
+     * Existing rows for developers that are missing from the payload
+     * are detached so the calculator falls back to the developer's
+     * base cost.
+     */
+    public function updateDeveloperCosts(
+        VersionDeveloperCostsRequest $request,
+        Version $version
+    ) {
+        $this->authorize('update', $version);
+
+        $overrides = collect($request->validated()['overrides'] ?? [])
+            ->keyBy('developer_id')
+            ->all();
+
+        $sync = [];
+
+        foreach ($overrides as $developerId => $override) {
+            $cost = $override['cost_per_hour'] ?? null;
+
+            $sync[(int) $developerId] = $cost === null
+                ? ['cost_per_hour' => null]
+                : ['cost_per_hour' => (float) $cost];
+        }
+
+        $version->developers()->sync($sync);
+
+        return response()->json([
+            'action' => 'updated',
+            'overrides' => $version->developers()
+                ->get(['developers.id', 'developers.user_id'])
+                ->map(function ($developer) use ($version) {
+                    $pivot = $version->developers()
+                        ->where('developers.id', $developer->id)
+                        ->first()
+                        ?->pivot;
+
+                    return [
+                        'developer_id' => $developer->id,
+                        'cost_per_hour' => $pivot?->cost_per_hour,
+                    ];
+                })
+                ->values(),
+        ]);
     }
 }

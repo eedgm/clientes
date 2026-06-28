@@ -26,7 +26,7 @@ class VersionFactory extends Factory
         return [
             'attachment' => $this->faker->text(255),
             'total' => $this->faker->randomFloat(2, 0, 9999),
-            'time' => $this->faker->date,
+            'time' => $this->faker->randomFloat(2, 0, 24),
             'cost_per_hour' => $this->faker->randomNumber(1),
             'hour_per_day' => $this->faker->randomNumber(1),
             'months_to_pay' => $this->faker->randomNumber(1),

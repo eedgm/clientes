@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\Developer;
 use App\Models\Priority;
 use App\Models\Proposal;
 use App\Models\Receipt;
@@ -210,6 +211,37 @@ class TaskControllerTest extends TestCase
     /**
      * @test
      */
+    public function it_stores_a_gantt_task_when_hours_is_omitted()
+    {
+        $proposal = Proposal::factory()->create();
+        $priority = Priority::factory()->create();
+        $statu = Statu::factory()->create();
+
+        $payload = [
+            'proposal_id' => $proposal->id,
+            'text' => 'New task without hours',
+            'start_date' => now()->format('Y-m-d H:i:s'),
+            'duration' => 1,
+            'priority_id' => $priority->id,
+            'statu_id' => $statu->id,
+        ];
+
+        $response = $this->postJson(route('tasks.gantt.store'), $payload);
+
+        $response
+            ->assertStatus(201)
+            ->assertJsonFragment(['action' => 'inserted']);
+
+        $this->assertDatabaseHas('tasks', [
+            'proposal_id' => $proposal->id,
+            'text' => 'New task without hours',
+            'hours' => 0,
+        ]);
+    }
+
+    /**
+     * @test
+     */
     public function it_rejects_invalid_gantt_create_payload()
     {
         $this->withExceptionHandling();
@@ -345,6 +377,117 @@ class TaskControllerTest extends TestCase
             'progress' => 0,
             'parent' => 0,
             'hours' => 6,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_syncs_gantt_task_developers_and_recomputes_task_hours()
+    {
+        $task = $this->createGanttTask(Proposal::factory()->create(), 'Build feature');
+        $first = Developer::factory()->create();
+        $second = Developer::factory()->create();
+
+        $response = $this->putJson(
+            route('tasks.gantt.developers.sync', $task),
+            [
+                'developers' => [
+                    ['developer_id' => $first->id, 'hours' => 3],
+                    ['developer_id' => $second->id, 'hours' => 5],
+                ],
+            ]
+        );
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('action', 'updated')
+            ->assertJsonPath('hours', 8);
+
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+            'hours' => 8,
+        ]);
+
+        $this->assertDatabaseHas('developer_task', [
+            'task_id' => $task->id,
+            'developer_id' => $first->id,
+            'hours' => 3,
+        ]);
+
+        $this->assertDatabaseHas('developer_task', [
+            'task_id' => $task->id,
+            'developer_id' => $second->id,
+            'hours' => 5,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_detaches_developers_omitted_from_the_sync_payload()
+    {
+        $task = $this->createGanttTask(Proposal::factory()->create(), 'Build feature');
+        $kept = Developer::factory()->create();
+        $dropped = Developer::factory()->create();
+
+        $task->developers()->attach($kept->id, ['hours' => 2]);
+        $task->developers()->attach($dropped->id, ['hours' => 4]);
+
+        $response = $this->putJson(
+            route('tasks.gantt.developers.sync', $task),
+            [
+                'developers' => [
+                    ['developer_id' => $kept->id, 'hours' => 6],
+                ],
+            ]
+        );
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('hours', 6);
+
+        $this->assertDatabaseHas('developer_task', [
+            'task_id' => $task->id,
+            'developer_id' => $kept->id,
+            'hours' => 6,
+        ]);
+
+        $this->assertDatabaseMissing('developer_task', [
+            'task_id' => $task->id,
+            'developer_id' => $dropped->id,
+        ]);
+
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+            'hours' => 6,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_keeps_legacy_task_hours_when_no_assignment_hours_are_provided()
+    {
+        $task = $this->createGanttTask(Proposal::factory()->create(), 'Legacy task');
+        $task->update(['hours' => 12]);
+        $developer = Developer::factory()->create();
+
+        // attach without hours, mimicking legacy pivot rows
+        $task->developers()->attach($developer->id);
+
+        $response = $this->putJson(
+            route('tasks.gantt.developers.sync', $task),
+            ['developers' => []]
+        );
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('hours', 12);
+
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+            'hours' => 12,
         ]);
     }
 }

@@ -54,4 +54,11 @@ class Version extends Model
     {
         return $this->hasMany(Receipt::class);
     }
+
+    public function developers()
+    {
+        return $this->belongsToMany(Developer::class)
+            ->withPivot('cost_per_hour')
+            ->withTimestamps();
+    }
 }

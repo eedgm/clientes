@@ -7,6 +7,7 @@ use App\Http\Requests\ProposalUpdateRequest;
 use App\Models\Client;
 use App\Models\Priority;
 use App\Models\Proposal;
+use App\Models\Rol;
 use App\Models\Statu;
 use App\Models\Task;
 use Illuminate\Http\Request;
@@ -41,6 +42,10 @@ class ProposalController extends Controller
             ->get(['id', 'name']);
 
         $statuses = Statu::query()
+            ->orderBy('id')
+            ->get(['id', 'name']);
+
+        $rols = Rol::query()
             ->orderBy('id')
             ->get(['id', 'name']);
 
@@ -100,6 +105,12 @@ class ProposalController extends Controller
                         'label' => $status->name,
                     ])
                     ->values(),
+                'rols' => $rols
+                    ->map(fn ($rol) => [
+                        'key' => $rol->id,
+                        'label' => $rol->name,
+                    ])
+                    ->values(),
                 'default_priority_id' => $priorities->first()->id ?? null,
                 'default_statu_id' => $statuses->first()->id ?? null,
             ],
@@ -108,6 +119,9 @@ class ProposalController extends Controller
                 'create' => route('tasks.gantt.store'),
                 'update' => route('tasks.gantt.update', ['task' => '__TASK__']),
                 'delete' => route('tasks.gantt.destroy', ['task' => '__TASK__']),
+                'task_developers_sync' => route('tasks.gantt.developers.sync', ['task' => '__TASK__']),
+                'developer_search' => route('developers.search'),
+                'developer_quick_store' => route('developers.quick-store'),
             ],
             'priority_class_map' => $priorities
                 ->mapWithKeys(function ($priority) {

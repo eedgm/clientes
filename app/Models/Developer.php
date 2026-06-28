@@ -3,15 +3,15 @@
 namespace App\Models;
 
 use App\Models\Scopes\Searchable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Developer extends Model
 {
     use HasFactory;
     use Searchable;
 
-    protected $fillable = ['user_id', 'rol_id'];
+    protected $fillable = ['user_id', 'rol_id', 'cost_per_hour'];
 
     protected $searchableFields = ['*'];
 
@@ -27,7 +27,7 @@ class Developer extends Model
 
     public function tasks()
     {
-        return $this->belongsToMany(Task::class);
+        return $this->belongsToMany(Task::class)->withPivot('comments', 'assignations', 'gain', 'hours');
     }
 
     public function tickets()
@@ -38,5 +38,12 @@ class Developer extends Model
     public function skills()
     {
         return $this->belongsToMany(Skill::class);
+    }
+
+    public function versions()
+    {
+        return $this->belongsToMany(Version::class)
+            ->withPivot('cost_per_hour')
+            ->withTimestamps();
     }
 }

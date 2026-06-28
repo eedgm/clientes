@@ -3,7 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Developer;
-use Illuminate\Support\Str;
+use App\Models\Rol;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class DeveloperFactory extends Factory
@@ -23,8 +24,9 @@ class DeveloperFactory extends Factory
     public function definition()
     {
         return [
-            'user_id' => \App\Models\User::factory(),
-            'rol_id' => \App\Models\Rol::factory(),
+            'user_id' => User::factory(),
+            'rol_id' => Rol::factory(),
+            'cost_per_hour' => $this->faker->randomFloat(2, 0, 200),
         ];
     }
 }

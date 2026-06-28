@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\Developer;
 use App\Models\Proposal;
 use App\Models\User;
 use App\Models\Version;
@@ -149,5 +150,74 @@ class VersionControllerTest extends TestCase
         $response->assertRedirect(route('versions.index'));
 
         $this->assertModelMissing($version);
+    }
+
+    /**
+     * @test
+     */
+    public function it_syncs_developer_cost_overrides_per_version()
+    {
+        $version = Version::factory()->create();
+        $first = Developer::factory()->create();
+        $second = Developer::factory()->create();
+
+        $response = $this->putJson(
+            route('versions.developer-costs.update', $version),
+            [
+                'overrides' => [
+                    ['developer_id' => $first->id, 'cost_per_hour' => 50],
+                    ['developer_id' => $second->id, 'cost_per_hour' => 75.5],
+                ],
+            ]
+        );
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('action', 'updated');
+
+        $this->assertDatabaseHas('developer_version', [
+            'version_id' => $version->id,
+            'developer_id' => $first->id,
+            'cost_per_hour' => 50,
+        ]);
+
+        $this->assertDatabaseHas('developer_version', [
+            'version_id' => $version->id,
+            'developer_id' => $second->id,
+            'cost_per_hour' => 75.5,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_detaches_developer_overrides_omitted_from_the_payload()
+    {
+        $version = Version::factory()->create();
+        $kept = Developer::factory()->create();
+        $dropped = Developer::factory()->create();
+
+        $version->developers()->attach($kept->id, ['cost_per_hour' => 30]);
+        $version->developers()->attach($dropped->id, ['cost_per_hour' => 40]);
+
+        $this->putJson(
+            route('versions.developer-costs.update', $version),
+            [
+                'overrides' => [
+                    ['developer_id' => $kept->id, 'cost_per_hour' => 99],
+                ],
+            ]
+        )->assertOk();
+
+        $this->assertDatabaseHas('developer_version', [
+            'version_id' => $version->id,
+            'developer_id' => $kept->id,
+            'cost_per_hour' => 99,
+        ]);
+
+        $this->assertDatabaseMissing('developer_version', [
+            'version_id' => $version->id,
+            'developer_id' => $dropped->id,
+        ]);
     }
 }

@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use App\Models\Scopes\Searchable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Task extends Model
 {
@@ -30,7 +30,7 @@ class Task extends Model
         'proposal_id',
         'duration',
         'progress',
-        'parent'
+        'parent',
     ];
 
     protected $searchableFields = ['*'];
@@ -62,6 +62,37 @@ class Task extends Model
 
     public function developers()
     {
-        return $this->belongsToMany(Developer::class);
+        return $this->belongsToMany(Developer::class)
+            ->withPivot('comments', 'assignations', 'gain', 'hours');
+    }
+
+    /**
+     * Sum of pivot hours for the task's developer assignments.
+     *
+     * Returns null when no assignment has hours recorded so the caller
+     * can keep the legacy `tasks.hours` fallback in place.
+     */
+    public function getAssignmentHoursTotalAttribute()
+    {
+        $hasAnyHours = $this->developers()
+            ->wherePivot('hours', '!=', null)
+            ->exists();
+
+        if (! $hasAnyHours) {
+            return null;
+        }
+
+        return (float) $this->developers()
+            ->wherePivot('hours', '!=', null)
+            ->sum('developer_task.hours');
+    }
+
+    /**
+     * Effective task hours: sum of developer assignment hours when
+     * available, otherwise the legacy `tasks.hours` column.
+     */
+    public function getEffectiveHoursAttribute()
+    {
+        return $this->assignment_hours_total ?? (float) $this->hours;
     }
 }

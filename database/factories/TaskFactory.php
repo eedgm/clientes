@@ -2,8 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Models\Priority;
+use App\Models\Proposal;
+use App\Models\Statu;
 use App\Models\Task;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TaskFactory extends Factory
@@ -23,13 +25,16 @@ class TaskFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->name,
+            'text' => $this->faker->name,
             'hours' => $this->faker->randomNumber(0),
             'real_hours' => $this->faker->randomNumber(1),
-            'statu_id' => \App\Models\Statu::factory(),
-            'priority_id' => \App\Models\Priority::factory(),
-            'version_id' => \App\Models\Version::factory(),
-            'receipt_id' => \App\Models\Receipt::factory(),
+            'statu_id' => Statu::factory(),
+            'priority_id' => Priority::factory(),
+            'proposal_id' => Proposal::factory(),
+            'start_date' => now()->format('Y-m-d H:i:s'),
+            'duration' => 1,
+            'progress' => 0,
+            'parent' => 0,
         ];
     }
 }

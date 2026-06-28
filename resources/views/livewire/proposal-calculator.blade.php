@@ -453,6 +453,69 @@
                         </tr>
                     </table>
                     </div>
+
+                    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                        <div class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-gray-600">
+                            <i class="bx bx-group text-indigo-500"></i>
+                            Costo interno por developer
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                            Resumen de horas acumuladas y costo interno por developer para esta propuesta.
+                            El costo efectivo usa el override de la versión, luego el costo base del developer y, finalmente, el costo por hora general de la versión.
+                        </p>
+
+                        <div class="mt-4 overflow-hidden rounded-xl border border-gray-200">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-600">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left">Developer</th>
+                                        <th class="px-3 py-2 text-right">Horas propuesta</th>
+                                        <th class="px-3 py-2 text-right">Costo base</th>
+                                        <th class="px-3 py-2 text-right">Override versión</th>
+                                        <th class="px-3 py-2 text-right">Costo efectivo</th>
+                                        <th class="px-3 py-2 text-right">Subtotal interno</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 text-gray-700">
+                                    @forelse ($this->developerSummaries as $summary)
+                                    <tr>
+                                        <td class="px-3 py-2 text-left font-medium text-gray-900">
+                                            {{ $summary['name'] }}
+                                        </td>
+                                        <td class="px-3 py-2 text-right">
+                                            {{ number_format($summary['proposal_hours'], 2) }}
+                                        </td>
+                                        <td class="px-3 py-2 text-right">
+                                            $ {{ number_format($summary['base_cost_per_hour'], 2) }}
+                                        </td>
+                                        <td class="px-3 py-2 text-right">
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                placeholder="—"
+                                                wire:model.live="developerOverrides.{{ $summary['id'] }}"
+                                                class="w-24 rounded-md border border-gray-300 bg-white px-2 py-1 text-right text-sm text-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                            />
+                                        </td>
+                                        <td class="px-3 py-2 text-right font-medium text-gray-900">
+                                            $ {{ number_format($summary['effective_cost_per_hour'], 2) }}
+                                        </td>
+                                        <td class="px-3 py-2 text-right font-semibold text-indigo-700">
+                                            $ {{ number_format($summary['subtotal'], 2) }}
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="6" class="px-3 py-6 text-center text-xs text-gray-500">
+                                            Todavía no hay tareas con horas asignadas a developers en esta propuesta.
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 

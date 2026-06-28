@@ -56,7 +56,12 @@ Route::prefix('/')
         Route::get('/proposal/tasks/{proposal}', [TaskController::class, 'getTasks'])->name('proposal.tasks');
         Route::post('/tasks/task', [TaskController::class, 'addGanttTask'])->name('tasks.gantt.store');
         Route::put('/tasks/task/update/{task}', [TaskController::class, 'updateGanttTask'])->name('tasks.gantt.update');
+        Route::put('/tasks/task/{task}/developers', [TaskController::class, 'syncGanttDevelopers'])->name('tasks.gantt.developers.sync');
         Route::put('/tasks/task/delete/{task}', [TaskController::class, 'destroyGanttTask'])->name('tasks.gantt.destroy');
+
+        Route::get('/developers/search', [DeveloperController::class, 'search'])->name('developers.search');
+        Route::post('/developers/quick-store', [DeveloperController::class, 'quickStore'])->name('developers.quick-store');
+        Route::put('/versions/{version}/developer-costs', [VersionController::class, 'updateDeveloperCosts'])->name('versions.developer-costs.update');
         Route::get('proposal/kanban/{proposal}', KanbanTasks::class)->name('proposal.kanban');
         Route::get('payables/clone', PayablesClone::class)->name('payables.clone');
 

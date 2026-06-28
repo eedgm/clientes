@@ -2,14 +2,13 @@
 
 namespace Tests\Feature\Controllers;
 
-use App\Models\User;
 use App\Models\Developer;
-
 use App\Models\Rol;
-
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
+use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 class DeveloperControllerTest extends TestCase
 {
@@ -23,7 +22,7 @@ class DeveloperControllerTest extends TestCase
             User::factory()->create(['email' => 'admin@admin.com'])
         );
 
-        $this->seed(\Database\Seeders\PermissionsSeeder::class);
+        $this->seed(PermissionsSeeder::class);
 
         $this->withoutExceptionHandling();
     }
@@ -139,5 +138,86 @@ class DeveloperControllerTest extends TestCase
         $response->assertRedirect(route('developers.index'));
 
         $this->assertModelMissing($developer);
+    }
+
+    /**
+     * @test
+     */
+    public function it_searches_developers_by_user_name()
+    {
+        $matching = Developer::factory()
+            ->for(User::factory(['name' => 'Ada Lovelace']))
+            ->create();
+
+        Developer::factory()
+            ->for(User::factory(['name' => 'Grace Hopper']))
+            ->create();
+
+        $response = $this->getJson(route('developers.search', ['q' => 'Ada']));
+
+        $response
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $matching->id)
+            ->assertJsonPath('data.0.name', 'Ada Lovelace');
+    }
+
+    /**
+     * @test
+     */
+    public function it_creates_developer_inline_creating_user_when_email_is_new()
+    {
+        $rol = Rol::factory()->create();
+
+        $payload = [
+            'name' => 'Linus Torvalds',
+            'email' => 'linus@example.test',
+            'password' => 'secret-pass',
+            'rol_id' => $rol->id,
+            'cost_per_hour' => 42.5,
+        ];
+
+        $response = $this->postJson(route('developers.quick-store'), $payload);
+
+        $response
+            ->assertStatus(201)
+            ->assertJsonPath('data.name', 'Linus Torvalds')
+            ->assertJsonPath('data.email', 'linus@example.test')
+            ->assertJsonPath('data.cost_per_hour', 42.5);
+
+        $this->assertDatabaseHas('users', ['email' => 'linus@example.test']);
+        $this->assertDatabaseHas('developers', [
+            'rol_id' => $rol->id,
+            'cost_per_hour' => 42.5,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_creates_developer_inline_reusing_existing_user_for_email()
+    {
+        $user = User::factory()->create([
+            'email' => 'duplicate@example.test',
+        ]);
+        $rol = Rol::factory()->create();
+
+        $payload = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'password' => 'ignored',
+            'rol_id' => $rol->id,
+        ];
+
+        $response = $this->postJson(route('developers.quick-store'), $payload);
+
+        $response->assertStatus(201)->assertJsonPath('data.id', fn ($id) => is_int($id));
+
+        $this->assertSame(1, User::where('email', $user->email)->count());
+
+        $this->assertDatabaseHas('developers', [
+            'user_id' => $user->id,
+            'rol_id' => $rol->id,
+        ]);
     }
 }

@@ -243,6 +243,158 @@
         </div>
     </div>
 
+    <div
+        id="gantt-developers-modal"
+        class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900/60 backdrop-blur-sm"
+        role="dialog"
+        aria-modal="true"
+    >
+        <div class="relative mx-auto my-10 max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div class="flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-500 px-6 py-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Asignar developers</h3>
+                    <p class="text-sm text-indigo-100">Buscá por nombre o creá uno nuevo. Las horas se suman al total de la tarea.</p>
+                </div>
+                <button
+                    type="button"
+                    class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white transition-all duration-200 hover:bg-white/20"
+                    data-gantt-developers-close
+                    aria-label="Cerrar"
+                >
+                    <i class="bx bx-x text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-6 px-6 py-5">
+                <p data-gantt-developers-flash class="hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"></p>
+
+                <div>
+                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Asignados</label>
+                    <div data-gantt-developers-rows class="mt-2 space-y-2"></div>
+                </div>
+
+                <div>
+                    <label for="gantt-developer-search" class="text-xs font-semibold uppercase tracking-wider text-gray-500">Buscar developer</label>
+                    <input
+                        id="gantt-developer-search"
+                        type="text"
+                        placeholder="Buscar por nombre..."
+                        data-gantt-developers-search
+                        class="mt-2 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200"
+                    />
+                    <div data-gantt-developers-results class="mt-2 space-y-1"></div>
+                </div>
+
+                <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Crear developer nuevo</p>
+                    <form data-gantt-developers-new-form class="mt-3 grid grid-cols-2 gap-3 text-sm">
+                        <input type="text" name="name" placeholder="Nombre" required class="rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200" />
+                        <input type="email" name="email" placeholder="Email" required class="rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200" />
+                        <input type="text" name="password" placeholder="Password" required class="rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200" />
+                        <select name="rol_id" required class="rounded-lg border border-gray-200 bg-white px-3 py-2 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200">
+                            <option value="" disabled selected>Rol</option>
+                            @foreach ($ganttConfig['lightbox']['rols'] ?? [] as $rol)
+                                <option value="{{ $rol['key'] }}">{{ $rol['label'] }}</option>
+                            @endforeach
+                        </select>
+                        <input type="number" name="cost_per_hour" placeholder="Costo por hora" step="0.01" min="0" class="col-span-2 rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200" />
+                        <button type="submit" class="col-span-2 inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700">
+                            <i class="bx bx-user-plus"></i>
+                            Crear y agregar
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 border-t border-gray-100 bg-gray-50 px-6 py-4">
+                <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                    data-gantt-developers-close
+                >
+                    Cancelar
+                </button>
+                <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
+                    data-gantt-developers-save
+                >
+                    <i class="bx bx-save"></i>
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        #gantt-developers-modal .gantt-developers-empty,
+        #gantt-developers-modal .gantt-developers-search-empty {
+            font-size: 0.85rem;
+            color: #6b7280;
+            padding: 0.5rem 0;
+        }
+
+        #gantt-developers-modal .gantt-developers-row {
+            display: grid;
+            grid-template-columns: 1fr 110px 32px;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+        }
+
+        #gantt-developers-modal .gantt-developers-row__name {
+            font-weight: 500;
+            color: #111827;
+        }
+
+        #gantt-developers-modal .gantt-developers-row__hours {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        #gantt-developers-modal .gantt-developers-row__remove {
+            border: none;
+            background: transparent;
+            color: #ef4444;
+            font-size: 1.25rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        #gantt-developers-modal .gantt-developers-search-result {
+            width: 100%;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        #gantt-developers-modal .gantt-developers-search-result:hover {
+            border-color: #6366f1;
+        }
+
+        #gantt-developers-modal .gantt-developers-search-result__name {
+            font-weight: 500;
+            color: #111827;
+        }
+
+        #gantt-developers-modal .gantt-developers-search-result__email {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+    </style>
+
     <script type="application/json" id="gantt-config">@json($ganttConfig)</script>
 
 </x-proposal-layout>

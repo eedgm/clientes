@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\GanttTaskDevelopersRequest;
 use App\Http\Requests\GanttTaskStoreRequest;
 use App\Http\Requests\GanttTaskUpdateRequest;
 use App\Http\Requests\TaskStoreRequest;
@@ -41,6 +42,7 @@ class TaskController extends Controller
         $validated = $request->validated();
         $validated['progress'] = $validated['progress'] ?? 0;
         $validated['parent'] = $validated['parent'] ?? 0;
+        $validated['hours'] = $validated['hours'] ?? 0;
 
         $task = Task::create($validated);
 
@@ -65,6 +67,26 @@ class TaskController extends Controller
         ]);
     }
 
+    /**
+     * Sync the developer assignments for a gantt task and recompute
+     * the task's total hours from the sum of pivot hours.
+     */
+    public function syncGanttDevelopers(
+        GanttTaskDevelopersRequest $request,
+        Task $task
+    ) {
+        $this->authorize('update', $task);
+
+        $assignments = $request->validated()['developers'] ?? [];
+
+        $this->syncTaskDeveloperAssignments($task, $assignments);
+
+        return response()->json([
+            'action' => 'updated',
+            'hours' => (float) $task->fresh()->effective_hours,
+        ]);
+    }
+
     public function destroyGanttTask(Task $task)
     {
         $this->authorize('delete', $task);
@@ -80,7 +102,7 @@ class TaskController extends Controller
     {
         $this->authorize('view', $proposal);
 
-        $tasks = $proposal->tasks()->get();
+        $tasks = $proposal->tasks()->with('developers.user')->get();
 
         return response()->json([
             'data' => $tasks,
@@ -177,5 +199,35 @@ class TaskController extends Controller
         return redirect()
             ->route('tasks.index')
             ->withSuccess(__('crud.common.removed'));
+    }
+
+    /**
+     * Reconcile a task's developer pivot with the incoming payload
+     * and recompute the task total hours. Legacy tasks without
+     * assignment hours keep their previous `tasks.hours` value.
+     */
+    private function syncTaskDeveloperAssignments(Task $task, array $assignments): void
+    {
+        $sync = [];
+
+        foreach ($assignments as $assignment) {
+            if (! isset($assignment['developer_id'])) {
+                continue;
+            }
+
+            $hours = $assignment['hours'] ?? null;
+
+            $sync[(int) $assignment['developer_id']] = $hours === null
+                ? []
+                : ['hours' => (float) $hours];
+        }
+
+        $task->developers()->sync($sync);
+
+        $total = $task->assignment_hours_total;
+
+        if ($total !== null) {
+            $task->forceFill(['hours' => $total])->save();
+        }
     }
 }
