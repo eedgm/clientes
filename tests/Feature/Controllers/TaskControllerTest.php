@@ -490,4 +490,435 @@ class TaskControllerTest extends TestCase
             'hours' => 12,
         ]);
     }
+
+    /**
+     * @test
+     */
+    public function it_returns_the_persisted_task_in_the_create_response()
+    {
+        $proposal = Proposal::factory()->create();
+        Version::factory()->create([
+            'proposal_id' => $proposal->id,
+            'hour_per_day' => 8,
+        ]);
+        $priority = Priority::factory()->create();
+        $statu = Statu::factory()->create();
+
+        $payload = [
+            'proposal_id' => $proposal->id,
+            'text' => 'Persisted with task payload',
+            'start_date' => '2026-01-01 00:00:00',
+            'hours' => 8,
+            'priority_id' => $priority->id,
+            'statu_id' => $statu->id,
+        ];
+
+        $response = $this->postJson(route('tasks.gantt.store'), $payload);
+
+        $response
+            ->assertStatus(201)
+            ->assertJsonFragment(['action' => 'inserted'])
+            ->assertJsonStructure([
+                'action',
+                'tid',
+                'task' => ['id', 'start_date', 'duration', 'sort_order'],
+            ]);
+
+        $task = Task::latest('id')->first();
+
+        $this->assertSame($task->id, (int) $response->json('tid'));
+        $this->assertSame($task->id, (int) $response->json('task.id'));
+        $this->assertSame(1, (int) $response->json('task.sort_order'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_creates_gantt_task_with_duration_derived_from_hour_per_day()
+    {
+        $proposal = Proposal::factory()->create();
+        Version::factory()->create([
+            'proposal_id' => $proposal->id,
+            'hour_per_day' => 8,
+        ]);
+        $priority = Priority::factory()->create();
+        $statu = Statu::factory()->create();
+
+        $payload = [
+            'proposal_id' => $proposal->id,
+            'text' => 'Sized from hours',
+            'start_date' => '2026-01-05 00:00:00',
+            'hours' => 20,
+            'priority_id' => $priority->id,
+            'statu_id' => $statu->id,
+        ];
+
+        $response = $this->postJson(route('tasks.gantt.store'), $payload);
+
+        $response->assertStatus(201);
+
+        $task = Task::latest('id')->first();
+
+        $this->assertSame(3, (int) $task->duration);
+        $this->assertSame(1, (int) $task->sort_order);
+    }
+
+    /**
+     * @test
+     */
+    public function it_uses_eight_as_default_hour_per_day_when_proposal_has_no_version()
+    {
+        $proposal = Proposal::factory()->create();
+        $priority = Priority::factory()->create();
+        $statu = Statu::factory()->create();
+
+        $payload = [
+            'proposal_id' => $proposal->id,
+            'text' => 'Default hour per day',
+            'start_date' => '2026-01-05 00:00:00',
+            'hours' => 9,
+            'priority_id' => $priority->id,
+            'statu_id' => $statu->id,
+        ];
+
+        $response = $this->postJson(route('tasks.gantt.store'), $payload);
+
+        $response->assertStatus(201);
+
+        $task = Task::latest('id')->first();
+
+        $this->assertSame(2, (int) $task->duration);
+    }
+
+    /**
+     * @test
+     */
+    public function it_recomputes_duration_when_hours_change_on_update()
+    {
+        $proposal = Proposal::factory()->create();
+        Version::factory()->create([
+            'proposal_id' => $proposal->id,
+            'hour_per_day' => 8,
+        ]);
+
+        $priority = Priority::factory()->create();
+        $statu = Statu::factory()->create();
+
+        $task = Task::create([
+            'proposal_id' => $proposal->id,
+            'text' => 'Resize on update',
+            'statu_id' => $statu->id,
+            'priority_id' => $priority->id,
+            'start_date' => '2026-01-05 00:00:00',
+            'duration' => 1,
+            'progress' => 0,
+            'parent' => 0,
+            'hours' => 4,
+        ]);
+
+        $response = $this->putJson(route('tasks.gantt.update', $task), [
+            'text' => 'Resized',
+            'start_date' => '2026-01-05 00:00:00',
+            'hours' => 18,
+            'priority_id' => $priority->id,
+            'statu_id' => $statu->id,
+        ]);
+
+        $response->assertOk();
+
+        $this->assertSame(3, (int) $task->fresh()->duration);
+    }
+
+    /**
+     * @test
+     */
+    public function it_cascades_following_tasks_when_a_task_shifts_on_update()
+    {
+        $proposal = Proposal::factory()->create();
+        Version::factory()->create([
+            'proposal_id' => $proposal->id,
+            'hour_per_day' => 8,
+        ]);
+
+        $priority = Priority::factory()->create();
+        $statu = Statu::factory()->create();
+
+        $first = Task::create([
+            'proposal_id' => $proposal->id,
+            'text' => 'First',
+            'statu_id' => $statu->id,
+            'priority_id' => $priority->id,
+            'start_date' => '2026-01-05 00:00:00',
+            'duration' => 1,
+            'progress' => 0,
+            'parent' => 0,
+            'sort_order' => 1,
+            'hours' => 4,
+        ]);
+
+        $second = Task::create([
+            'proposal_id' => $proposal->id,
+            'text' => 'Second',
+            'statu_id' => $statu->id,
+            'priority_id' => $priority->id,
+            'start_date' => '2026-01-06 00:00:00',
+            'duration' => 1,
+            'progress' => 0,
+            'parent' => 0,
+            'sort_order' => 2,
+            'hours' => 4,
+        ]);
+
+        $third = Task::create([
+            'proposal_id' => $proposal->id,
+            'text' => 'Third',
+            'statu_id' => $statu->id,
+            'priority_id' => $priority->id,
+            'start_date' => '2026-01-07 00:00:00',
+            'duration' => 1,
+            'progress' => 0,
+            'parent' => 0,
+            'sort_order' => 3,
+            'hours' => 4,
+        ]);
+
+        $this->putJson(route('tasks.gantt.update', $first), [
+            'text' => 'First',
+            'start_date' => '2026-01-12 00:00:00',
+            'duration' => 3,
+            'hours' => 24,
+            'priority_id' => $priority->id,
+            'statu_id' => $statu->id,
+        ])->assertOk();
+
+        $this->assertSame('2026-01-16 00:00:00', $second->fresh()->start_date->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-01-19 00:00:00', $third->fresh()->start_date->format('Y-m-d H:i:s'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_persists_manual_reorder_via_reorder_endpoint()
+    {
+        $proposal = Proposal::factory()->create();
+        Version::factory()->create([
+            'proposal_id' => $proposal->id,
+            'hour_per_day' => 8,
+        ]);
+
+        $priority = Priority::factory()->create();
+        $statu = Statu::factory()->create();
+
+        $first = Task::create([
+            'proposal_id' => $proposal->id,
+            'text' => 'A',
+            'statu_id' => $statu->id,
+            'priority_id' => $priority->id,
+            'start_date' => '2026-01-05 00:00:00',
+            'duration' => 1,
+            'progress' => 0,
+            'parent' => 0,
+            'sort_order' => 1,
+            'hours' => 4,
+        ]);
+
+        $second = Task::create([
+            'proposal_id' => $proposal->id,
+            'text' => 'B',
+            'statu_id' => $statu->id,
+            'priority_id' => $priority->id,
+            'start_date' => '2026-01-06 00:00:00',
+            'duration' => 1,
+            'progress' => 0,
+            'parent' => 0,
+            'sort_order' => 2,
+            'hours' => 4,
+        ]);
+
+        $third = Task::create([
+            'proposal_id' => $proposal->id,
+            'text' => 'C',
+            'statu_id' => $statu->id,
+            'priority_id' => $priority->id,
+            'start_date' => '2026-01-07 00:00:00',
+            'duration' => 1,
+            'progress' => 0,
+            'parent' => 0,
+            'sort_order' => 3,
+            'hours' => 4,
+        ]);
+
+        $response = $this->postJson(route('proposal.tasks.reorder', $proposal), [
+            'ordered_ids' => [$third->id, $first->id, $second->id],
+        ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('action', 'reordered')
+            ->assertJsonPath('count', 3)
+            ->assertJsonPath('tasks.0.id', $third->id)
+            ->assertJsonPath('tasks.0.sort_order', 1)
+            ->assertJsonPath('tasks.1.id', $first->id)
+            ->assertJsonPath('tasks.1.sort_order', 2)
+            ->assertJsonPath('tasks.2.id', $second->id)
+            ->assertJsonPath('tasks.2.sort_order', 3);
+
+        $ordered = $proposal->orderedTasks()->get();
+
+        $this->assertSame([$third->id, $first->id, $second->id], $ordered->pluck('id')->all());
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_full_task_payload_after_cascading_update()
+    {
+        $proposal = Proposal::factory()->create();
+        Version::factory()->create([
+            'proposal_id' => $proposal->id,
+            'hour_per_day' => 8,
+        ]);
+
+        $priority = Priority::factory()->create();
+        $statu = Statu::factory()->create();
+
+        $first = Task::create([
+            'proposal_id' => $proposal->id,
+            'text' => 'First',
+            'statu_id' => $statu->id,
+            'priority_id' => $priority->id,
+            'start_date' => '2026-01-05 00:00:00',
+            'duration' => 1,
+            'progress' => 0,
+            'parent' => 0,
+            'sort_order' => 1,
+            'hours' => 4,
+        ]);
+
+        $middle = Task::create([
+            'proposal_id' => $proposal->id,
+            'text' => 'Middle',
+            'statu_id' => $statu->id,
+            'priority_id' => $priority->id,
+            'start_date' => '2026-01-06 00:00:00',
+            'duration' => 1,
+            'progress' => 0,
+            'parent' => 0,
+            'sort_order' => 2,
+            'hours' => 4,
+        ]);
+
+        $third = Task::create([
+            'proposal_id' => $proposal->id,
+            'text' => 'Third',
+            'statu_id' => $statu->id,
+            'priority_id' => $priority->id,
+            'start_date' => '2026-01-07 00:00:00',
+            'duration' => 1,
+            'progress' => 0,
+            'parent' => 0,
+            'sort_order' => 3,
+            'hours' => 4,
+        ]);
+
+        $response = $this->putJson(route('tasks.gantt.update', $middle), [
+            'text' => 'Middle',
+            'start_date' => '2026-01-20 00:00:00',
+            'duration' => 2,
+            'hours' => 16,
+            'priority_id' => $priority->id,
+            'statu_id' => $statu->id,
+        ])->assertOk();
+
+        $response
+            ->assertJsonPath('action', 'updated')
+            ->assertJsonPath('task.id', $middle->id)
+            ->assertJsonPath('task.start_date', '2026-01-20 00:00:00')
+            ->assertJsonPath('task.duration', 2)
+            ->assertJsonPath('task.sort_order', 2);
+
+        // The middle task is the cursor; only the third task may be
+        // shifted. The first task must remain at 2026-01-05 (it comes
+        // BEFORE the cursor and must NOT be moved to a later slot).
+        $response
+            ->assertJsonPath('tasks.0.id', $first->id)
+            ->assertJsonPath('tasks.0.start_date', '2026-01-05 00:00:00')
+            ->assertJsonPath('tasks.1.id', $middle->id)
+            ->assertJsonPath('tasks.1.start_date', '2026-01-20 00:00:00')
+            ->assertJsonPath('tasks.2.id', $third->id)
+            ->assertJsonPath('tasks.2.start_date', '2026-01-23 00:00:00');
+
+        $this->assertSame('2026-01-05 00:00:00', $first->fresh()->start_date->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-01-23 00:00:00', $third->fresh()->start_date->format('Y-m-d H:i:s'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_full_task_payload_after_gantt_create()
+    {
+        $proposal = Proposal::factory()->create();
+        Version::factory()->create([
+            'proposal_id' => $proposal->id,
+            'hour_per_day' => 8,
+        ]);
+        $priority = Priority::factory()->create();
+        $statu = Statu::factory()->create();
+
+        $existing = Task::create([
+            'proposal_id' => $proposal->id,
+            'text' => 'Existing',
+            'statu_id' => $statu->id,
+            'priority_id' => $priority->id,
+            'start_date' => '2026-01-05 00:00:00',
+            'duration' => 1,
+            'progress' => 0,
+            'parent' => 0,
+            'sort_order' => 1,
+            'hours' => 4,
+        ]);
+
+        $response = $this->postJson(route('tasks.gantt.store'), [
+            'proposal_id' => $proposal->id,
+            'text' => 'New task',
+            'start_date' => '2026-01-01 00:00:00',
+            'hours' => 8,
+            'priority_id' => $priority->id,
+            'statu_id' => $statu->id,
+        ])->assertStatus(201);
+
+        $newTask = Task::where('text', 'New task')->firstOrFail();
+
+        $response
+            ->assertJsonPath('action', 'inserted')
+            ->assertJsonPath('tid', $newTask->id)
+            ->assertJsonPath('task.id', $newTask->id)
+            ->assertJsonPath('task.sort_order', 2)
+            // The new task was auto-placed on the next business day
+            // after the existing task ends (Mon 2026-01-05 + 1 day
+            // duration = ends Tue 2026-01-06, next business day =
+            // Wed 2026-01-07), and the response should reflect the
+            // authoritative server-computed start_date.
+            ->assertJsonPath('task.start_date', '2026-01-07 00:00:00');
+
+        $this->assertCount(2, $response->json('tasks'));
+        $this->assertSame($existing->id, $response->json('tasks.0.id'));
+        $this->assertSame($newTask->id, $response->json('tasks.1.id'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_rejects_reorder_payload_without_array()
+    {
+        $proposal = Proposal::factory()->create();
+
+        $this->withExceptionHandling();
+
+        $response = $this->postJson(route('proposal.tasks.reorder', $proposal), [
+            'ordered_ids' => 'not-an-array',
+        ]);
+
+        $response->assertStatus(422);
+    }
 }

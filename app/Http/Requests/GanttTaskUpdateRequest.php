@@ -29,12 +29,13 @@ class GanttTaskUpdateRequest extends FormRequest
             'proposal_id' => ['nullable', 'exists:proposals,id'],
             'text' => ['sometimes', 'required', 'string', 'max:255'],
             'start_date' => ['sometimes', 'required', 'date'],
-            'duration' => ['sometimes', 'required', 'integer', 'min:0'],
+            'duration' => ['sometimes', 'nullable', 'integer', 'min:0'],
             'hours' => ['sometimes', 'nullable', 'numeric', 'min:0'],
             'priority_id' => ['sometimes', 'required', 'exists:priorities,id'],
             'statu_id' => ['nullable', 'exists:status,id'],
             'progress' => ['nullable', 'numeric', 'between:0,1'],
             'parent' => ['nullable', 'integer', 'min:0'],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
         ];
     }
 

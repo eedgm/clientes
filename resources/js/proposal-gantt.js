@@ -11,6 +11,10 @@ if (configElement && ganttContainer && window.gantt) {
     const developersModal = document.getElementById('gantt-developers-modal');
     const csrfToken = config.csrf_token
         || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const hourPerDay = Number(config.hour_per_day) > 0 ? Number(config.hour_per_day) : 8;
+    let pendingReorderTimer = null;
+    let pendingReorderSignature = null;
+    let isApplyingServerSync = false;
 
     gantt.config.date_format = config.date_format || '%Y-%m-%d %H:%i:%s';
     gantt.config.work_time = true;
@@ -51,6 +55,16 @@ if (configElement && ganttContainer && window.gantt) {
     gantt.locale.labels.section_statu_id = 'Status';
     gantt.locale.labels.section_hours = 'Hours';
 
+    const computeDurationFromHours = (hoursValue) => {
+        const hours = Number(hoursValue);
+
+        if (!Number.isFinite(hours) || hours <= 0) {
+            return 0;
+        }
+
+        return Math.max(1, Math.ceil(hours / hourPerDay));
+    };
+
     gantt.config.lightbox.sections = [
         { name: 'description', height: 50, map_to: 'text', type: 'textarea', focus: true },
         {
@@ -69,7 +83,12 @@ if (configElement && ganttContainer && window.gantt) {
             options: config.lightbox?.statuses || [],
             default_value: config.lightbox?.default_statu_id,
         },
-        { name: 'hours', height: 50, map_to: 'hours', type: 'textarea' },
+        {
+            name: 'hours',
+            height: 50,
+            map_to: 'hours',
+            type: 'textarea',
+        },
         { name: 'time', height: 35, map_to: 'auto', type: 'duration' },
     ];
 
@@ -177,6 +196,50 @@ if (configElement && ganttContainer && window.gantt) {
         syncHoursLightboxState(taskId);
     });
 
+    gantt.attachEvent('onAfterLightbox', function (taskId) {
+        const lightbox = gantt.getLightbox?.();
+
+        if (!lightbox) {
+            return;
+        }
+
+        const textareas = lightbox.querySelectorAll('textarea');
+        const hoursInput = textareas.length > 1 ? textareas[1] : null;
+
+        if (!hoursInput) {
+            return;
+        }
+
+        const onHoursChange = () => {
+            const task = gantt.getTask(taskId);
+
+            if (!task) {
+                return;
+            }
+
+            task.duration = computeDurationFromHours(hoursInput.value);
+        };
+
+        hoursInput.addEventListener('input', onHoursChange);
+    });
+
+    gantt.attachEvent('onAfterTaskUpdate', function (id, task) {
+        if (!task) {
+            return;
+        }
+
+        const hours = Number(task.hours);
+        const computed = computeDurationFromHours(hours);
+
+        if (computed > 0 && Number(task.duration) !== computed) {
+            task.duration = computed;
+        }
+    });
+
+    gantt.attachEvent('onAfterTaskDrag', function () {
+        scheduleReorderPersist();
+    });
+
     let dragId = null;
 
     gantt.attachEvent('onRowDragStart', function (id) {
@@ -235,6 +298,72 @@ if (configElement && ganttContainer && window.gantt) {
         }
 
         return routePattern.replace('__TASK__', taskId);
+    };
+
+    const collectOrderedTaskIds = () => {
+        try {
+            return gantt.getTaskByTime().map((task) => task.id);
+        } catch (error) {
+            return [];
+        }
+    };
+
+    const persistReorder = async () => {
+        if (!routes.reorder) {
+            return;
+        }
+
+        const orderedIds = collectOrderedTaskIds();
+
+        if (orderedIds.length === 0) {
+            return;
+        }
+
+        const signature = orderedIds.join(',');
+
+        if (signature === pendingReorderSignature) {
+            return;
+        }
+
+        pendingReorderSignature = signature;
+
+        try {
+            const response = await fetch(routes.reorder, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({ ordered_ids: orderedIds }),
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const payload = await response.json().catch(() => null);
+
+            if (payload && Array.isArray(payload.tasks)) {
+                syncGanttTasksWithServer(payload.tasks);
+            }
+        } catch (error) {
+            // Network/order failures are non-blocking; the gantt still
+            // works locally and the next drag will try again.
+        }
+    };
+
+    const scheduleReorderPersist = () => {
+        if (pendingReorderTimer) {
+            clearTimeout(pendingReorderTimer);
+        }
+
+        pendingReorderTimer = setTimeout(() => {
+            pendingReorderTimer = null;
+            persistReorder();
+        }, 300);
     };
 
     const normalizeDeveloperEntry = (entry) => {
@@ -730,12 +859,24 @@ if (configElement && ganttContainer && window.gantt) {
     });
 
     gantt.createDataProcessor(function (entity, action, data, id) {
+        if (isApplyingServerSync) {
+            return Promise.resolve({ action: 'updated' });
+        }
+
         data._token = csrfToken;
         data.proposal_id = config.proposal_id;
 
         if (data.start_date) {
             data.start_date = getFormattedDate(data.start_date);
         }
+
+        const applyServerTasks = (payload) => {
+            if (!payload || !Array.isArray(payload.tasks)) {
+                return;
+            }
+
+            syncGanttTasksWithServer(payload.tasks);
+        };
 
         if (action === 'create' && routes.create) {
             return gantt.ajax.post(routes.create, data).then((response) => {
@@ -746,6 +887,12 @@ if (configElement && ganttContainer && window.gantt) {
                     completePendingDevelopersFlow(id, persistedTaskId);
                 }
 
+                // Cascade may have shifted the start_date of any task
+                // that comes after the new one. Pull the full
+                // authoritative list from the server so the gantt
+                // reorders and re-dates without a page refresh.
+                applyServerTasks(payload);
+
                 return payload;
             });
         }
@@ -754,7 +901,11 @@ if (configElement && ganttContainer && window.gantt) {
             const updateRoute = resolveRoute(routes.update, id);
 
             if (updateRoute) {
-                return gantt.ajax.put(updateRoute, data);
+                return gantt.ajax.put(updateRoute, data).then((response) => {
+                    const payload = JSON.parse(response.responseText || '{}');
+                    applyServerTasks(payload);
+                    return response;
+                });
             }
         }
 
@@ -766,6 +917,101 @@ if (configElement && ganttContainer && window.gantt) {
             }
         }
     });
+
+    /**
+     * Replace the gantt's local task rows with the authoritative
+     * server payload. Tasks are matched by id; missing rows are
+     * removed, unknown rows are inserted, and every row gets the
+     * server's start_date / duration / sort_order so the timeline
+     * and ordering stay in sync without a full reload.
+     */
+    const syncGanttTasksWithServer = (serverTasks) => {
+        if (!Array.isArray(serverTasks) || serverTasks.length === 0) {
+            return;
+        }
+
+        const serverIds = new Set();
+        const orderedIds = [];
+
+        isApplyingServerSync = true;
+
+        try {
+            gantt.silent(() => {
+                serverTasks.forEach((row) => {
+                    const serverId = Number(row.id);
+                    if (!Number.isFinite(serverId) || serverId <= 0) {
+                        return;
+                    }
+
+                    serverIds.add(serverId);
+                    orderedIds.push(serverId);
+
+                    // The server ships `start_date` as a formatted
+                    // string, but the gantt keeps it as a Date object.
+                    // `gantt.addTask` parses the string for us, but the
+                    // `Object.assign` path below would overwrite the
+                    // existing Date with a raw string and break the
+                    // timeline render. Normalize once, up front.
+                    if (typeof row.start_date === 'string' && row.start_date) {
+                        let parsed = null;
+                        if (typeof gantt.date.parseDate === 'function') {
+                            parsed = gantt.date.parseDate(row.start_date, gantt.config.date_format);
+                        } else if (typeof gantt.date.str_to_date === 'function') {
+                            parsed = gantt.date.str_to_date(gantt.config.date_format)(row.start_date);
+                        }
+                        if ((!parsed || Number.isNaN(parsed.getTime())) && typeof Date !== 'undefined') {
+                            parsed = new Date(row.start_date);
+                        }
+                        if (parsed && !Number.isNaN(parsed.getTime())) {
+                            row.start_date = parsed;
+                        }
+                    }
+
+                    if (gantt.isTaskExists(serverId)) {
+                        const task = gantt.getTask(serverId);
+                        Object.assign(task, row, {
+                            id: serverId,
+                            _persisted: true,
+                        });
+                    } else {
+                        gantt.addTask({
+                            ...row,
+                            id: serverId,
+                            _persisted: true,
+                        });
+                    }
+                });
+
+                const localIds = gantt.getTaskByTime()
+                    .map((task) => Number(task.id))
+                    .filter((taskId) => Number.isFinite(taskId) && taskId > 0);
+
+                localIds.forEach((taskId) => {
+                    if (!serverIds.has(taskId) && gantt.isTaskExists(taskId)) {
+                        gantt.deleteTask(taskId);
+                    }
+                });
+
+                const positions = new Map();
+                orderedIds.forEach((taskId, index) => {
+                    positions.set(taskId, index);
+                });
+
+                gantt.eachTask((task) => {
+                    const order = positions.get(Number(task.id));
+                    if (order === undefined) {
+                        return;
+                    }
+
+                    task.sort_order = order + 1;
+                });
+            });
+        } finally {
+            isApplyingServerSync = false;
+        }
+
+        gantt.render();
+    };
 
     if (zoomSelect) {
         zoomSelect.addEventListener('change', function (event) {

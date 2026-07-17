@@ -7,6 +7,7 @@ use App\Models\Priority;
 use App\Models\Proposal;
 use App\Models\Statu;
 use App\Models\User;
+use App\Models\Version;
 use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -124,6 +125,59 @@ class ProposalControllerTest extends TestCase
             ->assertSee('data-gantt-zoom-select', false)
             ->assertSee('proposal-gantt.css', false)
             ->assertSee('proposal-gantt.js', false);
+    }
+
+    /**
+     * @test
+     */
+    public function it_exposes_hour_per_day_from_latest_version_in_gantt_config()
+    {
+        $proposal = Proposal::factory()->create();
+        Version::factory()->create([
+            'proposal_id' => $proposal->id,
+            'hour_per_day' => 6,
+        ]);
+        Priority::factory()->create();
+        Statu::factory()->create();
+
+        $response = $this->get(route('gantt', $proposal));
+
+        $config = $response->viewData('ganttConfig');
+
+        $this->assertSame(6, $config['hour_per_day']);
+        $this->assertArrayHasKey('reorder', $config['routes']);
+    }
+
+    /**
+     * @test
+     */
+    public function it_defaults_gantt_zoom_to_day()
+    {
+        $proposal = Proposal::factory()->create();
+        Priority::factory()->create();
+        Statu::factory()->create();
+
+        $response = $this->get(route('gantt', $proposal));
+
+        $config = $response->viewData('ganttConfig');
+
+        $this->assertSame('day', $config['default_zoom']);
+    }
+
+    /**
+     * @test
+     */
+    public function it_defaults_hour_per_day_to_eight_when_no_version_exists()
+    {
+        $proposal = Proposal::factory()->create();
+        Priority::factory()->create();
+        Statu::factory()->create();
+
+        $response = $this->get(route('gantt', $proposal));
+
+        $config = $response->viewData('ganttConfig');
+
+        $this->assertSame(8, $config['hour_per_day']);
     }
 
     /**

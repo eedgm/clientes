@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\GanttTaskDevelopersRequest;
 use App\Http\Requests\GanttTaskStoreRequest;
 use App\Http\Requests\GanttTaskUpdateRequest;
+use App\Http\Requests\ProposalTaskReorderRequest;
 use App\Http\Requests\TaskStoreRequest;
 use App\Http\Requests\TaskUpdateRequest;
 use App\Models\Priority;
@@ -13,8 +14,10 @@ use App\Models\Receipt;
 use App\Models\Statu;
 use App\Models\Task;
 use App\Models\Version;
+use App\Services\GanttTaskScheduler;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 
 class TaskController extends Controller
 {
@@ -35,7 +38,7 @@ class TaskController extends Controller
         return view('app.tasks.index', compact('tasks', 'search'));
     }
 
-    public function addGanttTask(GanttTaskStoreRequest $request)
+    public function addGanttTask(GanttTaskStoreRequest $request, GanttTaskScheduler $scheduler)
     {
         $this->authorize('create', Task::class);
 
@@ -44,26 +47,66 @@ class TaskController extends Controller
         $validated['parent'] = $validated['parent'] ?? 0;
         $validated['hours'] = $validated['hours'] ?? 0;
 
+        $proposal = Proposal::findOrFail($validated['proposal_id']);
+        $validated = $scheduler->prepareForCreate($proposal, $validated);
+
         $task = Task::create($validated);
+
+        $scheduler->cascadeSchedule($task);
+
+        $proposal->load('tasks');
 
         return response()->json([
             'action' => 'inserted',
             'tid' => $task->id,
+            'task' => $this->serializeTask($task),
+            'tasks' => $this->serializeTasks($proposal->tasks),
         ], 201);
     }
 
-    public function updateGanttTask(GanttTaskUpdateRequest $request, Task $task)
-    {
+    public function updateGanttTask(
+        GanttTaskUpdateRequest $request,
+        Task $task,
+        GanttTaskScheduler $scheduler
+    ) {
         $this->authorize('update', $task);
 
         $validated = $request->validated();
 
         unset($validated['proposal_id']);
 
+        $validated = $scheduler->prepareForUpdate($task->proposal, $task, $validated);
+
         $task->update($validated);
+
+        $scheduler->cascadeSchedule($task->fresh());
+
+        $task->proposal->load('tasks');
 
         return response()->json([
             'action' => 'updated',
+            'task' => $this->serializeTask($task->fresh()),
+            'tasks' => $this->serializeTasks($task->proposal->tasks),
+        ]);
+    }
+
+    public function reorderProposalTasks(
+        ProposalTaskReorderRequest $request,
+        Proposal $proposal,
+        GanttTaskScheduler $scheduler
+    ) {
+        $this->authorize('update', $proposal);
+
+        $orderedIds = $request->validated()['ordered_ids'] ?? [];
+
+        $scheduler->applyOrdering($proposal, $orderedIds);
+
+        $proposal->load('tasks');
+
+        return response()->json([
+            'action' => 'reordered',
+            'count' => $proposal->tasks->count(),
+            'tasks' => $this->serializeTasks($proposal->tasks),
         ]);
     }
 
@@ -102,7 +145,7 @@ class TaskController extends Controller
     {
         $this->authorize('view', $proposal);
 
-        $tasks = $proposal->tasks()->with('developers.user')->get();
+        $tasks = $proposal->orderedTasks()->with('developers.user')->get();
 
         return response()->json([
             'data' => $tasks,
@@ -229,5 +272,45 @@ class TaskController extends Controller
         if ($total !== null) {
             $task->forceFill(['hours' => $total])->save();
         }
+    }
+
+    /**
+     * Serialize a single task to the authoritative shape the gantt
+     * needs to keep its timeline and order in sync after a server
+     * mutation (create/update/reorder).
+     *
+     * @return array<string, mixed>
+     */
+    private function serializeTask(Task $task): array
+    {
+        return [
+            'id' => $task->id,
+            'text' => $task->text,
+            'start_date' => $task->start_date?->format('Y-m-d H:i:s'),
+            'duration' => (int) $task->duration,
+            'sort_order' => (int) $task->sort_order,
+            'progress' => $task->progress !== null ? (float) $task->progress : 0.0,
+            'parent' => (int) $task->parent,
+            'priority_id' => $task->priority_id,
+            'statu_id' => $task->statu_id,
+            'proposal_id' => $task->proposal_id,
+        ];
+    }
+
+    /**
+     * Serialize a collection of tasks in persisted (sort_order, id)
+     * order so the frontend can replace local rows with the
+     * authoritative server state without a full page refresh.
+     *
+     * @param  Collection<int, Task>  $tasks
+     * @return array<int, array<string, mixed>>
+     */
+    private function serializeTasks(Collection $tasks): array
+    {
+        return $tasks
+            ->sortBy([['sort_order', 'asc'], ['id', 'asc']])
+            ->values()
+            ->map(fn (Task $task) => $this->serializeTask($task))
+            ->all();
     }
 }

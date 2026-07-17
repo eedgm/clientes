@@ -31,6 +31,12 @@ class Task extends Model
         'duration',
         'progress',
         'parent',
+        'sort_order',
+    ];
+
+    protected $casts = [
+        'start_date' => 'datetime',
+        'sort_order' => 'integer',
     ];
 
     protected $searchableFields = ['*'];

@@ -58,6 +58,7 @@ Route::prefix('/')
         Route::put('/tasks/task/update/{task}', [TaskController::class, 'updateGanttTask'])->name('tasks.gantt.update');
         Route::put('/tasks/task/{task}/developers', [TaskController::class, 'syncGanttDevelopers'])->name('tasks.gantt.developers.sync');
         Route::put('/tasks/task/delete/{task}', [TaskController::class, 'destroyGanttTask'])->name('tasks.gantt.destroy');
+        Route::post('/proposal/tasks/{proposal}/reorder', [TaskController::class, 'reorderProposalTasks'])->name('proposal.tasks.reorder');
 
         Route::get('/developers/search', [DeveloperController::class, 'search'])->name('developers.search');
         Route::post('/developers/quick-store', [DeveloperController::class, 'quickStore'])->name('developers.quick-store');

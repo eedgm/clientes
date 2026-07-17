@@ -10,6 +10,7 @@ use App\Models\Proposal;
 use App\Models\Rol;
 use App\Models\Statu;
 use App\Models\Task;
+use App\Services\GanttTaskScheduler;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
@@ -33,7 +34,7 @@ class ProposalController extends Controller
         return view('app.proposals.index', compact('proposals', 'search'));
     }
 
-    public function gantt(Request $request, Proposal $proposal)
+    public function gantt(Request $request, Proposal $proposal, GanttTaskScheduler $scheduler)
     {
         $this->authorize('view', $proposal);
 
@@ -48,6 +49,8 @@ class ProposalController extends Controller
         $rols = Rol::query()
             ->orderBy('id')
             ->get(['id', 'name']);
+
+        $hourPerDay = $scheduler->hourPerDayFor($proposal);
 
         $height = (int) $request->get('height', 700);
         $height = max(420, min($height, 1200));
@@ -86,12 +89,13 @@ class ProposalController extends Controller
             'csrf_token' => csrf_token(),
             'height' => $height,
             'date_format' => '%Y-%m-%d %H:%i:%s',
+            'hour_per_day' => $hourPerDay,
             'grid' => [
                 'desktop_width' => 300,
                 'mobile_width' => 170,
             ],
             'zoom_levels' => $zoomLevels,
-            'default_zoom' => 'week',
+            'default_zoom' => 'day',
             'lightbox' => [
                 'priorities' => $priorities
                     ->map(fn ($priority) => [
@@ -119,6 +123,7 @@ class ProposalController extends Controller
                 'create' => route('tasks.gantt.store'),
                 'update' => route('tasks.gantt.update', ['task' => '__TASK__']),
                 'delete' => route('tasks.gantt.destroy', ['task' => '__TASK__']),
+                'reorder' => route('proposal.tasks.reorder', $proposal),
                 'task_developers_sync' => route('tasks.gantt.developers.sync', ['task' => '__TASK__']),
                 'developer_search' => route('developers.search'),
                 'developer_quick_store' => route('developers.quick-store'),
