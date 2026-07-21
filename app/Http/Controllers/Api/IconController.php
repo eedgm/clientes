@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Icon;
-use Illuminate\Http\Request;
-use App\Http\Resources\IconResource;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\IconCollection;
 use App\Http\Requests\IconStoreRequest;
 use App\Http\Requests\IconUpdateRequest;
+use App\Http\Resources\IconCollection;
+use App\Http\Resources\IconResource;
+use App\Models\Icon;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class IconController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -30,8 +30,7 @@ class IconController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\IconStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(IconStoreRequest $request)
     {
@@ -45,9 +44,7 @@ class IconController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Icon $icon
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Icon $icon)
     {
@@ -57,9 +54,7 @@ class IconController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\IconUpdateRequest $request
-     * @param \App\Models\Icon $icon
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(IconUpdateRequest $request, Icon $icon)
     {
@@ -73,9 +68,7 @@ class IconController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Icon $icon
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Icon $icon)
     {

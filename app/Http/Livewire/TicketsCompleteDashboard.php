@@ -4,13 +4,15 @@ namespace App\Http\Livewire;
 
 use App\Models\Statu;
 use App\Models\Ticket;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class TicketsCompleteDashboard extends Component
 {
     protected $listeners = ['refreshComponent' => '$refresh'];
 
-    public function updateData($name, $id, $value) {
+    public function updateData($name, $id, $value)
+    {
         $ticket = Ticket::where('id', $id)->first();
         if ($name == 'hours' && $value > 0) {
             $client_cost = $ticket->product->client->cost_per_hour;
@@ -28,13 +30,14 @@ class TicketsCompleteDashboard extends Component
 
     public function completed(Ticket $ticket, $value)
     {
-        $ticket->finished_ticket = \Carbon\Carbon::parse(
+        $ticket->finished_ticket = Carbon::parse(
             $value
         );
         $ticket->update();
     }
 
-    public function changeStatus($status, $id) {
+    public function changeStatus($status, $id)
+    {
         $ticket = Ticket::where('id', $id)->first();
         $ticket->statu_id = $status;
         $ticket->update();

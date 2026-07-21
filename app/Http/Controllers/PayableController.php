@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PayableStoreRequest;
+use App\Http\Requests\PayableUpdateRequest;
 use App\Models\Payable;
 use App\Models\Product;
 use App\Models\Receipt;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
-use App\Http\Requests\PayableStoreRequest;
-use App\Http\Requests\PayableUpdateRequest;
+use Illuminate\Http\Response;
 
 class PayableController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -31,8 +31,7 @@ class PayableController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create(Request $request)
     {
@@ -49,8 +48,7 @@ class PayableController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\PayableStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(PayableStoreRequest $request)
     {
@@ -66,9 +64,7 @@ class PayableController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Payable $payable
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Payable $payable)
     {
@@ -78,9 +74,7 @@ class PayableController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Payable $payable
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Request $request, Payable $payable)
     {
@@ -97,9 +91,7 @@ class PayableController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\PayableUpdateRequest $request
-     * @param \App\Models\Payable $payable
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(PayableUpdateRequest $request, Payable $payable)
     {
@@ -115,9 +107,7 @@ class PayableController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Payable $payable
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Payable $payable)
     {

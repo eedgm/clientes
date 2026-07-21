@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Priority;
-use Illuminate\Http\Request;
-use App\Http\Resources\TaskResource;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TaskCollection;
+use App\Http\Resources\TaskResource;
+use App\Models\Priority;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class PriorityTasksController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Priority $priority
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request, Priority $priority)
     {
@@ -31,9 +30,7 @@ class PriorityTasksController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Priority $priority
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request, Priority $priority)
     {

@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Statu;
-use App\Models\Ticket;
-use App\Models\Person;
-use App\Models\Product;
-use App\Models\Receipt;
-use App\Models\Priority;
-use Illuminate\Http\Request;
 use App\Http\Requests\TicketStoreRequest;
 use App\Http\Requests\TicketUpdateRequest;
+use App\Models\Person;
+use App\Models\Priority;
+use App\Models\Product;
+use App\Models\Receipt;
+use App\Models\Statu;
+use App\Models\Ticket;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class TicketController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -33,8 +33,7 @@ class TicketController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create(Request $request)
     {
@@ -53,8 +52,7 @@ class TicketController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\TicketStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(TicketStoreRequest $request)
     {
@@ -70,9 +68,7 @@ class TicketController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Ticket $ticket
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Ticket $ticket)
     {
@@ -82,9 +78,7 @@ class TicketController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Ticket $ticket
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Request $request, Ticket $ticket)
     {
@@ -110,9 +104,7 @@ class TicketController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\TicketUpdateRequest $request
-     * @param \App\Models\Ticket $ticket
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(TicketUpdateRequest $request, Ticket $ticket)
     {
@@ -128,9 +120,7 @@ class TicketController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Ticket $ticket
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Ticket $ticket)
     {

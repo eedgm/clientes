@@ -2,21 +2,25 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\User;
 use App\Models\Client;
-use Livewire\Component;
+use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
 
 class UserClientsDetail extends Component
 {
     use AuthorizesRequests;
 
     public User $user;
+
     public Client $client;
+
     public $clientsForSelect = [];
+
     public $client_id = null;
 
     public $showingModal = false;
+
     public $modalTitle = 'New Client';
 
     protected $rules = [
@@ -32,7 +36,7 @@ class UserClientsDetail extends Component
 
     public function resetClientData()
     {
-        $this->client = new Client();
+        $this->client = new Client;
 
         $this->client_id = null;
 

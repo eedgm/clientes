@@ -2,8 +2,8 @@
 
 namespace App\Http\Livewire;
 
-use Carbon\Carbon;
 use App\Models\Payable;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class PayablesDashboard extends Component
@@ -12,6 +12,7 @@ class PayablesDashboard extends Component
     {
         $total = 0;
         $payables = Payable::where('receipt_id', null)->where('date', '<=', Carbon::now()->addMonth(5))->get();
+
         return view('livewire.dashboard/payables-dashboard', compact('payables', 'total'));
     }
 }

@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Ticket;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\TicketResource;
-use App\Http\Resources\TicketCollection;
 use App\Http\Requests\TicketStoreRequest;
 use App\Http\Requests\TicketUpdateRequest;
+use App\Http\Resources\TicketCollection;
+use App\Http\Resources\TicketResource;
+use App\Models\Ticket;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class TicketController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -30,8 +30,7 @@ class TicketController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\TicketStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(TicketStoreRequest $request)
     {
@@ -45,9 +44,7 @@ class TicketController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Ticket $ticket
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Ticket $ticket)
     {
@@ -57,9 +54,7 @@ class TicketController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\TicketUpdateRequest $request
-     * @param \App\Models\Ticket $ticket
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(TicketUpdateRequest $request, Ticket $ticket)
     {
@@ -73,9 +68,7 @@ class TicketController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Ticket $ticket
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Ticket $ticket)
     {

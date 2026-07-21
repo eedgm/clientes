@@ -2,30 +2,37 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Attach;
 use App\Models\Task;
 use App\Models\User;
-use App\Models\Attach;
-use Livewire\Component;
-use Livewire\WithPagination;
-use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class TaskAttachesDetail extends Component
 {
-    use WithPagination;
-    use WithFileUploads;
     use AuthorizesRequests;
+    use WithFileUploads;
+    use WithPagination;
 
     public Task $task;
+
     public Attach $attach;
+
     public $usersForSelect = [];
+
     public $attachAttachment;
+
     public $uploadIteration = 0;
 
     public $selected = [];
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
 
     public $modalTitle = 'New Attach';
@@ -45,7 +52,7 @@ class TaskAttachesDetail extends Component
 
     public function resetAttachData()
     {
-        $this->attach = new Attach();
+        $this->attach = new Attach;
 
         $this->attachAttachment = null;
         $this->attach->user_id = null;
@@ -88,7 +95,7 @@ class TaskAttachesDetail extends Component
     {
         $this->validate();
 
-        if (!$this->attach->task_id) {
+        if (! $this->attach->task_id) {
             $this->authorize('create', Attach::class);
 
             $this->attach->task_id = $this->task->id;
@@ -131,8 +138,9 @@ class TaskAttachesDetail extends Component
 
     public function toggleFullSelection()
     {
-        if (!$this->allSelected) {
+        if (! $this->allSelected) {
             $this->selected = [];
+
             return;
         }
 

@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Str;
 use App\Models\Scopes\Searchable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 class Ticket extends Model
 {
@@ -25,7 +25,7 @@ class Ticket extends Model
         'product_id',
         'receipt_id',
         'person_id',
-        'progress'
+        'progress',
     ];
 
     protected $searchableFields = ['*'];

@@ -2,34 +2,47 @@
 
 namespace App\Http\Livewire;
 
-use Carbon\Carbon;
 use App\Models\Client;
-use App\Models\Ticket;
 use App\Models\Payable;
 use App\Models\Receipt;
-use Livewire\Component;
 use App\Models\Supplier;
+use App\Models\Ticket;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
 
 class ReceiptAssignment extends Component
 {
     use AuthorizesRequests;
 
-    public $modalTitle = "Agregar pagos";
+    public $modalTitle = 'Agregar pagos';
+
     public $showingModal = false;
-    public $modalTitleEdit = "Editar pagos";
+
+    public $modalTitleEdit = 'Editar pagos';
+
     public $showingModalEdit = false;
+
     public Client $client;
+
     public Payable $payable;
+
     public $payables = null;
+
     public $tickets = null;
+
     public $receipt = null;
+
     public $payableDate;
+
     public $suppliersForSelect = [];
 
     public $allSelectedPayables = false;
+
     public $selectedPayable = [];
+
     public $allSelectedTickets = false;
+
     public $selectedTicket = [];
 
     protected $rules = [
@@ -61,8 +74,9 @@ class ReceiptAssignment extends Component
 
     public function toggleFullSelectionPayables()
     {
-        if (!$this->allSelectedPayables) {
+        if (! $this->allSelectedPayables) {
             $this->selectedPayable = [];
+
             return;
         }
 
@@ -73,8 +87,9 @@ class ReceiptAssignment extends Component
 
     public function toggleFullSelectionTickets()
     {
-        if (!$this->allSelectedTickets) {
+        if (! $this->allSelectedTickets) {
             $this->selectedTicket = [];
+
             return;
         }
 
@@ -83,7 +98,8 @@ class ReceiptAssignment extends Component
         }
     }
 
-    public function save() {
+    public function save()
+    {
         foreach ($this->selectedTicket as $ticket) {
             Ticket::where('id', $ticket)->update(['receipt_id' => $this->receipt->id]);
         }
@@ -139,25 +155,28 @@ class ReceiptAssignment extends Component
             $result['tickets'][$ticket->id]['person'] = $ticket->person ? $ticket->person->user->name : '-';
             $result['tickets'][$ticket->id]['cost'] = $ticket->total;
             $total += $ticket->total;
-            if ($ticket->hours)
+            if ($ticket->hours) {
                 $hours = true;
-            if ($ticket->person)
+            }
+            if ($ticket->person) {
                 $person = true;
+            }
         }
 
         return view('livewire.receipt-assignment', [
-                'payables' => $this->payables,
-                'tickets' => $this->tickets,
-                'results' => $result,
-                'total' => $total,
-                'receipt_id' => $this->receipt->id,
-                'hours' => $hours,
-                'person' => $person,
-            ]
+            'payables' => $this->payables,
+            'tickets' => $this->tickets,
+            'results' => $result,
+            'total' => $total,
+            'receipt_id' => $this->receipt->id,
+            'hours' => $hours,
+            'person' => $person,
+        ]
         );
     }
 
-    public function updateData($name, $id, $value) {
+    public function updateData($name, $id, $value)
+    {
         $ticket = Ticket::where('id', $id)->first();
         if ($name == 'hours' && $value > 0) {
             $client_cost = $ticket->product->client->cost_per_hour;
@@ -188,7 +207,7 @@ class ReceiptAssignment extends Component
     {
         $this->validate();
 
-        if (!$this->payable->product_id) {
+        if (! $this->payable->product_id) {
             $this->authorize('create', Payable::class);
 
             $this->payable->product_id = $this->product->id;
@@ -196,7 +215,7 @@ class ReceiptAssignment extends Component
             $this->authorize('update', $this->payable);
         }
 
-        $this->payable->date = \Carbon\Carbon::parse($this->payableDate);
+        $this->payable->date = Carbon::parse($this->payableDate);
 
         $this->payable->save();
 
@@ -217,6 +236,7 @@ class ReceiptAssignment extends Component
     {
         $columns = array_column($array, $field);
         array_multisort($columns, $direction, $array);
+
         return $array;
     }
 }

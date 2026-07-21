@@ -3,17 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Laravel\Sanctum\Sanctum;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PermissionController extends Controller
 {
     /**
-    * Display a listing of the resource.
-    *
-    * @return \Illuminate\Http\Response
-    */
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
     public function index(Request $request)
     {
         $this->authorize('list', Permission::class);
@@ -27,24 +28,24 @@ class PermissionController extends Controller
     }
 
     /**
-    * Show the form for creating a new resource.
-    *
-    * @return \Illuminate\Http\Response
-    */
+     * Show the form for creating a new resource.
+     *
+     * @return Response
+     */
     public function create()
     {
         $this->authorize('create', Permission::class);
 
         $roles = Role::all();
+
         return view('app.permissions.create')->with('roles', $roles);
     }
 
     /**
-    * Store a newly created resource in storage.
-    *
-    * @param  \Illuminate\Http\Request  $request
-    * @return \Illuminate\Http\Response
-    */
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
     public function store(Request $request)
     {
         Sanctum::actingAs(request()->user(), [], 'web');
@@ -53,11 +54,11 @@ class PermissionController extends Controller
 
         $data = $this->validate($request, [
             'name' => 'required|max:64',
-            'roles' => 'array'
+            'roles' => 'array',
         ]);
 
         $permission = Permission::create($data);
-        
+
         $roles = Role::find($request->roles);
         $permission->syncRoles($roles);
 
@@ -67,11 +68,10 @@ class PermissionController extends Controller
     }
 
     /**
-    * Display the specified resource.
-    *
-    * @param  \Spatie\Permission\Models\Permission  $permission
-    * @return \Illuminate\Http\Response
-    */
+     * Display the specified resource.
+     *
+     * @return Response
+     */
     public function show(Permission $permission)
     {
         $this->authorize('view', Permission::class);
@@ -80,11 +80,10 @@ class PermissionController extends Controller
     }
 
     /**
-    * Show the form for editing the specified resource.
-    *
-    * @param  \Spatie\Permission\Models\Permission  $permission
-    * @return \Illuminate\Http\Response
-    */
+     * Show the form for editing the specified resource.
+     *
+     * @return Response
+     */
     public function edit(Permission $permission)
     {
         $this->authorize('update', $permission);
@@ -97,23 +96,21 @@ class PermissionController extends Controller
     }
 
     /**
-    * Update the specified resource in storage.
-    *
-    * @param  \Illuminate\Http\Request  $request
-    * @param  \Spatie\Permission\Models\Permission  $permission
-    * @return \Illuminate\Http\Response
-    */
+     * Update the specified resource in storage.
+     *
+     * @return Response
+     */
     public function update(Request $request, Permission $permission)
     {
         $this->authorize('update', $permission);
 
         $data = $this->validate($request, [
             'name' => 'required|max:40',
-            'roles' => 'array'
+            'roles' => 'array',
         ]);
 
         $permission->update($data);
-        
+
         $roles = Role::find($request->roles);
         $permission->syncRoles($roles);
 
@@ -123,11 +120,10 @@ class PermissionController extends Controller
     }
 
     /**
-    * Remove the specified resource from storage.
-    *
-    * @param  \Spatie\Permission\Models\Permission  $permission
-    * @return \Illuminate\Http\Response
-    */
+     * Remove the specified resource from storage.
+     *
+     * @return Response
+     */
     public function destroy(Permission $permission)
     {
         $this->authorize('delete', $permission);

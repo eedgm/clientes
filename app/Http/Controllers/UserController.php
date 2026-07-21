@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -30,8 +30,7 @@ class UserController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create(Request $request)
     {
@@ -43,8 +42,7 @@ class UserController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\UserStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(UserStoreRequest $request)
     {
@@ -64,9 +62,7 @@ class UserController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\User $user
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, User $user)
     {
@@ -76,9 +72,7 @@ class UserController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\User $user
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Request $request, User $user)
     {
@@ -90,9 +84,7 @@ class UserController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\UserUpdateRequest $request
-     * @param \App\Models\User $user
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(UserUpdateRequest $request, User $user)
     {
@@ -116,9 +108,7 @@ class UserController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\User $user
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, User $user)
     {

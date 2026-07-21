@@ -1387,6 +1387,117 @@ if (configElement && ganttContainer && window.gantt) {
         gantt.render();
     });
 
+    const generatePrompt = () => {
+        const statuses = Array.isArray(config.lightbox?.statuses)
+            ? config.lightbox.statuses.map((s) => s.label).join(', ')
+            : 'pendiente, en progreso, completado';
+
+        const priorities = Array.isArray(config.lightbox?.priorities)
+            ? config.lightbox.priorities.map((p) => p.label).join(', ')
+            : 'baja, media, alta';
+
+        const proposalName = config.proposal_name || `Proposal #${config.proposal_id}`;
+        const proposalDesc = config.proposal_description || '(no description)';
+
+        const developers = Array.isArray(config.developers) ? config.developers : [];
+        const developerSection = developers.length > 0
+            ? developers.map((d) => `  {"id": ${d.id}, "name": "${d.name}", "email": "${d.email}"}`).join(',\n')
+            : '  // No developers saved yet. Ask the user to create them first.';
+
+        return `You are a project management assistant helping generate tasks for the Gantt chart of "${proposalName}".
+
+Proposal context: ${proposalDesc}
+
+## Instructions
+- Return ONLY valid JSON. No markdown, no code fences, no explanations.
+- Use the exact JSON shape shown below.
+- Allowed statuses: ${statuses}
+- Allowed priorities: ${priorities}
+- Each task MUST have a unique "text" name.
+- "hours" must be a positive number.
+- "start_date" is optional; if omitted the system will place it. Format: "YYYY-MM-DD HH:MM:SS".
+- "developers" array references existing developers by id. Each entry requires "id" and "hours".
+
+## Available developers (id, name, email)
+[
+${developerSection}
+]
+
+## Expected JSON shape
+{
+  "tasks": [
+    {
+      "text": "Task name",
+      "hours": 8,
+      "priority": "media",
+      "status": "pendiente",
+      "start_date": "2026-07-21 08:00:00",
+      "developers": [
+        {"id": 1, "hours": 4}
+      ]
+    }
+  ]
+}
+
+Generate between 3 and 15 tasks for this proposal.`;
+    };
+
+    const showToast = (message, type) => {
+        const toast = document.getElementById('gantt-toast');
+        if (!toast) return;
+
+        toast.textContent = message;
+        toast.className =
+            `fixed bottom-6 right-6 z-[100] flex items-center gap-2.5 rounded-xl px-5 py-3 text-sm font-medium text-white shadow-2xl transition-all duration-300 ${
+                type === 'success'
+                    ? 'bg-emerald-600'
+                    : type === 'error'
+                        ? 'bg-red-600'
+                        : 'bg-gray-900'
+            }`;
+        toast.classList.remove('hidden', 'opacity-0');
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(8px)';
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.style.opacity = '';
+                toast.style.transform = '';
+            }, 300);
+        }, 3000);
+    };
+
+    const copyPromptToClipboard = async () => {
+        const btn = document.getElementById('gantt-copy-prompt-btn');
+        if (!btn) return;
+
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bx bx-loader-alt bx-spin text-lg"></i> Generating...';
+
+        try {
+            const prompt = generatePrompt();
+            await navigator.clipboard.writeText(prompt);
+            showToast('Prompt copied to clipboard!', 'success');
+        } catch (err) {
+            showToast('Could not copy to clipboard. Check permissions.', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    };
+
+    const bindCopyPromptButton = () => {
+        const btn = document.getElementById('gantt-copy-prompt-btn');
+        if (btn) {
+            btn.addEventListener('click', copyPromptToClipboard);
+        }
+    };
+
     bindDevelopersModalEvents();
     bindImportModalEvents();
+    bindCopyPromptButton();
 }

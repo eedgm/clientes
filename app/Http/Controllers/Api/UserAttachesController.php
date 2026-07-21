@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Resources\AttachCollection;
+use App\Http\Resources\AttachResource;
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\AttachResource;
-use App\Http\Resources\AttachCollection;
+use Illuminate\Http\Response;
 
 class UserAttachesController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\User $user
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request, User $user)
     {
@@ -31,9 +30,7 @@ class UserAttachesController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\User $user
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request, User $user)
     {

@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Resources\PriorityCollection;
+use App\Http\Resources\PriorityResource;
 use App\Models\Color;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\PriorityResource;
-use App\Http\Resources\PriorityCollection;
+use Illuminate\Http\Response;
 
 class ColorPrioritiesController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Color $color
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request, Color $color)
     {
@@ -31,9 +30,7 @@ class ColorPrioritiesController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Color $color
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request, Color $color)
     {

@@ -2,33 +2,45 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Statu;
 use App\Models\Client;
-use App\Models\Ticket;
-use App\Models\Product;
-use Livewire\Component;
 use App\Models\Priority;
+use App\Models\Product;
+use App\Models\Statu;
+use App\Models\Ticket;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
 
 class KanbanTickets extends Component
 {
     use AuthorizesRequests;
 
     public $showingModal = false;
+
     public $clients;
+
     public $products = null;
+
     public $newStatus;
+
     public $moveTicket;
+
     public $colors = [];
+
     public $icons = [];
+
     public $ticket_client_id;
+
     public $ticketFinishedTicket;
+
     public $status;
+
     public $selectedStatus = [];
 
     public $ticketStatusSelected = null;
 
     public $editing = false;
+
     public $modalTitle = 'New Ticket';
 
     protected $listeners = ['refreshComponent' => '$refresh'];
@@ -46,7 +58,8 @@ class KanbanTickets extends Component
         'ticket.comments' => ['nullable', 'string'],
     ];
 
-    public function mount() {
+    public function mount()
+    {
         $this->showingModal = false;
         $this->statusForSelect = Statu::pluck('name', 'id');
         $this->prioritiesForSelect = Priority::pluck('name', 'id');
@@ -59,7 +72,7 @@ class KanbanTickets extends Component
             3 => 'bg-yellow-100',
             4 => 'bg-red-100',
             5 => 'bg-purple-100',
-            6 => 'bg-sky-100'
+            6 => 'bg-sky-100',
         ];
 
         $this->icons = [
@@ -68,7 +81,7 @@ class KanbanTickets extends Component
             3 => 'bx-alarm-off text-yellow-500',
             4 => 'bx-layer-minus text-red-500',
             5 => 'bx-bell text-purple-500',
-            6 => 'bx-dollar text-sky-500'
+            6 => 'bx-dollar text-sky-500',
         ];
 
         foreach ($this->status as $status) {
@@ -78,7 +91,7 @@ class KanbanTickets extends Component
 
     public function addTicket(Statu $status)
     {
-        $this->ticket = new Ticket();
+        $this->ticket = new Ticket;
         $this->ticket->statu_id = $status->id;
         $this->ticket->progress = 0;
         $this->showingModal = true;
@@ -120,7 +133,7 @@ class KanbanTickets extends Component
         $this->authorize('create', Ticket::class);
 
         if ($this->editing) {
-            $this->ticket->finished_ticket = \Carbon\Carbon::parse(
+            $this->ticket->finished_ticket = Carbon::parse(
                 $this->ticketFinishedTicket
             );
         }
@@ -153,7 +166,7 @@ class KanbanTickets extends Component
 
     public function toggleView(Statu $status)
     {
-        $this->selectedStatus[$status->id] = !$this->selectedStatus[$status->id];
+        $this->selectedStatus[$status->id] = ! $this->selectedStatus[$status->id];
     }
 
     public function render()

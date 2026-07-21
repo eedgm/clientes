@@ -3,21 +3,26 @@
 namespace App\Http\Livewire;
 
 use App\Models\Person;
-use Livewire\Component;
 use App\Models\Version;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
 
 class VersionPeopleDetail extends Component
 {
     use AuthorizesRequests;
 
     public Version $version;
+
     public Person $person;
+
     public $peopleForSelect = [];
+
     public $person_id = null;
+
     public $comments;
 
     public $showingModal = false;
+
     public $modalTitle = 'New Person';
 
     protected $rules = [
@@ -34,7 +39,7 @@ class VersionPeopleDetail extends Component
 
     public function resetPersonData()
     {
-        $this->person = new Person();
+        $this->person = new Person;
 
         $this->person_id = null;
         $this->comments = null;

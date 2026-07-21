@@ -2,29 +2,36 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Statu;
 use App\Models\Client;
-use App\Models\Ticket;
-use App\Models\Product;
-use Livewire\Component;
 use App\Models\Priority;
+use App\Models\Product;
+use App\Models\Statu;
+use App\Models\Ticket;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
 
 class NewTicket extends Component
 {
     use AuthorizesRequests;
 
     public $clients;
+
     public $products = null;
+
     public Ticket $ticket;
+
     public $statusForSelect = [];
+
     public $prioritiesForSelect = [];
+
     public $peopleForSelect = [];
 
     public $ticket_client_id;
 
     public $editing = false;
+
     public $showingModal = false;
+
     public $modalTitle = 'New Ticket';
 
     protected $listeners = ['refreshComponent' => '$refresh'];
@@ -50,7 +57,7 @@ class NewTicket extends Component
 
     public function createTicket()
     {
-        $this->ticket = new Ticket();
+        $this->ticket = new Ticket;
         $this->ticket->statu_id = 1;
         $this->showingModal = true;
     }

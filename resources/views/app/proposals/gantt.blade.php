@@ -43,6 +43,15 @@
                     Import JSON
                 </button>
 
+                <button
+                    type="button"
+                    id="gantt-copy-prompt-btn"
+                    class="group inline-flex items-center gap-2 rounded-xl border border-dashed border-emerald-300 bg-white px-4 py-2.5 text-sm font-semibold text-emerald-600 shadow-sm transition-all duration-200 hover:border-emerald-400 hover:bg-emerald-50 hover:shadow-md"
+                >
+                    <i class="bx bx-copy text-lg"></i>
+                    Copy Prompt
+                </button>
+
                 <livewire:proposal-calculator :proposal="$proposal" />
 
                 <div
@@ -488,5 +497,8 @@
     </style>
 
     <script type="application/json" id="gantt-config">@json($ganttConfig)</script>
+
+    <!-- Toast notification for clipboard and other non-blocking feedback -->
+    <div id="gantt-toast" class="fixed bottom-6 right-6 z-[100] hidden items-center gap-2.5 rounded-xl bg-gray-900 px-5 py-3 text-sm font-medium text-white shadow-2xl transition-all duration-300"></div>
 
 </x-proposal-layout>

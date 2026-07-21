@@ -3,24 +3,31 @@
 namespace App\Http\Livewire;
 
 use App\Models\Client;
-use Livewire\Component;
 use App\Models\Receipt;
-use Livewire\WithPagination;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class ClientReceiptsDetail extends Component
 {
-    use WithPagination;
     use AuthorizesRequests;
+    use WithPagination;
 
     public Client $client;
+
     public Receipt $receipt;
+
     public $receiptRealDate;
+
     public $receiptDateCharged;
 
     public $selected = [];
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
 
     public $modalTitle = 'New Receipt';
@@ -42,7 +49,7 @@ class ClientReceiptsDetail extends Component
 
     public function resetReceiptData()
     {
-        $this->receipt = new Receipt();
+        $this->receipt = new Receipt;
 
         $this->receiptRealDate = null;
         $this->receiptDateCharged = null;
@@ -90,7 +97,7 @@ class ClientReceiptsDetail extends Component
     {
         $this->validate();
 
-        if (!$this->receipt->client_id) {
+        if (! $this->receipt->client_id) {
             $this->authorize('create', Receipt::class);
 
             $this->receipt->client_id = $this->client->id;
@@ -98,10 +105,10 @@ class ClientReceiptsDetail extends Component
             $this->authorize('update', $this->receipt);
         }
 
-        $this->receipt->real_date = \Carbon\Carbon::parse(
+        $this->receipt->real_date = Carbon::parse(
             $this->receiptRealDate
         );
-        $this->receipt->date_charged = \Carbon\Carbon::parse(
+        $this->receipt->date_charged = Carbon::parse(
             $this->receiptDateCharged
         );
 
@@ -124,8 +131,9 @@ class ClientReceiptsDetail extends Component
 
     public function toggleFullSelection()
     {
-        if (!$this->allSelected) {
+        if (! $this->allSelected) {
             $this->selected = [];
+
             return;
         }
 

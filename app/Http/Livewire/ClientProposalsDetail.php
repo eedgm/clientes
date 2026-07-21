@@ -3,22 +3,26 @@
 namespace App\Http\Livewire;
 
 use App\Models\Client;
-use Livewire\Component;
 use App\Models\Proposal;
-use Livewire\WithPagination;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class ClientProposalsDetail extends Component
 {
-    use WithPagination;
     use AuthorizesRequests;
+    use WithPagination;
 
     public Client $client;
+
     public Proposal $proposal;
 
     public $selected = [];
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
 
     public $modalTitle = 'New Proposal';
@@ -36,7 +40,7 @@ class ClientProposalsDetail extends Component
 
     public function resetProposalData()
     {
-        $this->proposal = new Proposal();
+        $this->proposal = new Proposal;
 
         $this->dispatchBrowserEvent('refresh');
     }
@@ -76,7 +80,7 @@ class ClientProposalsDetail extends Component
     {
         $this->validate();
 
-        if (!$this->proposal->client_id) {
+        if (! $this->proposal->client_id) {
             $this->authorize('create', Proposal::class);
 
             $this->proposal->client_id = $this->client->id;
@@ -103,8 +107,9 @@ class ClientProposalsDetail extends Component
 
     public function toggleFullSelection()
     {
-        if (!$this->allSelected) {
+        if (! $this->allSelected) {
             $this->selected = [];
+
             return;
         }
 

@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Color;
-use Illuminate\Http\Request;
 use App\Http\Requests\ColorStoreRequest;
 use App\Http\Requests\ColorUpdateRequest;
+use App\Models\Color;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ColorController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -28,8 +28,7 @@ class ColorController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create(Request $request)
     {
@@ -39,8 +38,7 @@ class ColorController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\ColorStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(ColorStoreRequest $request)
     {
@@ -56,9 +54,7 @@ class ColorController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Color $color
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Color $color)
     {
@@ -68,9 +64,7 @@ class ColorController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Color $color
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Request $request, Color $color)
     {
@@ -80,9 +74,7 @@ class ColorController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\ColorUpdateRequest $request
-     * @param \App\Models\Color $color
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(ColorUpdateRequest $request, Color $color)
     {
@@ -98,9 +90,7 @@ class ColorController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Color $color
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Color $color)
     {

@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Receipt;
-use Illuminate\Http\Request;
-use App\Http\Resources\TaskResource;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TaskCollection;
+use App\Http\Resources\TaskResource;
+use App\Models\Receipt;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ReceiptTasksController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Receipt $receipt
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request, Receipt $receipt)
     {
@@ -31,9 +30,7 @@ class ReceiptTasksController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Receipt $receipt
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request, Receipt $receipt)
     {

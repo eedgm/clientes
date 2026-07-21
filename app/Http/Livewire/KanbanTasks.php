@@ -2,29 +2,37 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Task;
-use App\Models\Statu;
-use Livewire\Component;
 use App\Models\Priority;
 use App\Models\Proposal;
+use App\Models\Statu;
+use App\Models\Task;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
 
 class KanbanTasks extends Component
 {
     use AuthorizesRequests;
 
     public $showingModal = false;
+
     public $newStatus;
+
     public $moveTask;
+
     public $colors = [];
+
     public $icons = [];
+
     public $task_client_id;
+
     public $status;
+
     public $proposal;
 
     public $taskStatusSelected = null;
 
     public $editing = false;
+
     public $modalTitle = 'New task';
 
     protected $listeners = ['refreshComponent' => '$refresh'];
@@ -39,7 +47,8 @@ class KanbanTasks extends Component
         'task.comments' => ['nullable', 'max:255', 'string'],
     ];
 
-    public function mount(Proposal $proposal) {
+    public function mount(Proposal $proposal)
+    {
         $this->proposal = $proposal;
         $this->showingModal = false;
         $this->statusForSelect = Statu::pluck('name', 'id');
@@ -51,7 +60,7 @@ class KanbanTasks extends Component
             3 => 'bg-yellow-100',
             4 => 'bg-red-100',
             5 => 'bg-purple-100',
-            6 => 'bg-sky-100'
+            6 => 'bg-sky-100',
         ];
 
         $this->icons = [
@@ -60,13 +69,13 @@ class KanbanTasks extends Component
             3 => 'bx-alarm-off text-yellow-500',
             4 => 'bx-layer-minus text-red-500',
             5 => 'bx-bell text-purple-500',
-            6 => 'bx-dollar text-sky-500'
+            6 => 'bx-dollar text-sky-500',
         ];
     }
 
     public function addTask(Statu $status)
     {
-        $this->task = new Task();
+        $this->task = new Task;
         $this->task->statu_id = $status->id;
         $this->task->progress = 0;
         $this->showingModal = true;
@@ -102,7 +111,7 @@ class KanbanTasks extends Component
 
     public function delete(Task $task)
     {
-        $this->authorize('delete-any', task::class);
+        $this->authorize('delete-any', Task::class);
 
         $task->delete();
     }
@@ -112,7 +121,7 @@ class KanbanTasks extends Component
         $this->newStatus = $status;
     }
 
-    public function onDragEnd($event, task $task)
+    public function onDragEnd($event, Task $task)
     {
         $task->statu_id = $this->newStatus;
         $task->save();
@@ -121,6 +130,7 @@ class KanbanTasks extends Component
     public function render()
     {
         $tasks = Task::whereNull('receipt_id')->where('proposal_id', $this->proposal->id)->get();
+
         return view('livewire.kanban-tasks', compact('tasks'));
     }
 }

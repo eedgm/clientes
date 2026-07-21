@@ -1,18 +1,18 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
-use App\Models\Ticket;
-use App\Models\Developer;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TicketCollection;
+use App\Models\Developer;
+use App\Models\Ticket;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class DeveloperTicketsController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Developer $developer
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request, Developer $developer)
     {
@@ -30,10 +30,7 @@ class DeveloperTicketsController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Developer $developer
-     * @param \App\Models\Ticket $ticket
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(
         Request $request,
@@ -48,10 +45,7 @@ class DeveloperTicketsController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Developer $developer
-     * @param \App\Models\Ticket $ticket
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(
         Request $request,

@@ -2,23 +2,29 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Skill;
-use Livewire\Component;
 use App\Models\Developer;
+use App\Models\Skill;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
 
 class DeveloperSkillsDetail extends Component
 {
     use AuthorizesRequests;
 
     public Developer $developer;
+
     public Skill $skill;
+
     public $skillsForSelect = [];
+
     public $skill_id = null;
+
     public $experience_years;
+
     public $percentage;
 
     public $showingModal = false;
+
     public $modalTitle = 'New Skill';
 
     protected $rules = [
@@ -36,7 +42,7 @@ class DeveloperSkillsDetail extends Component
 
     public function resetSkillData()
     {
-        $this->skill = new Skill();
+        $this->skill = new Skill;
 
         $this->skill_id = null;
         $this->experience_years = null;

@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductStoreRequest;
+use App\Http\Requests\ProductUpdateRequest;
 use App\Models\Client;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use App\Http\Requests\ProductStoreRequest;
-use App\Http\Requests\ProductUpdateRequest;
+use Illuminate\Http\Response;
 
 class ProductController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -29,8 +29,7 @@ class ProductController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create(Request $request)
     {
@@ -42,8 +41,7 @@ class ProductController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\ProductStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(ProductStoreRequest $request)
     {
@@ -59,9 +57,7 @@ class ProductController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Product $product
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Product $product)
     {
@@ -71,9 +67,7 @@ class ProductController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Product $product
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Request $request, Product $product)
     {
@@ -85,9 +79,7 @@ class ProductController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\ProductUpdateRequest $request
-     * @param \App\Models\Product $product
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(ProductUpdateRequest $request, Product $product)
     {
@@ -103,9 +95,7 @@ class ProductController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Product $product
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Product $product)
     {

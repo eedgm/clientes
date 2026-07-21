@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProposalStoreRequest;
 use App\Http\Requests\ProposalUpdateRequest;
 use App\Models\Client;
+use App\Models\Developer;
 use App\Models\Priority;
 use App\Models\Proposal;
 use App\Models\Rol;
@@ -50,6 +51,11 @@ class ProposalController extends Controller
             ->orderBy('id')
             ->get(['id', 'name']);
 
+        $developers = Developer::query()
+            ->with('user:id,name,email')
+            ->orderBy('id')
+            ->get();
+
         $hourPerDay = $scheduler->hourPerDayFor($proposal);
 
         $height = (int) $request->get('height', 700);
@@ -86,6 +92,8 @@ class ProposalController extends Controller
 
         $ganttConfig = [
             'proposal_id' => $proposal->id,
+            'proposal_name' => $proposal->product_name,
+            'proposal_description' => $proposal->description,
             'csrf_token' => csrf_token(),
             'height' => $height,
             'date_format' => '%Y-%m-%d %H:%i:%s',
@@ -145,6 +153,13 @@ class ProposalController extends Controller
                     return [(string) $priority->id => 'medium'];
                 })
                 ->all(),
+            'developers' => $developers
+                ->map(fn ($developer) => [
+                    'id' => $developer->id,
+                    'name' => $developer->user?->name ?? "Developer #{$developer->id}",
+                    'email' => $developer->user?->email ?? '',
+                ])
+                ->values(),
         ];
 
         return view('app.proposals.gantt', compact('proposal', 'ganttConfig'));

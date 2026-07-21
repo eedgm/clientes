@@ -3,18 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Laravel\Sanctum\Sanctum;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
-class RoleController extends Controller {
-
+class RoleController extends Controller
+{
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function index(Request $request) 
+    public function index(Request $request)
     {
         $this->authorize('list', Role::class);
 
@@ -29,9 +30,9 @@ class RoleController extends Controller {
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function create() 
+    public function create()
     {
         $this->authorize('create', Role::class);
 
@@ -43,10 +44,9 @@ class RoleController extends Controller {
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function store(Request $request) 
+    public function store(Request $request)
     {
         Sanctum::actingAs(request()->user(), [], 'web');
 
@@ -70,10 +70,9 @@ class RoleController extends Controller {
     /**
      * Display the specified resource.
      *
-     * @param  \Spatie\Permission\Models\Role  $role
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function show(Role $role) 
+    public function show(Role $role)
     {
         $this->authorize('view', Role::class);
 
@@ -83,10 +82,9 @@ class RoleController extends Controller {
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \Spatie\Permission\Models\Role  $role
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function edit(Role $role) 
+    public function edit(Role $role)
     {
         $this->authorize('update', $role);
 
@@ -100,11 +98,9 @@ class RoleController extends Controller {
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Spatie\Permission\Models\Role  $role
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function update(Request $request, Role $role) 
+    public function update(Request $request, Role $role)
     {
         $this->authorize('update', $role);
 
@@ -112,7 +108,7 @@ class RoleController extends Controller {
             'name' => 'required|max:32|unique:roles,name,'.$role->id,
             'permissions' => 'array',
         ]);
-        
+
         $role->update($data);
 
         $permissions = Permission::find($request->permissions);
@@ -126,8 +122,7 @@ class RoleController extends Controller {
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \Spatie\Permission\Models\Role  $role
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Role $role)
     {

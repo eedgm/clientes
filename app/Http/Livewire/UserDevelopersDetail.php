@@ -2,25 +2,30 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Developer;
 use App\Models\Rol;
 use App\Models\User;
-use Livewire\Component;
-use App\Models\Developer;
-use Livewire\WithPagination;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class UserDevelopersDetail extends Component
 {
-    use WithPagination;
     use AuthorizesRequests;
+    use WithPagination;
 
     public User $user;
+
     public Developer $developer;
+
     public $rolsForSelect = [];
 
     public $selected = [];
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
 
     public $modalTitle = 'New Developer';
@@ -38,7 +43,7 @@ class UserDevelopersDetail extends Component
 
     public function resetDeveloperData()
     {
-        $this->developer = new Developer();
+        $this->developer = new Developer;
 
         $this->developer->rol_id = null;
 
@@ -80,7 +85,7 @@ class UserDevelopersDetail extends Component
     {
         $this->validate();
 
-        if (!$this->developer->user_id) {
+        if (! $this->developer->user_id) {
             $this->authorize('create', Developer::class);
 
             $this->developer->user_id = $this->user->id;
@@ -107,8 +112,9 @@ class UserDevelopersDetail extends Component
 
     public function toggleFullSelection()
     {
-        if (!$this->allSelected) {
+        if (! $this->allSelected) {
             $this->selected = [];
+
             return;
         }
 

@@ -2,31 +2,40 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\User;
-use Livewire\Component;
-use App\Models\Version;
 use App\Models\Proposal;
-use Livewire\WithPagination;
-use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Storage;
+use App\Models\User;
+use App\Models\Version;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class ProposalVersionsDetail extends Component
 {
-    use WithPagination;
-    use WithFileUploads;
     use AuthorizesRequests;
+    use WithFileUploads;
+    use WithPagination;
 
     public Proposal $proposal;
+
     public Version $version;
+
     public $usersForSelect = [];
+
     public $versionAttachment;
+
     public $uploadIteration = 0;
+
     public $versionTime;
 
     public $selected = [];
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
 
     public $modalTitle = 'New Version';
@@ -55,7 +64,7 @@ class ProposalVersionsDetail extends Component
 
     public function resetVersionData()
     {
-        $this->version = new Version();
+        $this->version = new Version;
 
         $this->versionAttachment = null;
         $this->versionTime = null;
@@ -101,7 +110,7 @@ class ProposalVersionsDetail extends Component
     {
         $this->validate();
 
-        if (!$this->version->proposal_id) {
+        if (! $this->version->proposal_id) {
             $this->authorize('create', Version::class);
 
             $this->version->proposal_id = $this->proposal->id;
@@ -115,7 +124,7 @@ class ProposalVersionsDetail extends Component
             );
         }
 
-        $this->version->time = \Carbon\Carbon::parse($this->versionTime);
+        $this->version->time = Carbon::parse($this->versionTime);
 
         $this->version->save();
 
@@ -146,8 +155,9 @@ class ProposalVersionsDetail extends Component
 
     public function toggleFullSelection()
     {
-        if (!$this->allSelected) {
+        if (! $this->allSelected) {
             $this->selected = [];
+
             return;
         }
 

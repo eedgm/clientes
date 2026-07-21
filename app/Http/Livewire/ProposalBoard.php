@@ -3,9 +3,9 @@
 namespace App\Http\Livewire;
 
 use App\Models\Client;
-use Livewire\Component;
 use App\Models\Proposal;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
 
 class ProposalBoard extends Component
 {
@@ -14,7 +14,9 @@ class ProposalBoard extends Component
     public Proposal $proposal;
 
     public $showingModal = false;
+
     public $modalTitle = 'New Proposal';
+
     public $editing = false;
 
     public $clients;
@@ -32,7 +34,7 @@ class ProposalBoard extends Component
 
     public function newProposal()
     {
-        $this->proposal = new Proposal();
+        $this->proposal = new Proposal;
         $this->editing = false;
         $this->modalTitle = trans('crud.client_proposals.new_title');
 
@@ -43,7 +45,7 @@ class ProposalBoard extends Component
     {
         $this->validate();
 
-        if (!$this->proposal->client_id) {
+        if (! $this->proposal->client_id) {
             $this->authorize('create', Proposal::class);
 
             $this->proposal->client_id = $this->client->id;
@@ -59,6 +61,7 @@ class ProposalBoard extends Component
     public function render()
     {
         $proposals = Proposal::orderBy('created_at', 'desc')->get();
+
         return view('livewire.proposal-board', compact('proposals'));
     }
 }

@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\ClientStoreRequest;
 use App\Http\Requests\ClientUpdateRequest;
+use App\Models\Client;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 
 class ClientController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-
     public function index(Request $request)
     {
         $this->authorize('view-any', Client::class);
@@ -29,13 +28,13 @@ class ClientController extends Controller
         return view('app.clients.index', compact('clients', 'search'));
     }
 
-    public function dashboard(Request $request) {
+    public function dashboard(Request $request)
+    {
         return view('app.clients.dashboard');
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create(Request $request)
     {
@@ -45,8 +44,7 @@ class ClientController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\ClientStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(ClientStoreRequest $request)
     {
@@ -65,9 +63,7 @@ class ClientController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Client $client
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Client $client)
     {
@@ -77,9 +73,7 @@ class ClientController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Client $client
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Request $request, Client $client)
     {
@@ -89,9 +83,7 @@ class ClientController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\ClientUpdateRequest $request
-     * @param \App\Models\Client $client
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(ClientUpdateRequest $request, Client $client)
     {
@@ -114,9 +106,7 @@ class ClientController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Client $client
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Client $client)
     {

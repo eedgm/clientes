@@ -2,28 +2,36 @@
 
 namespace App\Http\Livewire;
 
-use Livewire\Component;
-use App\Models\Product;
 use App\Models\Payable;
+use App\Models\Product;
 use App\Models\Receipt;
 use App\Models\Supplier;
-use Livewire\WithPagination;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class ProductPayablesDetail extends Component
 {
-    use WithPagination;
     use AuthorizesRequests;
+    use WithPagination;
 
     public Product $product;
+
     public Payable $payable;
+
     public $suppliersForSelect = [];
+
     public $receiptsForSelect = [];
+
     public $payableDate;
 
     public $selected = [];
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
 
     public $modalTitle = 'New Payable';
@@ -50,7 +58,7 @@ class ProductPayablesDetail extends Component
 
     public function resetPayableData()
     {
-        $this->payable = new Payable();
+        $this->payable = new Payable;
 
         $this->payableDate = null;
         $this->payable->supplier_id = null;
@@ -107,7 +115,7 @@ class ProductPayablesDetail extends Component
     {
         $this->validate();
 
-        if (!$this->payable->product_id) {
+        if (! $this->payable->product_id) {
             $this->authorize('create', Payable::class);
 
             $this->payable->product_id = $this->product->id;
@@ -115,7 +123,7 @@ class ProductPayablesDetail extends Component
             $this->authorize('update', $this->payable);
         }
 
-        $this->payable->date = \Carbon\Carbon::parse($this->payableDate);
+        $this->payable->date = Carbon::parse($this->payableDate);
 
         $this->payable->save();
 
@@ -136,8 +144,9 @@ class ProductPayablesDetail extends Component
 
     public function toggleFullSelection()
     {
-        if (!$this->allSelected) {
+        if (! $this->allSelected) {
             $this->selected = [];
+
             return;
         }
 

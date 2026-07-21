@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Rol;
-use Illuminate\Http\Request;
-use App\Http\Resources\RolResource;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\RolCollection;
 use App\Http\Requests\RolStoreRequest;
 use App\Http\Requests\RolUpdateRequest;
+use App\Http\Resources\RolCollection;
+use App\Http\Resources\RolResource;
+use App\Models\Rol;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class RolController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -30,8 +30,7 @@ class RolController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\RolStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(RolStoreRequest $request)
     {
@@ -45,9 +44,7 @@ class RolController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Rol $rol
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Rol $rol)
     {
@@ -57,9 +54,7 @@ class RolController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\RolUpdateRequest $request
-     * @param \App\Models\Rol $rol
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(RolUpdateRequest $request, Rol $rol)
     {
@@ -73,9 +68,7 @@ class RolController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Rol $rol
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Rol $rol)
     {

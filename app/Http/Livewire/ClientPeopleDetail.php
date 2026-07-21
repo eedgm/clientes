@@ -2,37 +2,49 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Rol;
-use App\Models\User;
 use App\Models\Client;
 use App\Models\Person;
-use Livewire\Component;
-use Livewire\WithPagination;
-use Livewire\WithFileUploads;
+use App\Models\Rol;
+use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class ClientPeopleDetail extends Component
 {
-    use WithPagination;
-    use WithFileUploads;
     use AuthorizesRequests;
+    use WithFileUploads;
+    use WithPagination;
 
     public Client $client;
+
     public Person $person;
+
     public User $user;
+
     public $password = null;
+
     public $rolsForSelect = [];
+
     public $usersForSelect = [];
+
     public $personPhoto;
+
     public $uploadIteration = 0;
+
     public $user_id = null;
 
     public $selected = [];
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
+
     public $userExist = false;
 
     public $modalTitle = 'New Person';
@@ -60,8 +72,8 @@ class ClientPeopleDetail extends Component
 
     public function resetPersonData()
     {
-        $this->person = new Person();
-        $this->user = new User();
+        $this->person = new Person;
+        $this->user = new User;
 
         $this->personPhoto = null;
         $this->person->rol_id = null;
@@ -105,7 +117,7 @@ class ClientPeopleDetail extends Component
     {
         $this->validate();
 
-        if (!$this->person->client_id) {
+        if (! $this->person->client_id) {
             $this->authorize('create', Person::class);
 
             $this->user->password = Hash::make($this->password);
@@ -136,8 +148,7 @@ class ClientPeopleDetail extends Component
             if (User::where('email', $value)->exists()) {
                 $this->userExist = true;
                 $this->user->email = '';
-            }
-            else {
+            } else {
                 $this->userExist = false;
             }
         }
@@ -165,8 +176,9 @@ class ClientPeopleDetail extends Component
 
     public function toggleFullSelection()
     {
-        if (!$this->allSelected) {
+        if (! $this->allSelected) {
             $this->selected = [];
+
             return;
         }
 

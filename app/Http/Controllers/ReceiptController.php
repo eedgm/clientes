@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
-use App\Models\Ticket;
-use App\Models\Payable;
-use App\Models\Receipt;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Http\Request;
 use App\Http\Requests\ReceiptStoreRequest;
 use App\Http\Requests\ReceiptUpdateRequest;
+use App\Models\Client;
+use App\Models\Payable;
+use App\Models\Receipt;
+use App\Models\Ticket;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ReceiptController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -32,8 +32,7 @@ class ReceiptController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create(Request $request)
     {
@@ -45,8 +44,7 @@ class ReceiptController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\ReceiptStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(ReceiptStoreRequest $request)
     {
@@ -62,9 +60,7 @@ class ReceiptController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Receipt $receipt
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Receipt $receipt)
     {
@@ -74,9 +70,7 @@ class ReceiptController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Receipt $receipt
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Request $request, Receipt $receipt)
     {
@@ -88,9 +82,7 @@ class ReceiptController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\ReceiptUpdateRequest $request
-     * @param \App\Models\Receipt $receipt
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(ReceiptUpdateRequest $request, Receipt $receipt)
     {
@@ -106,9 +98,7 @@ class ReceiptController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Receipt $receipt
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Receipt $receipt)
     {
@@ -151,15 +141,18 @@ class ReceiptController extends Controller
             $result['tickets'][$ticket->id]['person'] = $ticket->person ? $ticket->person->user->name : '-';
             $result['tickets'][$ticket->id]['cost'] = $ticket->total;
             $total += $ticket->total;
-            if ($ticket->hours)
+            if ($ticket->hours) {
                 $hours = true;
-            if ($ticket->person)
+            }
+            if ($ticket->person) {
                 $person = true;
+            }
         }
 
         $name = 'Estado de cuenta-'.$receipt->client->name.'-'.$receipt->number;
 
         $pdf = Pdf::loadView('app.receipts.invoice', ['results' => $result, 'receipt' => $receipt, 'total' => $total, 'name' => $name, 'hours' => $hours, 'person' => $person]);
+
         return $pdf->download($name.'.pdf');
     }
 }

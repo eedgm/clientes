@@ -2,24 +2,31 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Task;
-use Livewire\Component;
 use App\Models\Developer;
+use App\Models\Task;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
 
 class DeveloperTasksDetail extends Component
 {
     use AuthorizesRequests;
 
     public Developer $developer;
+
     public Task $task;
+
     public $tasksForSelect = [];
+
     public $task_id = null;
+
     public $comments;
+
     public $assignations;
+
     public $gain;
 
     public $showingModal = false;
+
     public $modalTitle = 'New Task';
 
     protected $rules = [
@@ -38,7 +45,7 @@ class DeveloperTasksDetail extends Component
 
     public function resetTaskData()
     {
-        $this->task = new Task();
+        $this->task = new Task;
 
         $this->task_id = null;
         $this->comments = null;

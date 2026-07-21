@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Person;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\PersonResource;
-use Illuminate\Support\Facades\Storage;
-use App\Http\Resources\PersonCollection;
 use App\Http\Requests\PersonStoreRequest;
 use App\Http\Requests\PersonUpdateRequest;
+use App\Http\Resources\PersonCollection;
+use App\Http\Resources\PersonResource;
+use App\Models\Person;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 
 class PersonController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -31,8 +31,7 @@ class PersonController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\PersonStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(PersonStoreRequest $request)
     {
@@ -49,9 +48,7 @@ class PersonController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Person $person
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Person $person)
     {
@@ -61,9 +58,7 @@ class PersonController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\PersonUpdateRequest $request
-     * @param \App\Models\Person $person
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(PersonUpdateRequest $request, Person $person)
     {
@@ -85,9 +80,7 @@ class PersonController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Person $person
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Person $person)
     {

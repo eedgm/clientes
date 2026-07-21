@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Resources\PayableCollection;
+use App\Http\Resources\PayableResource;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\PayableResource;
-use App\Http\Resources\PayableCollection;
+use Illuminate\Http\Response;
 
 class SupplierPayablesController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Supplier $supplier
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request, Supplier $supplier)
     {
@@ -31,9 +30,7 @@ class SupplierPayablesController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Supplier $supplier
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request, Supplier $supplier)
     {

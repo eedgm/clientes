@@ -1,18 +1,18 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
-use App\Models\User;
-use App\Models\Client;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ClientCollection;
+use App\Models\Client;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class UserClientsController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\User $user
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request, User $user)
     {
@@ -30,10 +30,7 @@ class UserClientsController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\User $user
-     * @param \App\Models\Client $client
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request, User $user, Client $client)
     {
@@ -45,10 +42,7 @@ class UserClientsController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\User $user
-     * @param \App\Models\Client $client
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, User $user, Client $client)
     {

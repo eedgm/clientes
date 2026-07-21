@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use App\Models\Scopes\Searchable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Receipt extends Model
 {
@@ -22,7 +22,7 @@ class Receipt extends Model
         'reference_charged',
         'date_charged',
         'manual_value',
-        'version_id'
+        'version_id',
     ];
 
     protected $searchableFields = ['*'];

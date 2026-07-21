@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PriorityStoreRequest;
+use App\Http\Requests\PriorityUpdateRequest;
 use App\Models\Color;
 use App\Models\Priority;
 use Illuminate\Http\Request;
-use App\Http\Requests\PriorityStoreRequest;
-use App\Http\Requests\PriorityUpdateRequest;
+use Illuminate\Http\Response;
 
 class PriorityController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -29,8 +29,7 @@ class PriorityController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create(Request $request)
     {
@@ -42,8 +41,7 @@ class PriorityController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\PriorityStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(PriorityStoreRequest $request)
     {
@@ -59,9 +57,7 @@ class PriorityController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Priority $priority
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Priority $priority)
     {
@@ -71,9 +67,7 @@ class PriorityController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Priority $priority
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Request $request, Priority $priority)
     {
@@ -85,9 +79,7 @@ class PriorityController extends Controller
     }
 
     /**
-     * @param \App\Http\Requests\PriorityUpdateRequest $request
-     * @param \App\Models\Priority $priority
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(PriorityUpdateRequest $request, Priority $priority)
     {
@@ -103,9 +95,7 @@ class PriorityController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Priority $priority
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, Priority $priority)
     {

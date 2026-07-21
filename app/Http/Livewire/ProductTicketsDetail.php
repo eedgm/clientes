@@ -2,32 +2,42 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Statu;
-use App\Models\Ticket;
 use App\Models\Person;
-use Livewire\Component;
+use App\Models\Priority;
 use App\Models\Product;
 use App\Models\Receipt;
-use App\Models\Priority;
-use Livewire\WithPagination;
+use App\Models\Statu;
+use App\Models\Ticket;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class ProductTicketsDetail extends Component
 {
-    use WithPagination;
     use AuthorizesRequests;
+    use WithPagination;
 
     public Product $product;
+
     public Ticket $ticket;
+
     public $statusForSelect = [];
+
     public $prioritiesForSelect = [];
+
     public $receiptsForSelect = [];
+
     public $peopleForSelect = [];
+
     public $ticketFinishedTicket;
 
     public $selected = [];
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
 
     public $modalTitle = 'New Ticket';
@@ -62,7 +72,7 @@ class ProductTicketsDetail extends Component
 
     public function resetTicketData()
     {
-        $this->ticket = new Ticket();
+        $this->ticket = new Ticket;
 
         $this->ticketFinishedTicket = null;
         $this->ticket->statu_id = 1;
@@ -109,7 +119,7 @@ class ProductTicketsDetail extends Component
     {
         $this->validate();
 
-        if (!$this->ticket->product_id) {
+        if (! $this->ticket->product_id) {
             $this->authorize('create', Ticket::class);
 
             $this->ticket->product_id = $this->product->id;
@@ -117,7 +127,7 @@ class ProductTicketsDetail extends Component
             $this->authorize('update', $this->ticket);
         }
 
-        $this->ticket->finished_ticket = $this->ticket->finished_ticket ? \Carbon\Carbon::parse(
+        $this->ticket->finished_ticket = $this->ticket->finished_ticket ? Carbon::parse(
             $this->ticketFinishedTicket
         ) : null;
 
@@ -140,8 +150,9 @@ class ProductTicketsDetail extends Component
 
     public function toggleFullSelection()
     {
-        if (!$this->allSelected) {
+        if (! $this->allSelected) {
             $this->selected = [];
+
             return;
         }
 

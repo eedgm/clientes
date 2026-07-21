@@ -2,14 +2,13 @@
 
 namespace App\Http\Livewire;
 
-use Carbon\Carbon;
-use App\Models\Ticket;
 use App\Models\Receipt;
+use App\Models\Ticket;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class IncomesTotal extends Component
 {
-
     public function render()
     {
         $start = new Carbon('first day of last month');

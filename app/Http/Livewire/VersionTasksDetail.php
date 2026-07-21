@@ -2,29 +2,36 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Task;
-use App\Models\Statu;
-use Livewire\Component;
-use App\Models\Version;
-use App\Models\Receipt;
 use App\Models\Priority;
-use Livewire\WithPagination;
+use App\Models\Receipt;
+use App\Models\Statu;
+use App\Models\Task;
+use App\Models\Version;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class VersionTasksDetail extends Component
 {
-    use WithPagination;
     use AuthorizesRequests;
+    use WithPagination;
 
     public Version $version;
+
     public Task $task;
+
     public $statusForSelect = [];
+
     public $prioritiesForSelect = [];
+
     public $receiptsForSelect = [];
 
     public $selected = [];
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
 
     public $modalTitle = 'New Task';
@@ -49,7 +56,7 @@ class VersionTasksDetail extends Component
 
     public function resetTaskData()
     {
-        $this->task = new Task();
+        $this->task = new Task;
 
         $this->task->statu_id = null;
         $this->task->priority_id = null;
@@ -93,7 +100,7 @@ class VersionTasksDetail extends Component
     {
         $this->validate();
 
-        if (!$this->task->version_id) {
+        if (! $this->task->version_id) {
             $this->authorize('create', Task::class);
 
             $this->task->version_id = $this->version->id;
@@ -120,8 +127,9 @@ class VersionTasksDetail extends Component
 
     public function toggleFullSelection()
     {
-        if (!$this->allSelected) {
+        if (! $this->allSelected) {
             $this->selected = [];
+
             return;
         }
 

@@ -2,32 +2,40 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Client;
+use App\Models\Person;
 use App\Models\Rol;
 use App\Models\User;
-use App\Models\Person;
-use App\Models\Client;
-use Livewire\Component;
-use Livewire\WithPagination;
-use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class UserPeopleDetail extends Component
 {
-    use WithPagination;
-    use WithFileUploads;
     use AuthorizesRequests;
+    use WithFileUploads;
+    use WithPagination;
 
     public User $user;
+
     public Person $person;
+
     public $clientsForSelect = [];
+
     public $rolsForSelect = [];
+
     public $personPhoto;
+
     public $uploadIteration = 0;
 
     public $selected = [];
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
 
     public $modalTitle = 'New Person';
@@ -51,7 +59,7 @@ class UserPeopleDetail extends Component
 
     public function resetPersonData()
     {
-        $this->person = new Person();
+        $this->person = new Person;
 
         $this->personPhoto = null;
         $this->person->client_id = null;
@@ -95,7 +103,7 @@ class UserPeopleDetail extends Component
     {
         $this->validate();
 
-        if (!$this->person->user_id) {
+        if (! $this->person->user_id) {
             $this->authorize('create', Person::class);
 
             $this->person->user_id = $this->user->id;
@@ -136,8 +144,9 @@ class UserPeopleDetail extends Component
 
     public function toggleFullSelection()
     {
-        if (!$this->allSelected) {
+        if (! $this->allSelected) {
             $this->selected = [];
+
             return;
         }
 

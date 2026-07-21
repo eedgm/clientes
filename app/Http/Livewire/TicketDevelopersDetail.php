@@ -2,24 +2,31 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Ticket;
-use Livewire\Component;
 use App\Models\Developer;
+use App\Models\Ticket;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
 
 class TicketDevelopersDetail extends Component
 {
     use AuthorizesRequests;
 
     public Ticket $ticket;
+
     public Developer $developer;
+
     public $developersForSelect = [];
+
     public $developer_id = null;
+
     public $assigments;
+
     public $comments;
+
     public $gain;
 
     public $showingModal = false;
+
     public $modalTitle = 'New Developer';
 
     protected $rules = [
@@ -38,7 +45,7 @@ class TicketDevelopersDetail extends Component
 
     public function resetDeveloperData()
     {
-        $this->developer = new Developer();
+        $this->developer = new Developer;
 
         $this->developer_id = null;
         $this->assigments = null;

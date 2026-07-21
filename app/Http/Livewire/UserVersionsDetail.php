@@ -2,26 +2,33 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\User;
-use Livewire\Component;
-use App\Models\Version;
 use App\Models\Proposal;
-use Livewire\WithPagination;
+use App\Models\User;
+use App\Models\Version;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class UserVersionsDetail extends Component
 {
-    use WithPagination;
     use AuthorizesRequests;
+    use WithPagination;
 
     public User $user;
+
     public Version $version;
+
     public $proposalsForSelect = [];
+
     public $versionTime;
 
     public $selected = [];
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
 
     public $modalTitle = 'New Version';
@@ -49,7 +56,7 @@ class UserVersionsDetail extends Component
 
     public function resetVersionData()
     {
-        $this->version = new Version();
+        $this->version = new Version;
 
         $this->versionTime = null;
         $this->version->proposal_id = null;
@@ -94,7 +101,7 @@ class UserVersionsDetail extends Component
     {
         $this->validate();
 
-        if (!$this->version->user_id) {
+        if (! $this->version->user_id) {
             $this->authorize('create', Version::class);
 
             $this->version->user_id = $this->user->id;
@@ -102,7 +109,7 @@ class UserVersionsDetail extends Component
             $this->authorize('update', $this->version);
         }
 
-        $this->version->time = \Carbon\Carbon::parse($this->versionTime);
+        $this->version->time = Carbon::parse($this->versionTime);
 
         $this->version->save();
 
@@ -123,8 +130,9 @@ class UserVersionsDetail extends Component
 
     public function toggleFullSelection()
     {
-        if (!$this->allSelected) {
+        if (! $this->allSelected) {
             $this->selected = [];
+
             return;
         }
 

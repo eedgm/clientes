@@ -3,22 +3,26 @@
 namespace App\Http\Livewire;
 
 use App\Models\Client;
-use Livewire\Component;
 use App\Models\Product;
-use Livewire\WithPagination;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class ClientProductsDetail extends Component
 {
-    use WithPagination;
     use AuthorizesRequests;
+    use WithPagination;
 
     public Client $client;
+
     public Product $product;
 
     public $selected = [];
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
 
     public $modalTitle = 'New Product';
@@ -40,7 +44,7 @@ class ClientProductsDetail extends Component
 
     public function resetProductData()
     {
-        $this->product = new Product();
+        $this->product = new Product;
 
         $this->dispatchBrowserEvent('refresh');
     }
@@ -80,7 +84,7 @@ class ClientProductsDetail extends Component
     {
         $this->validate();
 
-        if (!$this->product->client_id) {
+        if (! $this->product->client_id) {
             $this->authorize('create', Product::class);
 
             $this->product->client_id = $this->client->id;
@@ -107,8 +111,9 @@ class ClientProductsDetail extends Component
 
     public function toggleFullSelection()
     {
-        if (!$this->allSelected) {
+        if (! $this->allSelected) {
             $this->selected = [];
+
             return;
         }
 

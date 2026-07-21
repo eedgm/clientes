@@ -4,22 +4,29 @@ namespace App\Http\Livewire;
 
 use App\Models\Payable;
 use App\Models\Product;
-use Livewire\Component;
 use App\Models\Supplier;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
 
 class PayablesClone extends Component
 {
     use AuthorizesRequests;
 
     public Payable $payable;
+
     public $productsForSelect = [];
+
     public $payableDate;
 
     public $selected = [];
+
     public $cloning = false;
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
 
     public $modalTitle = 'New Payable';
@@ -45,7 +52,7 @@ class PayablesClone extends Component
 
     public function resetPayableData()
     {
-        $this->payable = new Payable();
+        $this->payable = new Payable;
 
         $this->payableDate = null;
         $this->payable->product_id = null;
@@ -95,7 +102,7 @@ class PayablesClone extends Component
 
     public function updated($name, $value)
     {
-        if ($name == 'payable.cost' ) {
+        if ($name == 'payable.cost') {
             $this->payable->margin = '';
         }
         if ($name == 'payable.margin') {
@@ -121,10 +128,10 @@ class PayablesClone extends Component
     {
         $this->validate();
 
-        if (!$this->cloning) {
+        if (! $this->cloning) {
             $this->authorize('create', Payable::class);
 
-            $this->payable->date = \Carbon\Carbon::parse($this->payableDate);
+            $this->payable->date = Carbon::parse($this->payableDate);
 
             $this->payable->save();
 
@@ -132,7 +139,7 @@ class PayablesClone extends Component
         } elseif ($this->editing) {
             $this->authorize('update', $this->payable);
 
-            $this->payable->date = \Carbon\Carbon::parse($this->payableDate);
+            $this->payable->date = Carbon::parse($this->payableDate);
 
             $this->payable->save();
 
@@ -142,7 +149,7 @@ class PayablesClone extends Component
 
             Payable::create([
                 'name' => $this->payable->name,
-                'date' => \Carbon\Carbon::parse($this->payableDate),
+                'date' => Carbon::parse($this->payableDate),
                 'cost' => $this->payable->cost,
                 'margin' => $this->payable->margin,
                 'total' => $this->payable->total,
@@ -167,6 +174,7 @@ class PayablesClone extends Component
     {
         $payables_without_receipt = Payable::whereNull('receipt_id')->with(['receipt'])->orderBy('date', 'desc')->get();
         $payables_with_receipt = Payable::whereNotNull('receipt_id')->with(['receipt'])->orderBy('date', 'desc')->get();
+
         return view('livewire.payables-clone', compact('payables_without_receipt', 'payables_with_receipt'));
     }
 }

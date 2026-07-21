@@ -2,30 +2,37 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\User;
-use App\Models\Ticket;
-use Livewire\Component;
 use App\Models\Attachment;
-use Livewire\WithPagination;
-use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Ticket;
+use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class TicketAttachmentsDetail extends Component
 {
-    use WithPagination;
-    use WithFileUploads;
     use AuthorizesRequests;
+    use WithFileUploads;
+    use WithPagination;
 
     public Ticket $ticket;
+
     public Attachment $attachment;
+
     public $usersForSelect = [];
+
     public $attachmentAttachment;
+
     public $uploadIteration = 0;
 
     public $selected = [];
+
     public $editing = false;
+
     public $allSelected = false;
+
     public $showingModal = false;
 
     public $modalTitle = 'New Attachment';
@@ -45,7 +52,7 @@ class TicketAttachmentsDetail extends Component
 
     public function resetAttachmentData()
     {
-        $this->attachment = new Attachment();
+        $this->attachment = new Attachment;
 
         $this->attachmentAttachment = null;
         $this->attachment->user_id = null;
@@ -88,7 +95,7 @@ class TicketAttachmentsDetail extends Component
     {
         $this->validate();
 
-        if (!$this->attachment->ticket_id) {
+        if (! $this->attachment->ticket_id) {
             $this->authorize('create', Attachment::class);
 
             $this->attachment->ticket_id = $this->ticket->id;
@@ -131,8 +138,9 @@ class TicketAttachmentsDetail extends Component
 
     public function toggleFullSelection()
     {
-        if (!$this->allSelected) {
+        if (! $this->allSelected) {
             $this->selected = [];
+
             return;
         }
 
