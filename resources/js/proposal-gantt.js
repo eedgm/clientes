@@ -831,6 +831,349 @@ if (configElement && ganttContainer && window.gantt) {
         }
     };
 
+    const bindImportModalEvents = () => {
+        const importBtn = document.getElementById('gantt-import-btn');
+        const importModal = document.getElementById('gantt-import-modal');
+        const textarea = document.getElementById('gantt-import-textarea');
+        const previewBtn = document.getElementById('gantt-import-preview-btn');
+        const storeBtn = document.getElementById('gantt-import-store-btn');
+        const previewContainer = document.getElementById('gantt-import-preview');
+        const previewBody = document.getElementById('gantt-import-preview-body');
+        const previewCount = document.getElementById('gantt-import-preview-count');
+        const issuesContainer = document.getElementById('gantt-import-issues');
+        const issuesBody = document.getElementById('gantt-import-issues-body');
+        const flash = document.querySelector('[data-gantt-import-flash]');
+
+        if (!importBtn || !importModal) {
+            return;
+        }
+
+        const showImportFlash = (message, type) => {
+            if (!flash) return;
+            flash.textContent = message;
+            flash.className = `rounded-lg border px-3 py-2 text-sm ${
+                type === 'error'
+                    ? 'border-rose-200 bg-rose-50 text-rose-700'
+                    : type === 'success'
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                        : 'border-amber-200 bg-amber-50 text-amber-700'
+            }`;
+            flash.classList.remove('hidden');
+        };
+
+        const hideImportFlash = () => {
+            if (flash) {
+                flash.classList.add('hidden');
+                flash.textContent = '';
+            }
+        };
+
+        const closeImportModal = () => {
+            importModal.classList.add('hidden');
+            document.body.classList.remove('overflow-y-hidden');
+            hideImportFlash();
+            previewContainer.classList.add('hidden');
+            issuesContainer.classList.add('hidden');
+            storeBtn.disabled = true;
+        };
+
+        const resetImportButtonLabels = () => {
+            storeBtn.disabled = true;
+            storeBtn.innerHTML = '<i class="bx bx-import"></i> Importar';
+            previewBtn.disabled = false;
+            previewBtn.innerHTML = '<i class="bx bx-search-alt"></i> Vista previa';
+        };
+
+        const openImportModal = () => {
+            importModal.classList.remove('hidden');
+            document.body.classList.add('overflow-y-hidden');
+            textarea.value = '';
+            hideImportFlash();
+            previewContainer.classList.add('hidden');
+            issuesContainer.classList.add('hidden');
+            resetImportButtonLabels();
+            textarea.focus();
+        };
+
+        const closeButtons = importModal.querySelectorAll('[data-gantt-import-close]');
+        closeButtons.forEach((btn) => {
+            btn.addEventListener('click', closeImportModal);
+        });
+
+        importBtn.addEventListener('click', openImportModal);
+
+        importModal.addEventListener('click', (event) => {
+            if (event.target === importModal) {
+                closeImportModal();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !importModal.classList.contains('hidden')) {
+                closeImportModal();
+            }
+        });
+
+        const renderPreviewCard = (task) => {
+            const card = document.createElement('div');
+            card.className = 'rounded-lg border border-gray-200 bg-white p-3';
+
+            const header = document.createElement('div');
+            header.className = 'flex items-center justify-between';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'font-medium text-gray-900';
+            nameSpan.textContent = task.text;
+            header.appendChild(nameSpan);
+
+            const hoursSpan = document.createElement('span');
+            hoursSpan.className = 'text-xs text-gray-500';
+            hoursSpan.textContent = `${task.hours}h`;
+            header.appendChild(hoursSpan);
+
+            card.appendChild(header);
+
+            const meta = document.createElement('div');
+            meta.className = 'mt-1 flex items-center gap-3 text-xs text-gray-600';
+
+            // Priority label
+            const pSpan = document.createElement('span');
+            pSpan.textContent = 'P: ';
+            const pVal = document.createElement('span');
+            pVal.className = task.priority?.resolved ? 'text-emerald-600 font-medium' : 'text-rose-600';
+            pVal.textContent = task.priority?.name ?? '?';
+            if (!task.priority?.resolved) {
+                pVal.textContent += ' (no resuelta)';
+            }
+            pSpan.appendChild(pVal);
+            meta.appendChild(pSpan);
+
+            // Status label
+            const sSpan = document.createElement('span');
+            sSpan.textContent = 'E: ';
+            const sVal = document.createElement('span');
+            sVal.className = task.status?.resolved ? 'text-emerald-600 font-medium' : 'text-rose-600';
+            sVal.textContent = task.status?.name ?? '?';
+            if (!task.status?.resolved) {
+                sVal.textContent += ' (no resuelta)';
+            }
+            sSpan.appendChild(sVal);
+            meta.appendChild(sSpan);
+
+            // Developers label
+            const dSpan = document.createElement('span');
+            dSpan.textContent = 'D: ';
+            const devs = Array.isArray(task.developers) && task.developers.length > 0
+                ? task.developers.map((d) => {
+                    const el = document.createElement('span');
+                    el.className = d.resolved ? 'text-emerald-600' : (d.ambiguous ? 'text-amber-600' : 'text-rose-600');
+                    el.textContent = d.name;
+                    if (!d.resolved) {
+                        el.textContent += d.ambiguous ? ' (ambigüo)' : ' (no resuelto)';
+                    }
+                    return el;
+                })
+                : [];
+
+            if (devs.length > 0) {
+                devs.forEach((el, idx) => {
+                    if (idx > 0) {
+                        const sep = document.createTextNode(', ');
+                        dSpan.appendChild(sep);
+                    }
+                    dSpan.appendChild(el);
+                });
+            } else {
+                const none = document.createElement('span');
+                none.className = 'text-gray-400';
+                none.textContent = 'sin developers';
+                dSpan.appendChild(none);
+            }
+            meta.appendChild(dSpan);
+
+            // Effective hours hint
+            if (task.effective_hours !== undefined && task.effective_hours !== null && task.effective_hours !== task.hours) {
+                const eHint = document.createElement('span');
+                eHint.className = 'text-amber-600';
+                eHint.textContent = ` → ${task.effective_hours}h efectivas`;
+                meta.appendChild(eHint);
+            }
+
+            card.appendChild(meta);
+            return card;
+        };
+
+        const renderIssueItem = (issueText) => {
+            const li = document.createElement('li');
+            li.className = 'flex items-center gap-2 text-sm text-rose-700';
+
+            const icon = document.createElement('i');
+            icon.className = 'bx bx-x-circle';
+            li.appendChild(icon);
+
+            const text = document.createElement('span');
+            text.textContent = issueText;
+            li.appendChild(text);
+
+            return li;
+        };
+
+        previewBtn.addEventListener('click', async () => {
+            const raw = textarea.value.trim();
+            if (!raw) {
+                showImportFlash('Pegá el JSON primero.', 'error');
+                return;
+            }
+
+            let parsed;
+            try {
+                parsed = JSON.parse(raw);
+            } catch (e) {
+                showImportFlash('JSON inválido. Revisá la sintaxis.', 'error');
+                return;
+            }
+
+            if (!parsed.tasks || !Array.isArray(parsed.tasks) || parsed.tasks.length === 0) {
+                showImportFlash('El JSON debe contener un array "tasks" con al menos un elemento.', 'error');
+                return;
+            }
+
+            hideImportFlash();
+            previewBtn.disabled = true;
+            previewBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Analizando...';
+
+            try {
+                const response = await fetch(routes.bulk_preview, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(parsed),
+                });
+
+                const payload = await response.json().catch(() => null);
+
+                // Surface server validation errors instead of a generic message
+                if (!response.ok) {
+                    if (payload?.errors) {
+                        const firstKey = Object.keys(payload.errors)[0];
+                        const msgs = payload.errors[firstKey];
+                        showImportFlash(Array.isArray(msgs) ? msgs[0] : String(msgs), 'error');
+                    } else {
+                        showImportFlash(payload?.message || 'Error del servidor.', 'error');
+                    }
+                    return;
+                }
+
+                const hasIssues = payload.has_issues === true;
+                const issues = Array.isArray(payload.issues) ? payload.issues : [];
+                const preview = Array.isArray(payload.preview) ? payload.preview : [];
+
+                // Render preview cards with safe DOM APIs
+                previewBody.textContent = '';
+                if (preview.length > 0) {
+                    previewCount.textContent = `${preview.length} tarea(s)`;
+                    preview.forEach((task) => {
+                        previewBody.appendChild(renderPreviewCard(task));
+                    });
+                    previewContainer.classList.remove('hidden');
+                } else {
+                    previewContainer.classList.add('hidden');
+                }
+
+                // Render issue items with safe DOM APIs
+                issuesBody.textContent = '';
+                if (hasIssues && issues.length > 0) {
+                    issues.forEach((issue) => {
+                        issuesBody.appendChild(renderIssueItem(issue));
+                    });
+                    issuesContainer.classList.remove('hidden');
+                    storeBtn.disabled = true;
+                } else {
+                    issuesContainer.classList.add('hidden');
+                    storeBtn.disabled = false;
+                }
+
+                if (!hasIssues) {
+                    showImportFlash('Todas las referencias se resolvieron correctamente.', 'success');
+                }
+            } catch (error) {
+                showImportFlash('Error de conexión.', 'error');
+            } finally {
+                previewBtn.disabled = false;
+                previewBtn.innerHTML = '<i class="bx bx-search-alt"></i> Vista previa';
+            }
+        });
+
+        storeBtn.addEventListener('click', async () => {
+            const raw = textarea.value.trim();
+            if (!raw) return;
+
+            let parsed;
+            try {
+                parsed = JSON.parse(raw);
+            } catch (e) {
+                showImportFlash('JSON inválido.', 'error');
+                return;
+            }
+
+            if (!parsed.tasks || !Array.isArray(parsed.tasks) || parsed.tasks.length === 0) {
+                showImportFlash('El JSON debe contener un array "tasks".', 'error');
+                return;
+            }
+
+            storeBtn.disabled = true;
+            storeBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Importando...';
+            hideImportFlash();
+
+            try {
+                const response = await fetch(routes.bulk_store, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(parsed),
+                });
+
+                const payload = await response.json().catch(() => null);
+
+                if (!response.ok) {
+                    const errors = payload?.errors || {};
+                    const firstError = Object.values(errors).flat()[0] || 'Error desconocido';
+                    showImportFlash(firstError, 'error');
+                    storeBtn.disabled = false;
+                    storeBtn.innerHTML = '<i class="bx bx-import"></i> Importar';
+                    return;
+                }
+
+                // Sync the gantt with the authoritative server state
+                if (payload && Array.isArray(payload.tasks)) {
+                    syncGanttTasksWithServer(payload.tasks);
+                }
+
+                showImportFlash(`¡${payload.count || 'todas las'} tarea(s) importadas correctamente!`, 'success');
+                storeBtn.innerHTML = '<i class="bx bx-check"></i> Importado';
+                storeBtn.disabled = true;
+
+                setTimeout(() => {
+                    closeImportModal();
+                }, 1500);
+            } catch (error) {
+                showImportFlash('Error de conexión.', 'error');
+                storeBtn.disabled = false;
+                storeBtn.innerHTML = '<i class="bx bx-import"></i> Importar';
+            }
+        });
+    };
+
     gantt.init('gantt_here');
 
     if (defaultZoom) {
@@ -1045,4 +1388,5 @@ if (configElement && ganttContainer && window.gantt) {
     });
 
     bindDevelopersModalEvents();
+    bindImportModalEvents();
 }

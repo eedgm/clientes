@@ -137,6 +137,24 @@
     background-color: #fafafa !important;
 }
 
+#gantt-import-modal textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+#gantt-import-preview-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+#gantt-import-preview-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#gantt-import-preview-body::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
+
 @media (max-width: 768px) {
     .gantt-page {
         width: 100%;

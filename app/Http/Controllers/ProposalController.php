@@ -127,6 +127,8 @@ class ProposalController extends Controller
                 'task_developers_sync' => route('tasks.gantt.developers.sync', ['task' => '__TASK__']),
                 'developer_search' => route('developers.search'),
                 'developer_quick_store' => route('developers.quick-store'),
+                'bulk_preview' => route('tasks.gantt.bulk-preview', $proposal),
+                'bulk_store' => route('tasks.gantt.bulk-store', $proposal),
             ],
             'priority_class_map' => $priorities
                 ->mapWithKeys(function ($priority) {

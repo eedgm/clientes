@@ -23,7 +23,7 @@
                 </div>
             </div>
 
-            <div x-data="{ showTasksModal: false }" class="flex items-center gap-4">
+            <div x-data="{ showTasksModal: false, showImportModal: false }" class="flex items-center gap-4">
                 <button
                     type="button"
                     class="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition-all duration-200 hover:from-indigo-500 hover:to-indigo-400 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 active:translate-y-0"
@@ -32,6 +32,15 @@
                     <i class="bx bx-list-check text-lg group-hover:rotate-6 transition-transform"></i>
                     Tasks
                     <span class="ml-1 rounded-full bg-white/20 px-2 py-0.5 text-xs">{{ $proposal->tasks->count() }}</span>
+                </button>
+
+                <button
+                    type="button"
+                    id="gantt-import-btn"
+                    class="group inline-flex items-center gap-2 rounded-xl border border-dashed border-indigo-300 bg-white px-4 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm transition-all duration-200 hover:border-indigo-400 hover:bg-indigo-50 hover:shadow-md"
+                >
+                    <i class="bx bx-import text-lg"></i>
+                    Import JSON
                 </button>
 
                 <livewire:proposal-calculator :proposal="$proposal" />
@@ -201,6 +210,89 @@
                             >
                                 <i class="bx bx-x"></i>
                                 Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Import JSON Modal (controlled by vanilla JS via proposal-gantt.js) -->
+                <div
+                    id="gantt-import-modal"
+                    class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900/60 backdrop-blur-sm"
+                    role="dialog"
+                    aria-modal="true"
+                >
+                    <div class="relative mx-auto my-10 max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl">
+                        <div class="flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-500 px-6 py-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">Importar tareas desde JSON</h3>
+                                <p class="text-sm text-indigo-100">Pegá el JSON generado por ChatGPT/Claude</p>
+                            </div>
+                            <button
+                                type="button"
+                                class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white transition-all duration-200 hover:bg-white/20"
+                                data-gantt-import-close
+                                aria-label="Cerrar"
+                            >
+                                <i class="bx bx-x text-xl"></i>
+                            </button>
+                        </div>
+
+                        <div class="space-y-4 px-6 py-5">
+                            <p data-gantt-import-flash class="hidden rounded-lg border px-3 py-2 text-sm"></p>
+
+                            <div>
+                                <label for="gantt-import-textarea" class="text-xs font-semibold uppercase tracking-wider text-gray-500">JSON</label>
+                                <textarea
+                                    id="gantt-import-textarea"
+                                    rows="10"
+                                    placeholder='{"tasks": [{"text": "Tarea", "hours": 8, "priority": "media", "status": "pendiente", "developers": [{"name": "Juan", "hours": 4}]}]}'
+                                    class="mt-2 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 font-mono focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200"
+                                ></textarea>
+                            </div>
+
+                            <div id="gantt-import-preview" class="hidden space-y-3">
+                                <div class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                                    <i class="bx bx-search-alt text-indigo-500"></i>
+                                    <span>Vista previa</span>
+                                    <span id="gantt-import-preview-count" class="ml-auto rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-semibold text-indigo-700"></span>
+                                </div>
+                                <div id="gantt-import-preview-body" class="max-h-64 overflow-y-auto space-y-2 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm"></div>
+                            </div>
+
+                            <div id="gantt-import-issues" class="hidden">
+                                <div class="flex items-center gap-2 text-sm font-medium text-amber-700">
+                                    <i class="bx bx-error-circle"></i>
+                                    <span>Issues</span>
+                                </div>
+                                <ul id="gantt-import-issues-body" class="mt-2 space-y-1"></ul>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-2 border-t border-gray-100 bg-gray-50 px-6 py-4">
+                            <button
+                                type="button"
+                                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                                data-gantt-import-close
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="button"
+                                id="gantt-import-preview-btn"
+                                class="inline-flex items-center gap-2 rounded-lg border border-indigo-300 bg-white px-4 py-2 text-sm font-medium text-indigo-700 transition hover:bg-indigo-50"
+                            >
+                                <i class="bx bx-search-alt"></i>
+                                Vista previa
+                            </button>
+                            <button
+                                type="button"
+                                id="gantt-import-store-btn"
+                                class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled
+                            >
+                                <i class="bx bx-import"></i>
+                                Importar
                             </button>
                         </div>
                     </div>
