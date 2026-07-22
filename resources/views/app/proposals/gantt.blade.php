@@ -148,7 +148,7 @@
                                                     <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
                                                         <i class="bx bx-task"></i>
                                                     </div>
-                                                    <span class="font-medium text-gray-900">{{ $task->text ?? '-' }}</span>
+                                                    <span class="text-sm text-gray-900">{{ $task->text ?? '-' }}</span>
                                                 </div>
                                             </td>
                                             <td class="px-4 py-4 text-right">
@@ -319,7 +319,27 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <div class="inline-flex items-center gap-2 rounded-xl border border-gray-200/80 bg-white px-4 py-2 shadow-sm">
+                <!-- View toggle: Gantt / Hours -->
+                <div class="inline-flex items-center rounded-xl border border-gray-200/80 bg-white p-1 shadow-sm" data-gantt-view-toggle>
+                    <button
+                        type="button"
+                        data-gantt-view="gantt"
+                        class="rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200 bg-indigo-600 text-white shadow-sm"
+                    >
+                        <i class="bx bx-gantt text-sm mr-1"></i>
+                        Gantt
+                    </button>
+                    <button
+                        type="button"
+                        data-gantt-view="hours"
+                        class="rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 transition-all duration-200 hover:text-gray-800"
+                    >
+                        <i class="bx bx-table text-sm mr-1"></i>
+                        Horas
+                    </button>
+                </div>
+
+                <div class="inline-flex items-center gap-2 rounded-xl border border-gray-200/80 bg-white px-4 py-2 shadow-sm" data-gantt-zoom-controls>
                     <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Zoom</span>
                     <div class="h-5 w-px bg-gray-200"></div>
                     <button type="button" class="group flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-gray-500 transition-all duration-200 hover:border-gray-200 hover:bg-gray-50 hover:text-indigo-600" data-gantt-zoom-step="-1">
@@ -339,8 +359,31 @@
             </div>
         </div>
 
-        <div class="gantt-wrapper rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div class="gantt-wrapper rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden" data-gantt-panel="gantt">
             <div id="gantt_here" style="height: {{ $ganttConfig['height'] }}px;"></div>
+        </div>
+
+        <!-- Hours quick-edit table view (hidden by default) -->
+        <div id="gantt-hours-table" data-gantt-panel="hours" class="hidden">
+            <div class="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                <div class="flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-500 px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+                            <i class="bx bx-table text-xl text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Horas por desarrollador</h3>
+                            <p class="text-xs text-indigo-100">Edición rápida de horas asignadas por tarea</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="gantt-hours-table-body" class="overflow-x-auto overflow-y-auto max-h-[32rem] p-4">
+                    <div class="flex items-center justify-center py-16 text-gray-400">
+                        <i class="bx bx-loader-alt bx-spin text-2xl mr-2"></i>
+                        <span class="text-sm">Loading tasks...</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

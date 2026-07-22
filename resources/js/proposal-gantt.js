@@ -384,6 +384,73 @@ if (configElement && ganttContainer && window.gantt) {
         };
     };
 
+    /**
+     * Persist developer assignments on the server and update the
+     * gantt task's in-memory state atomically. Shared by the modal
+     * save flow and the hours-table inline save flow.
+     *
+     * @param {string|number} taskId
+     * @param {Array<{developer_id: number, name?: string, hours: number|null}>} developers
+     * @returns {Promise<{ok: boolean, hours: number|null}>}
+     */
+    const saveDevelopersForTask = async (taskId, developers) => {
+        const url = resolveRoute(routes.task_developers_sync, taskId);
+        if (!url) return { ok: false, hours: null };
+
+        let response;
+        try {
+            response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    developers: developers.map(d => ({
+                        developer_id: d.developer_id,
+                        hours: d.hours,
+                    })),
+                }),
+            });
+        } catch {
+            return { ok: false, hours: null };
+        }
+
+        if (!response.ok) return { ok: false, hours: null };
+
+        let data;
+        try { data = await response.json(); } catch { return { ok: false, hours: null }; }
+
+        // Update gantt in-memory state
+        const task = gantt.getTask(taskId);
+        if (task) {
+            // Build a name lookup from the current task developers so the
+            // payload (which may not carry names from the table flow) still
+            // produces well-formed developer objects.
+            const nameMap = {};
+            (task.developers || []).forEach(d => {
+                const n = normalizeDeveloperEntry(d);
+                if (n) nameMap[n.developer_id] = n.name;
+            });
+
+            task.developers = developers.map(d => ({
+                developer_id: d.developer_id,
+                name: d.name || nameMap[d.developer_id] || `Developer #${d.developer_id}`,
+                hours: d.hours,
+            }));
+
+            if (typeof data.hours === 'number') {
+                task.hours = data.hours;
+                gantt.refreshTask(taskId);
+            }
+        }
+
+        return { ok: true, hours: data.hours ?? null };
+    };
+
     const getCurrentDevelopers = (taskId) => {
         const task = gantt.getTask(taskId);
         if (!Array.isArray(task?.developers)) {
@@ -393,15 +460,6 @@ if (configElement && ganttContainer && window.gantt) {
         return task.developers
             .map(normalizeDeveloperEntry)
             .filter(Boolean);
-    };
-
-    const setCurrentDevelopers = (taskId, developers) => {
-        const task = gantt.getTask(taskId);
-        if (task) {
-            task.developers = developers
-                .map(normalizeDeveloperEntry)
-                .filter(Boolean);
-        }
     };
 
     const taskUsesCalculatedHours = (taskId) => {
@@ -480,7 +538,7 @@ if (configElement && ganttContainer && window.gantt) {
         return Array.from(container.querySelectorAll('.gantt-developers-row')).map((row) => {
             const index = Number(row.dataset.index || 0);
             const hoursInput = row.querySelector('.gantt-developers-row__hours');
-            const hours = hoursInput.value === '' ? null : Number(hoursInput.value);
+            const hours = hoursInput.value === '' ? 0 : Number(hoursInput.value);
 
             return {
                 entry: window.__ganttDevelopersState.entries[index],
@@ -734,12 +792,6 @@ if (configElement && ganttContainer && window.gantt) {
                 }
 
                 const entries = collectDeveloperEntries(rowsContainer);
-                const payload = {
-                    developers: entries.map((entry) => ({
-                        developer_id: entry.developer_id,
-                        hours: entry.hours,
-                    })),
-                };
 
                 const taskId = resolvePersistedTaskId(window.__ganttDevelopersState.taskId);
 
@@ -749,54 +801,24 @@ if (configElement && ganttContainer && window.gantt) {
                 }
 
                 window.__ganttDevelopersState.taskId = taskId;
+                saveBtn.disabled = true;
 
-                const url = resolveRoute(routes.task_developers_sync, taskId);
+                const result = await saveDevelopersForTask(taskId, entries);
 
-                if (!url) {
+                if (!result.ok) {
                     showFlash('No se pudo guardar la asignación.', 'error');
+                    saveBtn.disabled = false;
                     return;
                 }
 
-                saveBtn.disabled = true;
-
-                try {
-                    const response = await fetch(url, {
-                        method: 'PUT',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken,
-                            'X-Requested-With': 'XMLHttpRequest',
-                        },
-                        credentials: 'same-origin',
-                        body: JSON.stringify(payload),
-                    });
-
-                    if (!response.ok) {
-                        showFlash('No se pudo guardar la asignación.', 'error');
-                        return;
-                    }
-
-                    const data = await response.json();
-                    setCurrentDevelopers(
-                        taskId,
-                        entries
-                    );
-                    if (typeof data.hours === 'number') {
-                        const task = gantt.getTask(taskId);
-
-                        if (task) {
-                            task.hours = data.hours;
-                            syncHoursLightboxState(taskId, data.hours);
-                            gantt.refreshTask(taskId);
-                        }
-                    }
-                    closeDevelopersModal();
-                } catch (error) {
-                    showFlash('No se pudo guardar la asignación.', 'error');
-                } finally {
-                    saveBtn.disabled = false;
+                // The shared helper already updated task.developers and
+                // task.hours. Lightbox sync is specific to the modal flow.
+                if (result.hours !== null) {
+                    syncHoursLightboxState(taskId, result.hours);
                 }
+
+                closeDevelopersModal();
+                saveBtn.disabled = false;
             });
         }
 
@@ -1500,4 +1522,336 @@ Generate between 3 and 15 tasks for this proposal.`;
     bindDevelopersModalEvents();
     bindImportModalEvents();
     bindCopyPromptButton();
+
+    // ─── Hours Quick-Edit Table ───────────────────────────────
+
+    const viewToggle = document.querySelector('[data-gantt-view-toggle]');
+    const ganttWrapper = document.querySelector('[data-gantt-panel="gantt"]');
+    const hoursContainer = document.getElementById('gantt-hours-table');
+    const hoursBody = document.getElementById('gantt-hours-table-body');
+
+    /**
+     * Build a textContent-based safe string from a user-supplied value.
+     */
+    const esc = (str) => {
+        const d = document.createElement('div');
+        d.textContent = str ?? '';
+        return d.innerHTML;
+    };
+
+    /**
+     * Developer-name lookup keyed by id, populated by buildHoursTable
+     * so save helpers that only have a developer_id can produce a
+     * well-formed name.
+     */
+    let hoursDeveloperNames = {};
+
+    const buildStatusLabel = (statuId) => {
+        const s = (config.lightbox?.statuses || []).find(s => Number(s.key) === Number(statuId));
+        return s ? s.label : '-';
+    };
+
+    const buildPriorityLabel = (priorityId) => {
+        const p = (config.lightbox?.priorities || []).find(p => Number(p.key) === Number(priorityId));
+        return p ? p.label : '-';
+    };
+
+    const buildHoursTable = () => {
+        const tasks = gantt.getTaskByTime();
+        if (!tasks.length) {
+            hoursBody.innerHTML = '<div class="flex items-center justify-center py-16 text-gray-400"><i class="bx bx-inbox text-3xl mr-2"></i><span class="text-sm">No hay tareas cargadas.</span></div>';
+            return;
+        }
+
+        // Collect unique developers — primary source: catalog, then merge task assignments
+        const devMap = new Map();
+        const catalogDevs = Array.isArray(config.developers) ? config.developers : [];
+        catalogDevs.forEach(d => {
+            if (d && d.id && !devMap.has(d.id)) {
+                devMap.set(d.id, d.name || `Developer #${d.id}`);
+            }
+        });
+        tasks.forEach(t => {
+            (t.developers || []).forEach(d => {
+                const n = normalizeDeveloperEntry(d);
+                if (n && !devMap.has(n.developer_id)) {
+                    devMap.set(n.developer_id, n.name);
+                }
+            });
+        });
+
+        const developers = Array.from(devMap.entries()).map(([id, name]) => ({ developer_id: id, name }));
+        hoursDeveloperNames = Object.fromEntries(devMap);
+
+        // Build table HTML
+        let html = '<table class="min-w-full divide-y divide-gray-200">';
+
+        // ── THEAD ──
+        html += '<thead class="bg-gray-50"><tr>';
+        html += '<th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Tarea</th>';
+        html += '<th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-600">Estado</th>';
+        html += '<th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-600">Prioridad</th>';
+        html += '<th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Planif.</th>';
+        developers.forEach(dev => {
+            html += `<th class="px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-600" title="${esc(dev.name)}">${esc(dev.name)}</th>`;
+        });
+        html += '<th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Total</th>';
+        html += '</tr></thead>';
+
+        // ── TBODY ──
+        html += '<tbody class="divide-y divide-gray-100 bg-white">';
+
+        const devTotals = {};
+        developers.forEach(dev => { devTotals[dev.developer_id] = 0; });
+        let grandTotal = 0;
+        let planGrandTotal = 0;
+
+        tasks.forEach(task => {
+            const devHours = {};
+            (task.developers || []).forEach(d => {
+                const n = normalizeDeveloperEntry(d);
+                if (n) {
+                    devHours[n.developer_id] = n.hours;
+                }
+            });
+
+            const taskDevTotal = Object.values(devHours).reduce((s, h) => s + (Number(h) || 0), 0);
+            const planHrs = Number(task.hours) || 0;
+            planGrandTotal += planHrs;
+            grandTotal += taskDevTotal;
+
+            html += `<tr class="hover:bg-indigo-50/50 transition-colors" data-task-id="${esc(task.id)}">`;
+            html += `<td class="px-4 py-3 text-sm text-gray-900 max-w-[200px] truncate" title="${esc(task.text)}">${esc(task.text)}</td>`;
+
+            // Status badge
+            const sLabel = buildStatusLabel(task.statu_id);
+            html += `<td class="px-4 py-3 text-center"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-700">${esc(sLabel)}</span></td>`;
+
+            // Priority badge
+            const pLabel = buildPriorityLabel(task.priority_id);
+            html += `<td class="px-4 py-3 text-center"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-700">${esc(pLabel)}</span></td>`;
+
+            // Planned hours (Planif.)
+            html += `<td class="px-4 py-3 text-right font-mono text-sm text-gray-700" data-hr-plan="${esc(task.id)}">${planHrs.toFixed(1)}</td>`;
+
+            // Developer columns (editable)
+            developers.forEach(dev => {
+                const hVal = devHours[dev.developer_id];
+                const val = hVal !== undefined && hVal !== null ? hVal : '';
+                html += `<td class="px-3 py-3 text-center">
+                    <input type="number" min="0" step="0.25"
+                           data-hr-task="${esc(task.id)}"
+                           data-hr-dev="${esc(dev.developer_id)}"
+                           class="w-20 rounded-md border border-gray-300 px-2 py-1 text-center text-sm font-mono focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200"
+                           value="${esc(val)}" placeholder="—" />
+                </td>`;
+                if (hVal !== undefined && hVal !== null && Number(hVal) > 0) {
+                    devTotals[dev.developer_id] += Number(hVal);
+                }
+            });
+
+            // Total column
+            const totalClass = taskDevTotal > planHrs ? 'text-amber-600' : 'text-gray-700';
+            html += `<td class="px-4 py-3 text-right font-mono text-sm font-medium ${totalClass}" data-hr-row-total="${esc(task.id)}">${taskDevTotal.toFixed(1)}</td>`;
+            html += '</tr>';
+        });
+
+        // ── TFOOT ──
+        html += '</tbody><tfoot class="bg-gray-50 border-t-2 border-gray-200"><tr>';
+        html += '<td class="px-4 py-3 text-sm font-semibold text-gray-700">Totales</td>';
+        html += '<td></td><td></td>';
+        html += `<td class="px-4 py-3 text-right font-mono text-sm font-semibold text-gray-700">${planGrandTotal.toFixed(1)}</td>`;
+        // Reset ALL footer cells — including developers with zero total
+        developers.forEach(dev => {
+            const total = devTotals[dev.developer_id] || 0;
+            html += `<td class="px-3 py-3 text-center font-mono text-sm font-semibold text-gray-700" data-hr-footer-dev="${esc(dev.developer_id)}">${total.toFixed(1)}</td>`;
+        });
+        html += `<td class="px-4 py-3 text-right font-mono text-sm font-semibold text-gray-700" data-hr-footer-grand>${grandTotal.toFixed(1)}</td>`;
+        html += '</tr></tfoot></table>';
+
+        hoursBody.innerHTML = html;
+
+        // Attach change handler for inline save
+        hoursBody.querySelectorAll('input[data-hr-task]').forEach(input => {
+            input.addEventListener('change', onHoursCellChange);
+        });
+    };
+
+    /**
+     * Recalculate row totals and ALL footer cells from the current
+     * input values without rebuilding the table.  Iterates the full
+     * set of developer columns so cells that dropped to zero are
+     * correctly reset.
+     */
+    const recalcTableTotals = () => {
+        if (!hoursBody) return;
+
+        const rows = hoursBody.querySelectorAll('tbody tr[data-task-id]');
+        const footerDevCells = hoursBody.querySelectorAll('[data-hr-footer-dev]');
+        const grandCell = hoursBody.querySelector('[data-hr-footer-grand]');
+
+        // Collect all developer IDs that have a footer cell
+        const allDevIds = Array.from(footerDevCells).map(cell => cell.dataset.hrFooterDev);
+
+        // Init every developer to zero so dropped entries are reset
+        const devTotals = {};
+        allDevIds.forEach(id => { devTotals[id] = 0; });
+
+        let grandTotal = 0;
+
+        rows.forEach(row => {
+            const taskId = row.dataset.taskId;
+            const inputs = row.querySelectorAll('input[data-hr-task]');
+            let rowTotal = 0;
+
+            inputs.forEach(input => {
+                const devId = input.dataset.hrDev;
+                const h = input.value === '' ? null : Number(input.value);
+                if (h !== null && !Number.isNaN(h) && h > 0) {
+                    rowTotal += h;
+                    devTotals[devId] = (devTotals[devId] || 0) + h;
+                }
+            });
+
+            grandTotal += rowTotal;
+
+            const totalCell = row.querySelector(`[data-hr-row-total="${taskId}"]`);
+            const planCell = row.querySelector(`[data-hr-plan="${taskId}"]`);
+            if (totalCell) {
+                const planHrs = planCell ? Number(planCell.textContent) || 0 : 0;
+                totalCell.textContent = rowTotal.toFixed(1);
+                totalCell.className = `px-4 py-3 text-right font-mono text-sm font-medium ${rowTotal > planHrs ? 'text-amber-600' : 'text-gray-700'}`;
+            }
+        });
+
+        // Update ALL footer developer cells — zero totals included
+        allDevIds.forEach(devId => {
+            const cell = hoursBody.querySelector(`[data-hr-footer-dev="${devId}"]`);
+            if (cell) {
+                cell.textContent = (devTotals[devId] || 0).toFixed(1);
+            }
+        });
+
+        if (grandCell) {
+            grandCell.textContent = grandTotal.toFixed(1);
+        }
+    };
+
+    /**
+     * Handle cell change: save to server via the shared helper, then
+     * reconcile table state — roll back on failure, apply server
+     * hours on success, and refresh totals.
+     */
+    const onHoursCellChange = async (event) => {
+        const input = event.target;
+        const taskId = input.dataset.hrTask;
+        const devId = Number(input.dataset.hrDev);
+
+        if (!taskId || !Number.isFinite(devId)) return;
+
+        // Collect all inputs for this task
+        const taskInputs = hoursBody.querySelectorAll(`input[data-hr-task="${taskId}"]`);
+        const existingTask = gantt.getTask(taskId);
+        const existingDevIds = existingTask ? new Set((existingTask.developers || []).map(d => {
+            const n = normalizeDeveloperEntry(d);
+            return n ? n.developer_id : null;
+        }).filter(Boolean)) : new Set();
+
+        const payloadDevs = [];
+        taskInputs.forEach(inp => {
+            const dId = Number(inp.dataset.hrDev);
+            const h = inp.value === '' ? null : Number(inp.value);
+            const hasValue = h !== null && !Number.isNaN(h);
+            const wasAssigned = existingDevIds.has(dId);
+
+            // Only include developers that were previously assigned OR have a value
+            if (wasAssigned || hasValue) {
+                // For previously assigned devs with a blank cell, send 0 instead of
+                // null — null tells the backend to preserve existing pivot hours,
+                // which causes UI/backend divergence after a clear.
+                const effectiveHours = wasAssigned && !hasValue ? 0 : (hasValue ? h : null);
+                payloadDevs.push({
+                    developer_id: dId,
+                    hours: effectiveHours,
+                });
+            }
+        });
+
+        input.disabled = true;
+
+        const result = await saveDevelopersForTask(taskId, payloadDevs);
+
+        if (!result.ok) {
+            // Roll back: rebuild the table from authoritative gantt
+            // in-memory state so the UI cannot diverge from persisted data.
+            showToast('Error al guardar. Revertido.', 'error');
+            input.disabled = false;
+            buildHoursTable();
+            return;
+        }
+
+        // Success — update Plan cell from server-confirmed hours
+        const planCell = hoursBody.querySelector(`[data-hr-plan="${taskId}"]`);
+        const task = gantt.getTask(taskId);
+        if (planCell && task) {
+            const serverHrs = Number(result.hours ?? task.hours ?? 0);
+            planCell.textContent = serverHrs.toFixed(1);
+        }
+
+        // Reconcile the changed input value with what we actually sent, so the
+        // UI cell matches the backend state (especially important when blank was
+        // sent as 0 — the server saved 0, so the input must show 0, not blank).
+        const savedPayload = payloadDevs.find(p => p.developer_id === devId);
+        if (savedPayload) {
+            input.value = savedPayload.hours !== null && savedPayload.hours !== undefined
+                ? String(savedPayload.hours)
+                : '';
+        }
+
+        // Refresh all table totals from current (now authoritative) input values
+        recalcTableTotals();
+        input.disabled = false;
+    };
+
+    // ─── View Toggle ──────────────────────────────────────
+
+    if (viewToggle) {
+        viewToggle.addEventListener('click', (event) => {
+            const btn = event.target.closest('[data-gantt-view]');
+            if (!btn) return;
+
+            const view = btn.dataset.ganttView;
+
+            // Update toggle active state
+            viewToggle.querySelectorAll('[data-gantt-view]').forEach(b => {
+                b.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+                b.classList.add('text-gray-500');
+            });
+            btn.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+            btn.classList.remove('text-gray-500');
+
+            // Show/hide panels
+            const showGantt = view === 'gantt';
+
+            if (ganttWrapper) {
+                ganttWrapper.classList.toggle('hidden', !showGantt);
+            }
+
+            if (hoursContainer) {
+                hoursContainer.classList.toggle('hidden', showGantt);
+            }
+
+            // Build table on first switch to hours view
+            if (!showGantt && hoursBody) {
+                buildHoursTable();
+            }
+        });
+
+        // Also rebuild table when the gantt fires a parse event (new data loaded)
+        gantt.attachEvent('onParse', function () {
+            if (hoursContainer && !hoursContainer.classList.contains('hidden')) {
+                buildHoursTable();
+            }
+        });
+    }
 }

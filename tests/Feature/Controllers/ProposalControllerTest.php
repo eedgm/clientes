@@ -3,9 +3,11 @@
 namespace Tests\Feature\Controllers;
 
 use App\Models\Client;
+use App\Models\Developer;
 use App\Models\Priority;
 use App\Models\Proposal;
 use App\Models\Statu;
+use App\Models\Task;
 use App\Models\User;
 use App\Models\Version;
 use Database\Seeders\PermissionsSeeder;
@@ -216,5 +218,101 @@ class ProposalControllerTest extends TestCase
         $response->assertRedirect(route('proposals.index'));
 
         $this->assertModelMissing($proposal);
+    }
+
+    /**
+     * @test
+     */
+    public function gantt_page_has_hours_table_toggle_and_container()
+    {
+        $proposal = Proposal::factory()->create();
+        Priority::factory()->count(2)->create();
+        Statu::factory()->count(2)->create();
+
+        $response = $this->get(route('gantt', $proposal));
+
+        $response
+            ->assertOk()
+            // View toggle element
+            ->assertSee('data-gantt-view-toggle', false)
+            // Default active state is "gantt"
+            ->assertSee('data-gantt-view="gantt"', false)
+            // Hours option exists
+            ->assertSee('data-gantt-view="hours"', false)
+            // Hours table container present and initially hidden
+            ->assertSee('id="gantt-hours-table"', false);
+    }
+
+    /**
+     * @test
+     */
+    public function gantt_page_exposes_task_developers_sync_route_in_config()
+    {
+        $proposal = Proposal::factory()->create();
+        Priority::factory()->create();
+        Statu::factory()->create();
+
+        $response = $this->get(route('gantt', $proposal));
+
+        $config = $response->viewData('ganttConfig');
+
+        $this->assertArrayHasKey('task_developers_sync', $config['routes']);
+        $this->assertStringContainsString('__TASK__', $config['routes']['task_developers_sync']);
+    }
+
+    /**
+     * @test
+     */
+    public function gantt_page_includes_developer_catalog_in_config()
+    {
+        $proposal = Proposal::factory()->create();
+        Priority::factory()->create();
+        Statu::factory()->create();
+        Developer::factory()->count(3)->create();
+
+        $response = $this->get(route('gantt', $proposal));
+
+        $config = $response->viewData('ganttConfig');
+
+        $this->assertArrayHasKey('developers', $config);
+        $this->assertCount(3, $config['developers']);
+        $this->assertArrayHasKey('id', $config['developers'][0]);
+        $this->assertArrayHasKey('name', $config['developers'][0]);
+        $this->assertArrayHasKey('email', $config['developers'][0]);
+    }
+
+    /**
+     * @test
+     */
+    public function gantt_page_developers_is_empty_array_when_no_developers_exist()
+    {
+        $proposal = Proposal::factory()->create();
+        Priority::factory()->create();
+        Statu::factory()->create();
+
+        $response = $this->get(route('gantt', $proposal));
+
+        $config = $response->viewData('ganttConfig');
+
+        $this->assertArrayHasKey('developers', $config);
+        $this->assertCount(0, $config['developers']);
+    }
+
+    /**
+     * @test
+     */
+    public function gantt_page_with_tasks_renders_no_errors()
+    {
+        $proposal = Proposal::factory()->create();
+        Priority::factory()->count(3)->create();
+        Statu::factory()->count(3)->create();
+        Task::factory()->count(2)->create([
+            'proposal_id' => $proposal->id,
+        ]);
+
+        $response = $this->get(route('gantt', $proposal));
+
+        $response->assertOk();
+        $this->assertCount(2, $proposal->tasks);
     }
 }

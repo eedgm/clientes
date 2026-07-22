@@ -494,6 +494,91 @@ class TaskControllerTest extends TestCase
     /**
      * @test
      */
+    public function it_preserves_pivot_hours_when_syncing_with_null_hours()
+    {
+        $task = $this->createGanttTask(Proposal::factory()->create(), 'Null hours');
+        $developer = Developer::factory()->create();
+        $task->developers()->attach($developer->id, ['hours' => 5]);
+
+        // hours: null in the request maps to [] in Laravel's sync(),
+        // which does NOT overwrite existing pivot data — the pivot
+        // hours stay at their previous value.
+        $response = $this->putJson(
+            route('tasks.gantt.developers.sync', $task),
+            ['developers' => [['developer_id' => $developer->id, 'hours' => null]]]
+        );
+
+        $response
+            ->assertOk()
+            // effective_hours still 5 because pivot hours were preserved
+            ->assertJsonPath('hours', 5);
+
+        $this->assertDatabaseHas('developer_task', [
+            'task_id' => $task->id,
+            'developer_id' => $developer->id,
+            'hours' => 5,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_sets_pivot_hours_to_zero_when_syncing_with_zero_hours()
+    {
+        $task = $this->createGanttTask(Proposal::factory()->create(), 'Zero hours');
+        $developer = Developer::factory()->create();
+        $task->developers()->attach($developer->id, ['hours' => 5]);
+
+        // hours: 0 must overwrite the pivot — unlike null, which preserves it.
+        $response = $this->putJson(
+            route('tasks.gantt.developers.sync', $task),
+            ['developers' => [['developer_id' => $developer->id, 'hours' => 0]]]
+        );
+
+        $response
+            ->assertOk()
+            // effective_hours is 0 (pivot was overwritten, sum of assignments = 0)
+            ->assertJsonPath('hours', 0);
+
+        $this->assertDatabaseHas('developer_task', [
+            'task_id' => $task->id,
+            'developer_id' => $developer->id,
+            'hours' => 0,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_422_on_invalid_developer_sync_payload()
+    {
+        $task = $this->createGanttTask(Proposal::factory()->create(), 'Validation task');
+
+        // Missing developer_id
+        $response = $this->putJson(
+            route('tasks.gantt.developers.sync', $task),
+            ['developers' => [['hours' => 4]]]
+        );
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonPath('action', 'error')
+            ->assertJsonStructure(['errors' => ['developers.0.developer_id']]);
+
+        // Non-existent developer
+        $response = $this->putJson(
+            route('tasks.gantt.developers.sync', $task),
+            ['developers' => [['developer_id' => 99999, 'hours' => 4]]]
+        );
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonPath('action', 'error');
+    }
+
+    /**
+     * @test
+     */
     public function it_returns_the_persisted_task_in_the_create_response()
     {
         $proposal = Proposal::factory()->create();
